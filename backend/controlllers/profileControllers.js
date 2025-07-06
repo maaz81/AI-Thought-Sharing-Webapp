@@ -1,0 +1,36 @@
+const User = require('../models/User');
+const Post = require('../models/Post');
+
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      username: user.username,
+      email: user.email,
+      role: user.role
+    });
+
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getUserPost=  async (req, res) => {
+    try {
+        const userPosts = await Post.find({ userid: req.userId });
+        res.json(userPosts);
+        
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
+
+module.exports = { getUserProfile,getUserPost };
