@@ -51,11 +51,24 @@ const ProfilePost = () => {
                 <p>No posts found.</p>
             ) : (
                 posts.map((post) => (
-                    <div key={post._id} className="border p-3 rounded mb-2 shadow">
-                        <h3 className="text-lg font-semibold">{post.title}</h3>
-                        <p>{post.content}</p>
-                        <div className="text-sm text-gray-600">
+                    <div key={post._id} className="border p-4 rounded-xl mb-4 shadow-lg bg-white">
+                        <h3 className="text-xl font-semibold text-gray-800">{post.title}</h3>
+                        <p className="text-gray-700 my-2">{post.content}</p>
+                        <div className="text-sm text-gray-500 mb-3">
                             Tags: {post.tags.join(', ')} | Likes: {post.likes} | Dislikes: {post.dislikes}
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition"
+                            >
+                                Update
+                            </button>
+                            <button
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition"
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 ))
