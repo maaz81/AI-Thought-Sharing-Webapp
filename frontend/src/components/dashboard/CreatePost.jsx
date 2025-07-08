@@ -5,6 +5,7 @@ const CreatePost = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [tags, setTags] = useState("");
+    const [visibility, setVisibility] = useState("public"); 
     const [status, setStatus] = useState(null);
     const [message, setMessage] = useState("");
 
@@ -15,7 +16,7 @@ const CreatePost = () => {
             title,
             content,
             tags: tags.split(",").map(tag => tag.trim()).filter(tag => tag),
-            userid: "685e82aaff8cea194344ea58" // convert string to array
+            visibility,
         };
 
         try {
@@ -34,6 +35,7 @@ const CreatePost = () => {
                 setTitle("");
                 setContent("");
                 setTags("");
+                setVisibility("public");
             } else {
                 setMessage(`❌ Failed to create post: ${response.data.message || "Unknown error"}`);
             }
@@ -78,6 +80,35 @@ const CreatePost = () => {
                     onChange={(e) => setTags(e.target.value)}
                     className="w-full border rounded px-3 py-2 mt-1"
                 />
+            </div>
+
+             {/* ✅ Visibility Toggle */}
+            <div>
+                <label className="block font-medium mb-2">Visibility</label>
+                <div className="flex gap-4">
+                    <button
+                        type="button"
+                        onClick={() => setVisibility("public")}
+                        className={`px-4 py-2 rounded ${
+                            visibility === "public"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                        }`}
+                    >
+                        Public
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setVisibility("private")}
+                        className={`px-4 py-2 rounded ${
+                            visibility === "private"
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                        }`}
+                    >
+                        Private
+                    </button>
+                </div>
             </div>
 
             <button

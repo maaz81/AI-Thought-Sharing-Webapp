@@ -14,7 +14,7 @@ const PostDetailsSchema = mongoose.Schema({
     comment:{
         type: String
     },
-    status:{
+    visibility:{
         type: String,
         enum: ['public','private'],
         default: 'public',

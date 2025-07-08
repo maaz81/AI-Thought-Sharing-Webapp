@@ -54,7 +54,7 @@ const createPosts = async (req, res) => {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    const { title, content, tags } = req.body;
+    const { title, content, tags, visibility } = req.body;
 
     const post = await Post.create({
       title,
@@ -68,7 +68,7 @@ const createPosts = async (req, res) => {
       userid: req.userId,
       like: '0',
       dislike: '0',
-      status: 'public'
+      visibility
     });
   
     await User.findByIdAndUpdate(
