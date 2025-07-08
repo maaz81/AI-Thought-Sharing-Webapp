@@ -21,7 +21,8 @@ const PostDetailsSchema = mongoose.Schema({
         required: true
     },
     update:{
-        type: String, 
+        type: Date,
+        default: Date.now 
     },
     delete:{
         type: Date,

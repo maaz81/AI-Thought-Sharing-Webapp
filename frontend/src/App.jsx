@@ -7,6 +7,7 @@ import CreatePost from "./components/dashboard/CreatePost";
 import SearchBar from "./components/dashboard/SearchBar";
 import ProfilePage from "./components/profile/ProfilePage";
 import PrivateRoute from "./components/auth/PrivateRoute";
+import UpdatePost from "./components/profile/UpdatePost";
 
 function App() {
 
@@ -16,10 +17,15 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/" element={<PostCard />} />
+
+
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/post" element={<CreatePost />} />
+          <Route path="/profile/update/:id" element={<UpdatePost />} />
         </Route>
+
+        
       </Routes>
     </Router>
   );
