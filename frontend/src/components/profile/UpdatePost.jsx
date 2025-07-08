@@ -1,4 +1,3 @@
-// Update.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -49,26 +48,59 @@ const UpdatePost = () => {
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
             <h2 className="text-2xl font-bold mb-4 text-blue-700">Edit Post</h2>
+
             <input
                 type="text"
                 className="w-full border p-2 rounded mb-4"
                 value={post.title}
                 onChange={(e) => setPost({ ...post, title: e.target.value })}
             />
+
             <textarea
                 className="w-full border p-2 rounded mb-4"
                 rows={5}
                 value={post.content}
                 onChange={(e) => setPost({ ...post, content: e.target.value })}
             />
+
             <input
                 type="text"
                 className="w-full border p-2 rounded mb-4"
-                value={post.tags.join(', ')}
+                value={post.tags?.join(', ') || ''}
                 onChange={(e) =>
                     setPost({ ...post, tags: e.target.value.split(',').map(tag => tag.trim()) })
                 }
             />
+
+            {/* ✅ Visibility toggle */}
+            <div className="mb-4">
+                <label className="block font-medium mb-2">Visibility</label>
+                <div className="flex gap-4">
+                    <button
+                        type="button"
+                        onClick={() => setPost({ ...post, visibility: 'public' })}
+                        className={`px-4 py-2 rounded ${
+                            post.visibility === 'public'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        }`}
+                    >
+                        Public
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setPost({ ...post, visibility: 'private' })}
+                        className={`px-4 py-2 rounded ${
+                            post.visibility === 'private'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        }`}
+                    >
+                        Private
+                    </button>
+                </div>
+            </div>
+
             <button
                 onClick={handleUpdate}
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"

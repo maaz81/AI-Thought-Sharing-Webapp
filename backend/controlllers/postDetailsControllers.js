@@ -51,7 +51,7 @@ const getLikeDetails = async (req, res) => {
 }
 
 const postUpdateDetails = async (req, res) => {
-  const { title, content, tags } = req.body;
+  const { title, content, tags, visibility } = req.body;
 
   try {
     const post = await Post.findById(req.params.id);
@@ -68,6 +68,7 @@ const postUpdateDetails = async (req, res) => {
 
     const postDetails = await PostDetails.findOne({ postid: post._id});
     postDetails.update = Date.now();
+    postDetails.visibility = visibility;
     await postDetails.save();
 
     const io = req.app.get('io');

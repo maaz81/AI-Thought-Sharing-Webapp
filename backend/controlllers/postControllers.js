@@ -1,37 +1,3 @@
-// const Post = require('../models/Post');
-
-// const getPosts = async (req, res)=>{
-//     try{
-//         const posts = await Post.find();
-//         if(!posts || posts.length === 0) {
-//             return res.status(404).json({message: 'Posts not avaiable'});
-//         }
-//         res.status(200).json(posts);
-//     }
-//     catch(err){
-//         res.status(500).json({error: err.message});
-//     }
-// }
-
-// const createPosts = async (req,res) =>{
-//     try {
-//         const { title, content, tags, userid } = req.body; 
-//         const post = await Post.create({
-//             title,
-//             content,
-//             tags,
-//             userid
-//         })
-//         res.status(200).json(post);
-//     } catch(err){
-//         res.status(500).json({error: err.message});
-//     }
-// }
-
-
-// module.exports = { getPosts, createPosts};
-
-
 const Post = require('../models/Post');
 const User = require('../models/User');
 const PostDetails = require('../models/PostDetails');
