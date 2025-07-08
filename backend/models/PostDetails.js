@@ -22,11 +22,7 @@ const PostDetailsSchema = mongoose.Schema({
     },
     update:{
         type: Date,
-        default: Date.now 
-    },
-    delete:{
-        type: Date,
-        default: Date.now
+        default: null
     },
     postid:{
         type: mongoose.Schema.Types.ObjectId,

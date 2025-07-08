@@ -66,6 +66,13 @@ const postUpdateDetails = async (req, res) => {
 
     const updatedPost = await post.save();
 
+    const postDetails = await PostDetails.findOne({ postid: post._id});
+    postDetails.update = Date.now();
+    await postDetails.save();
+
+    const io = req.app.get('io');
+    io.emit('postUpdated', updatedPost);
+
     res.status(200).json(updatedPost);
   } catch (err) {
     console.error('Error updating post:', err);
@@ -94,6 +101,10 @@ const deletePostDetails = async (req, res) => {
         if (!deleted) {
             return res.status(404).json({ message: 'Post not found' });
         }
+
+        const io = req.app.get('io');
+        io.emit('postDeleted', req.params.id);
+
         res.status(200).json({ message: 'Post deleted successfully' });
     } catch (err) {
         console.error('Delete error:', err);
