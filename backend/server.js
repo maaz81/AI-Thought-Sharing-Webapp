@@ -37,6 +37,7 @@ const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const postDetailsRoutes = require('./routes/postDetailsRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 
@@ -57,6 +58,7 @@ app.use('/api/users', userRoutes);
 app.use('/', postRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
+app.use('/api/ai', aiRoutes)
 
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);
