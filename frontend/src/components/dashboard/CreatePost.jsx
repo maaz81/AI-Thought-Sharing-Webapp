@@ -9,6 +9,11 @@ const CreatePost = () => {
     const [visibility, setVisibility] = useState("public");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState({ text: "", type: "" });
+    const [wordCount, setWordCount] = useState(0);
+    const [suggestedTitles, setSuggestedTitles] = useState([]);
+    const [suggestedDescription, setSuggestedDescription] = useState('');
+    const [aiLoading, setAiLoading] = useState(false);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,9 +35,9 @@ const CreatePost = () => {
             );
 
             if (response.status === 201 || response.status === 200) {
-                setMessage({ 
-                    text: "Post created successfully!", 
-                    type: "success" 
+                setMessage({
+                    text: "Post created successfully!",
+                    type: "success"
                 });
                 // Reset form
                 setTitle("");
@@ -40,16 +45,16 @@ const CreatePost = () => {
                 setTags("");
                 setVisibility("public");
             } else {
-                setMessage({ 
-                    text: response.data.message || "Failed to create post", 
-                    type: "error" 
+                setMessage({
+                    text: response.data.message || "Failed to create post",
+                    type: "error"
                 });
             }
         } catch (error) {
             console.error("Error creating post:", error);
-            setMessage({ 
-                text: error.response?.data?.message || "Network Error", 
-                type: "error" 
+            setMessage({
+                text: error.response?.data?.message || "Network Error",
+                type: "error"
             });
         } finally {
             setIsSubmitting(false);
@@ -92,7 +97,13 @@ const CreatePost = () => {
                             </label>
                             <textarea
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setContent(value);
+                                    const words = value.trim().split(/\s+/);
+                                    setWordCount(words.filter(Boolean).length);
+                                }}
+
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px]"
                                 placeholder="Write your thoughts here..."
                                 required
@@ -116,6 +127,38 @@ const CreatePost = () => {
                             </p>
                         </div>
 
+                        {/* AI Suggestion Button */}
+                        <div className="pt-2">
+                            <button
+                                type="button"
+                                disabled={wordCount < 50 || aiLoading}
+                                onClick={async () => {
+                                    try {
+                                        setAiLoading(true);
+                                        const response = await axios.post("http://localhost:5000/api/ai/suggest", {
+                                            title,
+                                            description: content,
+                                        });
+                                        const { titles, description: newDesc } = response.data;
+                                        setSuggestedTitles(titles || []);
+                                        setSuggestedDescription(newDesc || '');
+                                    } catch (err) {
+                                        console.error("AI Error:", err);
+                                    } finally {
+                                        setAiLoading(false);
+                                    }
+                                }}
+                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium transition-all ${wordCount < 50 || aiLoading
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-green-600 hover:bg-green-700"
+                                    }`}
+                            >
+                                {aiLoading ? "Generating Suggestions..." : "✨ AI Suggestion"}
+                            </button>
+                            <p className="text-xs text-gray-500 mt-1">Enabled after 50+ words in content</p>
+                        </div>
+
+
                         {/* Visibility Toggle */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -125,11 +168,10 @@ const CreatePost = () => {
                                 <button
                                     type="button"
                                     onClick={() => setVisibility("public")}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${
-                                        visibility === "public"
-                                            ? "bg-blue-50 border-blue-500 text-blue-700"
-                                            : "border-gray-300 hover:bg-gray-50"
-                                    }`}
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${visibility === "public"
+                                        ? "bg-blue-50 border-blue-500 text-blue-700"
+                                        : "border-gray-300 hover:bg-gray-50"
+                                        }`}
                                 >
                                     <FiGlobe />
                                     Public
@@ -138,11 +180,10 @@ const CreatePost = () => {
                                 <button
                                     type="button"
                                     onClick={() => setVisibility("private")}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${
-                                        visibility === "private"
-                                            ? "bg-blue-50 border-blue-500 text-blue-700"
-                                            : "border-gray-300 hover:bg-gray-50"
-                                    }`}
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${visibility === "private"
+                                        ? "bg-blue-50 border-blue-500 text-blue-700"
+                                        : "border-gray-300 hover:bg-gray-50"
+                                        }`}
                                 >
                                     <FiLock />
                                     Private
@@ -156,11 +197,10 @@ const CreatePost = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ${
-                                    isSubmitting 
-                                        ? "bg-blue-400 cursor-not-allowed" 
-                                        : "bg-blue-600 hover:bg-blue-700"
-                                }`}
+                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ${isSubmitting
+                                    ? "bg-blue-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700"
+                                    }`}
                             >
                                 {isSubmitting ? (
                                     <>
@@ -174,13 +214,53 @@ const CreatePost = () => {
                             </button>
                         </div>
 
+                        {/* Suggested Titles */}
+                        {suggestedTitles.length > 0 && (
+                            <div className="mt-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Titles</h3>
+                                <ul className="space-y-2">
+                                    {suggestedTitles.map((item, index) => (
+                                        <li key={index} className="flex justify-between items-center bg-gray-100 rounded px-4 py-2">
+                                            <span className="text-sm text-gray-800">{item}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setTitle(item)}
+                                                className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                            >
+                                                Use this
+                                            </button>
+
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Suggested Description */}
+                        {suggestedDescription && (
+                            <div className="mt-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Description</h3>
+                                <div className="bg-gray-100 rounded p-4 space-y-2">
+                                    <p className="text-sm text-gray-700">{suggestedDescription}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => setContent(suggestedDescription)}
+                                        className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                    >
+                                        Use this
+                                    </button>
+
+                                </div>
+                            </div>
+                        )}
+
+
                         {/* Status Message */}
                         {message.text && (
-                            <div className={`mt-4 p-4 rounded-lg ${
-                                message.type === "success" 
-                                    ? "bg-green-50 text-green-800" 
-                                    : "bg-red-50 text-red-800"
-                            }`}>
+                            <div className={`mt-4 p-4 rounded-lg ${message.type === "success"
+                                ? "bg-green-50 text-green-800"
+                                : "bg-red-50 text-red-800"
+                                }`}>
                                 <div className="flex items-start">
                                     <div className="flex-shrink-0">
                                         {message.type === "success" ? (
