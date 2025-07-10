@@ -1,7 +1,7 @@
 const openRouterClient = require('../utils/openaiClient');
 
 const generatePostSuggestions = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, tags } = req.body;
 
   if (!title || !description) {
     return res.status(400).json({ error: "Title and description are required" });
@@ -14,12 +14,14 @@ Given the title: "${title}"
 And description: "${description}"
 
 1. Suggest 5 catchy, unique blog titles.
-2. Improve and rewrite the description in a more engaging way.
+2. Improve and rewrite the {3} description in a more engaging way.
+3. 10 tags related to the topic
 
 Respond in JSON format as:
 {
   "titles": ["Title 1", "Title 2", "Title 3", "Title 4", "Title 5"],
-  "description": "Improved description here"
+  "descriptions": ["Description 1", "Description 2", "Description 3"],
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10"]
 }
 `;
 

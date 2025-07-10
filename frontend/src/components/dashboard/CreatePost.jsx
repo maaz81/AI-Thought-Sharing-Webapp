@@ -11,7 +11,8 @@ const CreatePost = () => {
     const [message, setMessage] = useState({ text: "", type: "" });
     const [wordCount, setWordCount] = useState(0);
     const [suggestedTitles, setSuggestedTitles] = useState([]);
-    const [suggestedDescription, setSuggestedDescription] = useState('');
+    const [suggestedDescription, setSuggestedDescription] = useState([]);
+    const [suggestedTags, setSuggestedTags] = useState([]);
     const [aiLoading, setAiLoading] = useState(false);
 
 
@@ -139,9 +140,11 @@ const CreatePost = () => {
                                             title,
                                             description: content,
                                         });
-                                        const { titles, description: newDesc } = response.data;
+                                        const { titles, descriptions, tags } = response.data;
                                         setSuggestedTitles(titles || []);
-                                        setSuggestedDescription(newDesc || '');
+                                        setSuggestedDescription(descriptions || []);
+                                        setSuggestedTags(tags || []);
+
                                     } catch (err) {
                                         console.error("AI Error:", err);
                                     } finally {
@@ -237,22 +240,45 @@ const CreatePost = () => {
                         )}
 
                         {/* Suggested Description */}
-                        {suggestedDescription && (
+                        {suggestedDescription.length > 0 && (
                             <div className="mt-6">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Description</h3>
-                                <div className="bg-gray-100 rounded p-4 space-y-2">
-                                    <p className="text-sm text-gray-700">{suggestedDescription}</p>
-                                    <button
-                                        type="button"
-                                        onClick={() => setContent(suggestedDescription)}
-                                        className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                                    >
-                                        Use this
-                                    </button>
-
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Descriptions</h3>
+                                <div className="space-y-4">
+                                    {suggestedDescription.map((desc, index) => (
+                                        <div key={index} className="bg-gray-100 rounded p-4 space-y-2">
+                                            <p className="text-sm text-gray-700">{desc}</p>
+                                            <button
+                                                type="button"
+                                                onClick={() => setContent(desc)}
+                                                className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                            >
+                                                Use this
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
+
+                        {suggestedTags.length > 0 && (
+                            <div className="mt-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Tags</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {suggestedTags.map((tag, index) => (
+                                        <button
+                                            key={index}
+                                            type="button"
+                                            onClick={() => setTags(prev => prev ? `${prev}, ${tag}` : tag)}
+                                            className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full hover:bg-blue-200 transition"
+                                        >
+                                            {tag}
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">Click to add a tag to the input</p>
+                            </div>
+                        )}
+
 
 
                         {/* Status Message */}
