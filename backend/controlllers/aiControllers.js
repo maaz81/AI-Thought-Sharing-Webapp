@@ -14,7 +14,9 @@ Given the title: "${title}"
 And description: "${description}"
 
 1. Suggest 5 catchy, unique blog titles.
-2. Improve and rewrite the {3} description in a more engaging way.
+2. Rewrite the original description into 3 different, improved versions.
+   - Each version should be at least **50 words long**.
+   - Make them more engaging and informative.
 3. 10 tags related to the topic
 
 Respond in JSON format as:

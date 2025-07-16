@@ -3,7 +3,7 @@ const Post = require('../models/Post');
 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select("-password");
+    const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -31,6 +31,17 @@ const getUserPost=  async (req, res) => {
     }
 };
 
+const getUserStats = async (req, res)=>{
+   try {
+        const userPosts = await Post.find({ userid: req.userId });
+        res.json({
+          posts: userPosts.length,
+          })
+        
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
 
 
-module.exports = { getUserProfile,getUserPost };
+module.exports = { getUserProfile,getUserPost, getUserStats };

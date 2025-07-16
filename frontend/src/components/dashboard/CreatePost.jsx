@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from 'axios';
 import { FiPlus, FiTag, FiLock, FiGlobe, FiCheck } from "react-icons/fi";
+import AiSuggestionPanel from '../aiPanel/AiSuggestionPanel';
 
 const CreatePost = () => {
     const [title, setTitle] = useState("");
@@ -14,6 +15,7 @@ const CreatePost = () => {
     const [suggestedDescription, setSuggestedDescription] = useState([]);
     const [suggestedTags, setSuggestedTags] = useState([]);
     const [aiLoading, setAiLoading] = useState(false);
+
 
 
     const handleSubmit = async (e) => {
@@ -217,67 +219,15 @@ const CreatePost = () => {
                             </button>
                         </div>
 
-                        {/* Suggested Titles */}
-                        {suggestedTitles.length > 0 && (
-                            <div className="mt-6">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Titles</h3>
-                                <ul className="space-y-2">
-                                    {suggestedTitles.map((item, index) => (
-                                        <li key={index} className="flex justify-between items-center bg-gray-100 rounded px-4 py-2">
-                                            <span className="text-sm text-gray-800">{item}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => setTitle(item)}
-                                                className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                                            >
-                                                Use this
-                                            </button>
-
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        {/* Suggested Description */}
-                        {suggestedDescription.length > 0 && (
-                            <div className="mt-6">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Descriptions</h3>
-                                <div className="space-y-4">
-                                    {suggestedDescription.map((desc, index) => (
-                                        <div key={index} className="bg-gray-100 rounded p-4 space-y-2">
-                                            <p className="text-sm text-gray-700">{desc}</p>
-                                            <button
-                                                type="button"
-                                                onClick={() => setContent(desc)}
-                                                className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                                            >
-                                                Use this
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {suggestedTags.length > 0 && (
-                            <div className="mt-6">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">AI Suggested Tags</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {suggestedTags.map((tag, index) => (
-                                        <button
-                                            key={index}
-                                            type="button"
-                                            onClick={() => setTags(prev => prev ? `${prev}, ${tag}` : tag)}
-                                            className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full hover:bg-blue-200 transition"
-                                        >
-                                            {tag}
-                                        </button>
-                                    ))}
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">Click to add a tag to the input</p>
-                            </div>
-                        )}
+                        
+                        <AiSuggestionPanel
+                            titles={suggestedTitles}
+                            descriptions={suggestedDescription}
+                            tags={suggestedTags}
+                            onSelectTitle={setTitle}
+                            onSelectDescription={setContent}
+                            onSelectTags={setTags}
+                        />
 
 
 

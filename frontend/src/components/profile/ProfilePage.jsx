@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import axios from 'axios';
 import { FiUser, FiMessageSquare, FiCornerUpLeft, FiStar, FiLoader } from "react-icons/fi";
 import ProfilePost from "./ProfilePost";
@@ -20,10 +20,11 @@ const ProfilePage = () => {
         const [profileRes, statsRes] = await Promise.all([
           axios.get('http://localhost:5000/profile/', { withCredentials: true }),
           axios.get('http://localhost:5000/profile/stats', { withCredentials: true })
-        ]);
-        
+      ]);
+
         setUserData(profileRes.data);
-        setStats(statsRes.data);
+        setStats(statsRes.data)
+
       } catch (error) {
         console.error('Error fetching profile data', error);
       } finally {
@@ -31,8 +32,11 @@ const ProfilePage = () => {
       }
     };
 
+    console.log(stats);
+    
     fetchUserData();
   }, []);
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -89,13 +93,14 @@ const ProfilePage = () => {
               </div>
             </div>
             <div className="ml-6">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl mb-2 font-bold text-gray-900">
                 {userData?.username || "User"}
+
               </h1>
-              <p className="text-gray-600">{userData?.bio || "No bio yet"}</p>
+              <p className="text-gray-600 mb-1">{userData?.bio || "No bio yet"}</p>
             </div>
           </div>
-          
+
           {/* Stats Overview */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
             {[
@@ -104,12 +109,11 @@ const ProfilePage = () => {
               { name: 'Replies', value: stats.replies, icon: <FiCornerUpLeft className="text-purple-500" /> },
               { name: 'Contributions', value: stats.contributions, icon: <FiStar className="text-yellow-500" /> }
             ].map((stat) => (
-              <div 
+              <div
                 key={stat.name}
                 onClick={() => setActiveTab(stat.name.toLowerCase())}
-                className={`bg-gray-50 rounded-lg p-4 text-center cursor-pointer transition-all hover:shadow-md ${
-                  activeTab === stat.name.toLowerCase() ? 'ring-2 ring-blue-400' : ''
-                }`}
+                className={`bg-gray-50 rounded-lg p-4 text-center cursor-pointer transition-all hover:shadow-md ${activeTab === stat.name.toLowerCase() ? 'ring-2 ring-blue-400' : ''
+                  }`}
               >
                 <div className="flex justify-center mb-2">
                   {stat.icon}
@@ -128,11 +132,10 @@ const ProfilePage = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
-              activeTab === tab
+            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
                 ? "bg-blue-600 text-white shadow-md"
                 : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-            }`}
+              }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
