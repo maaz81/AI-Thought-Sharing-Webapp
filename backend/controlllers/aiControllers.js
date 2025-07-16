@@ -44,4 +44,17 @@ Respond in JSON format as:
   }
 };
 
-module.exports = { generatePostSuggestions };
+
+const handleAIChat = async (req, res) => {
+  const { message } = req.body;
+
+  try {
+    const aiReply = await openRouterClient(message);
+    res.status(200).json({ reply: aiReply });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'AI chat failed' });
+  }
+};
+
+
+module.exports = { generatePostSuggestions , handleAIChat};
