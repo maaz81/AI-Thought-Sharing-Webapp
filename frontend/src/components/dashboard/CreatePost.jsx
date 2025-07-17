@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from 'axios';
-import { FiPlus, FiTag, FiLock, FiGlobe, FiCheck } from "react-icons/fi";
+import { FiPlus, FiTag, FiLock, FiGlobe, FiCheck, FiMessageSquare, FiX } from "react-icons/fi";
 import AiSuggestionPanel from '../aiPanel/AiSuggestionPanel';
+import AIChatbot from "../aiPanel/AIChatbot";
 
 const CreatePost = () => {
     const [title, setTitle] = useState("");
@@ -16,7 +17,16 @@ const CreatePost = () => {
     const [suggestedTags, setSuggestedTags] = useState([]);
     const [aiLoading, setAiLoading] = useState(false);
 
+    const [showChat, setShowChat] = useState(false);
 
+    const displayAiChat = () => {
+        if (!showChat) {
+            setShowChat(true);
+        }
+        else {
+            setShowChat(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -219,7 +229,7 @@ const CreatePost = () => {
                             </button>
                         </div>
 
-                        
+
                         <AiSuggestionPanel
                             titles={suggestedTitles}
                             descriptions={suggestedDescription}
@@ -265,7 +275,46 @@ const CreatePost = () => {
                     <p>Your post will be visible to {visibility === "public" ? "everyone" : "only you"}.</p>
                 </div>
             </div>
-        </div>
+
+
+
+            {/* Enhanced Chat UI */}
+            {showChat ? (
+                <div className="fixed bottom-6 right-6 w-full max-w-md bg-white shadow-xl rounded-t-2xl overflow-hidden border border-gray-200 flex flex-col"
+                    style={{ height: '650px' }}>
+                    {/* Chat Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                            <FiMessageSquare className="text-white text-lg" />
+                            <h3 className="text-white font-semibold">AI Writing Assistant</h3>
+                        </div>
+                        <button
+                            onClick={displayAiChat}
+                            className="p-1 rounded-full hover:bg-blue-800 transition-colors text-white"
+                            aria-label="Close chat"
+                        >
+                            <FiX className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    {/* Chat Content */}
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <AIChatbot />
+                    </div>
+                </div>
+            ) : (
+                <button
+                    onClick={displayAiChat}
+                    className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                    aria-label="Open AI chat"
+                >
+                    <FiMessageSquare className="h-6 w-6" />
+                    <span className="sr-only">Chat with AI</span>
+                </button>
+            )}
+
+
+        </div >
     );
 };
 

@@ -8,6 +8,8 @@ const AIChatbot = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
+      setInput("");
+
     const userMessage = { sender: "user", text: input };
     setMessages(prev => [...prev, userMessage]);
 
@@ -18,9 +20,7 @@ const AIChatbot = () => {
     } catch (err) {
       console.error("Chat error:", err);
     }
-
-    setInput("");
-  };
+  }
 
   return (
     <div className="p-4 border rounded w-full max-w-md mx-auto">
