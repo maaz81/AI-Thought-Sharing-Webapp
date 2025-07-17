@@ -8,6 +8,7 @@ import SearchBar from "./components/dashboard/SearchBar";
 import ProfilePage from "./components/profile/ProfilePage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import UpdatePost from "./components/profile/UpdatePost";
+import UpdateProfile from "./components/profile/UpdateProfile";
 
 function App() {
 
@@ -16,7 +17,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
-        <Route path="/" element={<PostCard />} />
+        <Route path="/" element={<UpdateProfile />} />
 
 
         <Route element={<PrivateRoute />}>
