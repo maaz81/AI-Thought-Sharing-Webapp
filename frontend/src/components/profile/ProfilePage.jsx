@@ -2,8 +2,11 @@ import React, { use, useEffect, useState } from "react";
 import axios from 'axios';
 import { FiUser, FiMessageSquare, FiCornerUpLeft, FiStar, FiLoader } from "react-icons/fi";
 import ProfilePost from "./ProfilePost";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState("posts");
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +23,7 @@ const ProfilePage = () => {
         const [profileRes, statsRes] = await Promise.all([
           axios.get('http://localhost:5000/profile/', { withCredentials: true }),
           axios.get('http://localhost:5000/profile/stats', { withCredentials: true })
-      ]);
+        ]);
 
         setUserData(profileRes.data);
         setStats(statsRes.data)
@@ -33,7 +36,7 @@ const ProfilePage = () => {
     };
 
     console.log(stats);
-    
+
     fetchUserData();
   }, []);
 
@@ -89,7 +92,11 @@ const ProfilePage = () => {
           <div className="flex items-end -mt-16 mb-4">
             <div className="h-24 w-24 rounded-full border-4 border-white bg-white shadow-md overflow-hidden">
               <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400">
-                <FiUser className="text-4xl" />
+                <button
+                  onClick={() => navigate('/profile/update')}>
+                  <FiUser className="text-4xl" />
+                </button>
+
               </div>
             </div>
             <div className="ml-6">
@@ -98,7 +105,14 @@ const ProfilePage = () => {
 
               </h1>
               <p className="text-gray-600 mb-1">{userData?.bio || "No bio yet"}</p>
+              
             </div>
+             <button
+    onClick={() => navigate('/profile/update')}
+    className="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all"
+  >
+    Update Profile
+  </button>
           </div>
 
           {/* Stats Overview */}
@@ -133,8 +147,8 @@ const ProfilePage = () => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+              ? "bg-blue-600 text-white shadow-md"
+              : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
               }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}

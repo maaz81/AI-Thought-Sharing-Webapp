@@ -17,13 +17,14 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
-        <Route path="/" element={<UpdateProfile />} />
+        <Route path="/" element={<PostCard />} />
 
 
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/post" element={<CreatePost />} />
-          <Route path="/profile/update/:id" element={<UpdatePost />} />
+          <Route path="/profile/post/update/:id" element={<UpdatePost />} />
+          <Route path="/profile/update/" element={<UpdateProfile />} />
         </Route>
 
         
