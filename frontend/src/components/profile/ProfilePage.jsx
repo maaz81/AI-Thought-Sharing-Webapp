@@ -105,14 +105,14 @@ const ProfilePage = () => {
 
               </h1>
               <p className="text-gray-600 mb-1">{userData?.bio || "No bio yet"}</p>
-              
+
             </div>
-             <button
-    onClick={() => navigate('/profile/update')}
-    className="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all"
-  >
-    Update Profile
-  </button>
+            <button
+              onClick={() => navigate('/profile/update')}
+              className="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all"
+            >
+              Update Profile
+            </button>
           </div>
 
           {/* Stats Overview */}

@@ -34,7 +34,7 @@ const UpdateProfile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData(prev => ({
@@ -80,10 +80,11 @@ const UpdateProfile = () => {
         }
       }
 
-      const response = await axios.put('/api/profile', formDataToSend, {
+      const response = await axios.post('http://localhost:5000/api/profile/update', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        withCredentials: true
       });
 
       setMessage('Profile updated successfully!');
@@ -235,154 +236,154 @@ const UpdateProfile = () => {
     </div>
   );
 
-  const renderContactInfo = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
-          <input
-            type="email"
-            name="contact.email"
-            value={formData.contact.email}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
+  // const renderContactInfo = () => (
+  //   <div className="space-y-4">
+  //     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+  //         <input
+  //           type="email"
+  //           name="contact.email"
+  //           value={formData.contact.email}
+  //           onChange={handleChange}
+  //           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //           required
+  //         />
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-          <input
-            type="tel"
-            name="contact.phone"
-            value={formData.contact.phone}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-      </div>
-    </div>
-  );
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+  //         <input
+  //           type="tel"
+  //           name="contact.phone"
+  //           value={formData.contact.phone}
+  //           onChange={handleChange}
+  //           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //         />
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
-  const renderSocialInfo = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-              linkedin.com/in/
-            </span>
-            <input
-              type="text"
-              name="socialLinks.linkedin"
-              value={formData.socialLinks.linkedin}
-              onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="username"
-            />
-          </div>
-        </div>
+  // const renderSocialInfo = () => (
+  //   <div className="space-y-4">
+  //     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+  //         <div className="flex">
+  //           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+  //             linkedin.com/in/
+  //           </span>
+  //           <input
+  //             type="text"
+  //             name="socialLinks.linkedin"
+  //             value={formData.socialLinks.linkedin}
+  //             onChange={handleChange}
+  //             className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //             placeholder="username"
+  //           />
+  //         </div>
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-              github.com/
-            </span>
-            <input
-              type="text"
-              name="socialLinks.github"
-              value={formData.socialLinks.github}
-              onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="username"
-            />
-          </div>
-        </div>
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
+  //         <div className="flex">
+  //           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+  //             github.com/
+  //           </span>
+  //           <input
+  //             type="text"
+  //             name="socialLinks.github"
+  //             value={formData.socialLinks.github}
+  //             onChange={handleChange}
+  //             className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //             placeholder="username"
+  //           />
+  //         </div>
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-              twitter.com/
-            </span>
-            <input
-              type="text"
-              name="socialLinks.twitter"
-              value={formData.socialLinks.twitter}
-              onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="username"
-            />
-          </div>
-        </div>
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
+  //         <div className="flex">
+  //           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+  //             twitter.com/
+  //           </span>
+  //           <input
+  //             type="text"
+  //             name="socialLinks.twitter"
+  //             value={formData.socialLinks.twitter}
+  //             onChange={handleChange}
+  //             className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //             placeholder="username"
+  //           />
+  //         </div>
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Personal Website</label>
-          <input
-            type="url"
-            name="socialLinks.website"
-            value={formData.socialLinks.website}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="https://example.com"
-          />
-        </div>
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">Personal Website</label>
+  //         <input
+  //           type="url"
+  //           name="socialLinks.website"
+  //           value={formData.socialLinks.website}
+  //           onChange={handleChange}
+  //           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //           placeholder="https://example.com"
+  //         />
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-              facebook.com/
-            </span>
-            <input
-              type="text"
-              name="socialLinks.facebook"
-              value={formData.socialLinks.facebook}
-              onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="username"
-            />
-          </div>
-        </div>
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+  //         <div className="flex">
+  //           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+  //             facebook.com/
+  //           </span>
+  //           <input
+  //             type="text"
+  //             name="socialLinks.facebook"
+  //             value={formData.socialLinks.facebook}
+  //             onChange={handleChange}
+  //             className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //             placeholder="username"
+  //           />
+  //         </div>
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-              instagram.com/
-            </span>
-            <input
-              type="text"
-              name="socialLinks.instagram"
-              value={formData.socialLinks.instagram}
-              onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="username"
-            />
-          </div>
-        </div>
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+  //         <div className="flex">
+  //           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+  //             instagram.com/
+  //           </span>
+  //           <input
+  //             type="text"
+  //             name="socialLinks.instagram"
+  //             value={formData.socialLinks.instagram}
+  //             onChange={handleChange}
+  //             className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //             placeholder="username"
+  //           />
+  //         </div>
+  //       </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-              youtube.com/
-            </span>
-            <input
-              type="text"
-              name="socialLinks.youtube"
-              value={formData.socialLinks.youtube}
-              onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="channel"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  //       <div>
+  //         <label className="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
+  //         <div className="flex">
+  //           <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+  //             youtube.com/
+  //           </span>
+  //           <input
+  //             type="text"
+  //             name="socialLinks.youtube"
+  //             value={formData.socialLinks.youtube}
+  //             onChange={handleChange}
+  //             className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //             placeholder="channel"
+  //           />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6">
@@ -448,3 +449,41 @@ const UpdateProfile = () => {
 };
 
 export default UpdateProfile;
+
+
+// import React, { useState } from 'react';
+// import axios from 'axios';
+
+// const UpdateProfile = () => {
+//   const [username, setUsername] = useState('');
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const response = await axios.post('http://localhost:5000/api/profile/update', 
+//         { username }, 
+//         { withCredentials: true }
+//       );
+//       console.log('Profile updated:', response.data);
+//     } catch (error) {
+//       console.error('Error updating profile:', error);
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <form onSubmit={handleSubmit}>
+//         <input
+//           className='bg-slate-600'
+//           type="text"
+//           name='username'
+//           value={username}
+//           onChange={(e) => setUsername(e.target.value)}
+//         />
+//         <button type='submit'>Submit</button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default UpdateProfile;

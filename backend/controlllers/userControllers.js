@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const UserDetails = require('../models/UserDetails');
 const { generateToken } = require('../utils/generateToken');
 const bcrypt = require('bcrypt');
 
@@ -18,6 +19,18 @@ const registerUser = async (req, res) => {
             password: hashPassword,
             role
         });
+
+        const userDetails = await UserDetails.create({
+            basic_info: {
+                username: user.username,
+                photo: 'default.jpg' // Placeholder for default photo
+            },
+            userid: user._id
+        })
+
+        user.userDetails = [userDetails._id]; ;
+        await user.save();
+
         const token = generateToken(user._id);
         res.cookie('token', token, {
             httpOnly: true,

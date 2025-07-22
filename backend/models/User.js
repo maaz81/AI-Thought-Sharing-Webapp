@@ -20,6 +20,10 @@ const userSchema = mongoose.Schema({
         default: 'user',
         required: true
     },
+    userDetails:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'UserDetails'
+    },
     posts:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'

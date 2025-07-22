@@ -40,6 +40,10 @@ const postDetailsRoutes = require('./routes/postDetailsRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
+const userDetailsRoutes = require('./routes/userDetailsRoutes');
+const path = require('path');
+
+
 
 // Setup Express App
 const app = express();
@@ -49,6 +53,8 @@ app.use(cors({
   origin: "http://localhost:5173",  // 👈 Your frontend port
   credentials: true
 }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Connect to MongoDB
 connectDB();
@@ -59,6 +65,7 @@ app.use('/', postRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
+app.use('/api/profile', userDetailsRoutes)
 
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);
