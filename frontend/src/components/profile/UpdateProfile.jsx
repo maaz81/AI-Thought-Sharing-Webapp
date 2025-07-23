@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const UpdateProfile = () => {
-const [formData, setFormData] = useState({
-  basic_info: {
-    name: '',
-    age: '',
-    gender: '',
-    profession: '',
-    bio: '',
-    location: ''
-  },
-  professional: {
-    education: '',
-    keySkills: '',
-    interests: ''
-  },
-  contact: {
-    email: '',
-    phone: ''
-  },
-  socialLinks: {
-    linkedin: '',
-    github: '',
-    twitter: '',
-    website: '',
-    facebook: '',
-    instagram: '',
-    youtube: ''
-  },
-  photo: null
-});
+  const [formData, setFormData] = useState({
+    basic_info: {
+      name: '',
+      age: '',
+      gender: '',
+      profession: '',
+      bio: '',
+      location: ''
+    },
+    professional: {
+      education: '',
+      keySkills: '',
+      interests: ''
+    },
+    contact: {
+      email: '',
+      phone: ''
+    },
+    socialLinks: {
+      linkedin: '',
+      github: '',
+      twitter: '',
+      website: '',
+      facebook: '',
+      instagram: '',
+      youtube: ''
+    },
+    photo: null
+  });
 
 
 
@@ -38,26 +38,80 @@ const [formData, setFormData] = useState({
   const [message, setMessage] = useState('');
   const [activeSection, setActiveSection] = useState('basic'); // For tab navigation
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  // Inside the component
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/profile/details', {
+          withCredentials: true
+        });
 
-  const keys = name.split(".");
-  if (keys.length === 2) {
-    const [parentKey, childKey] = keys;
-    setFormData((prevData) => ({
-      ...prevData,
-      [parentKey]: {
-        ...prevData[parentKey],
-        [childKey]: value,
-      },
-    }));
-  } else {
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  }
-};
+        const data = res.data;
+
+        // Set form data based on response structure
+        setFormData({
+          basic_info: {
+            name: data?.basic_info?.username || '',
+            age: data?.basic_info?.age || '',
+            gender: data?.basic_info?.gender || '',
+            profession: data?.basic_info?.profession || '',
+            bio: data?.basic_info?.bio || '',
+            location: data?.basic_info?.location || ''
+          },
+          professional: {
+            education: data?.professional?.education || '',
+            keySkills: data?.professional?.keySkills || '',
+            interests: data?.professional?.interests || ''
+          },
+          contact: {
+            email: data?.contact?.email || '',
+            phone: data?.contact?.phone || ''
+          },
+          socialLinks: {
+            linkedin: data?.socialLinks?.linkedin || '',
+            github: data?.socialLinks?.github || '',
+            twitter: data?.socialLinks?.twitter || '',
+            website: data?.socialLinks?.website || '',
+            facebook: data?.socialLinks?.facebook || '',
+            instagram: data?.socialLinks?.instagram || '',
+            youtube: data?.socialLinks?.youtube || ''
+          },
+          photo: null
+        });
+
+        if (data?.basic_info?.photo) {
+          setPreview(`http://localhost:5000/uploads/${data.basic_info.photo}`);
+        }
+
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    const keys = name.split(".");
+    if (keys.length === 2) {
+      const [parentKey, childKey] = keys;
+      setFormData((prevData) => ({
+        ...prevData,
+        [parentKey]: {
+          ...prevData[parentKey],
+          [childKey]: value,
+        },
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
 
 
   const handlePhotoChange = (e) => {
@@ -72,45 +126,45 @@ const handleChange = (e) => {
     }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const formDataToSend = new FormData();
+    try {
+      const formDataToSend = new FormData();
 
-    // Basic Info
-    for (const key in formData.basic_info) {
-      formDataToSend.append(key, formData.basic_info[key]);
+      // Basic Info
+      for (const key in formData.basic_info) {
+        formDataToSend.append(key, formData.basic_info[key]);
+      }
+
+      // Professional
+      for (const key in formData.professional) {
+        formDataToSend.append(key, formData.professional[key]);
+      }
+
+      // Contact & Social Links (as JSON)
+      formDataToSend.append('contact', JSON.stringify(formData.contact));
+      formDataToSend.append('socialLinks', JSON.stringify(formData.socialLinks));
+
+      // Photo
+      if (formData.photo) {
+        formDataToSend.append('photo', formData.photo);
+      }
+
+      const response = await axios.post('http://localhost:5000/api/profile/update', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      });
+
+      setMessage('Profile updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error(error);
+      setMessage('Error updating profile. Please try again.');
     }
-
-    // Professional
-    for (const key in formData.professional) {
-      formDataToSend.append(key, formData.professional[key]);
-    }
-
-    // Contact & Social Links (as JSON)
-    formDataToSend.append('contact', JSON.stringify(formData.contact));
-    formDataToSend.append('socialLinks', JSON.stringify(formData.socialLinks));
-
-    // Photo
-    if (formData.photo) {
-      formDataToSend.append('photo', formData.photo);
-    }
-
-    const response = await axios.post('http://localhost:5000/api/profile/update', formDataToSend, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      withCredentials: true
-    });
-
-    setMessage('Profile updated successfully!');
-    setTimeout(() => setMessage(''), 3000);
-  } catch (error) {
-    console.error(error);
-    setMessage('Error updating profile. Please try again.');
-  }
-};
+  };
 
 
   const renderBasicInfo = () => (
