@@ -8,14 +8,34 @@ const createUserDetails = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const contact = JSON.parse(req.body.contact || '{}');
+    const socialLinks = JSON.parse(req.body.socialLinks || '{}');
+
     // req.body is now parsed by multer
     const {
       name,
       age,
       gender,
+      profession,
       bio,
-      location
+      location,
+      education,
+      keySkills,
+      interests,
+      email,
+      phone,
+      linkedin,
+      github,
+      twitter,
+      website,
+      facebook,
+      instagram,
+      youtube,
     } = req.body;
+
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ message: 'Username (name) is required' });
+    }
 
     const photoFilename = req.file ? req.file.filename : null;
 
@@ -27,14 +47,25 @@ const createUserDetails = async (req, res) => {
             username: name,
             age,
             gender,
+            profession,
             bio,
             location,
             photo: photoFilename || 'default.jpg'
-          }
+          },
+          professional: {
+            education,
+            keySkills,
+            interests,
+          },
+          contact,         // ✅ uses parsed JSON
+          socialLinks      // ✅ uses parsed JSON
         }
       },
       { new: true, upsert: true }
     );
+
+
+
 
     const user = await User.findById(userId);
     if (user) {

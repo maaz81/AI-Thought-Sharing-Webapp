@@ -6,6 +6,7 @@ const userDetailsSchema = new mongoose.Schema({
         age: Number,
         gender: String,
         bio: String,
+        profession: String,
         location: String,
         photo: String
     },
