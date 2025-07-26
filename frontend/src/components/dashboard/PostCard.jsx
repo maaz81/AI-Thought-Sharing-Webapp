@@ -5,6 +5,7 @@ import SearchBar from "./SearchBar";
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 const PostCard = () => {
     const [posts, setPosts] = useState([]);
@@ -279,68 +280,83 @@ const PostCard = () => {
     );
 };
 
-const PostCardDisplay = ({ post, handleReaction, onClick }) => (
-    <motion.div 
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-        className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-100"
-        onClick={onClick}
-    >
-        <div className="p-6 space-y-4">
-            <div className="flex justify-between items-start">
-                <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
-                <span className="text-xs text-gray-500">{post.createdAt}</span>
-            </div>
-            
-            <p className="text-gray-600 line-clamp-3">{post.content}</p>
+const PostCardDisplay = ({ post, handleReaction, onClick }) => {
+    const navigate = useNavigate();
 
-            {post.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag, index) => (
-                        <span
-                            key={index}
-                            className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full hover:bg-blue-200 transition-colors"
-                        >
-                            #{tag}
-                        </span>
-                    ))}
-                </div>
-            )}
+    const goToPostDetails = (e) => {
+        e.stopPropagation(); // Prevent card selection
+        navigate(`/post/${post._id}`);
+    };
 
-            <div className="flex items-center justify-between pt-3">
-                <div className="flex space-x-3">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleReaction(post._id, 'like');
-                        }}
-                        className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${post.userReaction === 'like' ? 'bg-green-50 text-green-600' : 'text-gray-500 hover:bg-gray-50'}`}
-                    >
-                        <span className="text-lg">👍</span>
-                        <span className="text-sm">{post.likes}</span>
-                    </button>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleReaction(post._id, 'dislike');
-                        }}
-                        className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${post.userReaction === 'dislike' ? 'bg-red-50 text-red-600' : 'text-gray-500 hover:bg-gray-50'}`}
-                    >
-                        <span className="text-lg">👎</span>
-                        <span className="text-sm">{post.dislikes}</span>
-                    </button>
+    return (
+        <motion.div 
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-100"
+            onClick={onClick}
+        >
+            <div className="p-6 space-y-4">
+                <div className="flex justify-between items-start">
+                    <h2 className="text-xl font-bold text-gray-800" onClick={goToPostDetails}>
+                        {post.title}
+                    </h2>
+                    <span className="text-xs text-gray-500">{post.createdAt}</span>
                 </div>
                 
-                <button 
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                    Read more →
-                </button>
+                <p className="text-gray-600 line-clamp-3">{post.content}</p>
+
+                {post.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {post.tags.map((tag, index) => (
+                            <span
+                                key={index}
+                                className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full hover:bg-blue-200 transition-colors"
+                            >
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
+                <div className="flex items-center justify-between pt-3">
+                    <div className="flex space-x-3">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleReaction(post._id, 'like');
+                            }}
+                            className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${post.userReaction === 'like' ? 'bg-green-50 text-green-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                        >
+                            <span className="text-lg">👍</span>
+                            <span className="text-sm">{post.likes}</span>
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleReaction(post._id, 'dislike');
+                            }}
+                            className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${post.userReaction === 'dislike' ? 'bg-red-50 text-red-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                        >
+                            <span className="text-lg">👎</span>
+                            <span className="text-sm">{post.dislikes}</span>
+                        </button>
+                    </div>
+                    
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            goToPostDetails(e);
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                        Read more →
+                    </button>
+                </div>
             </div>
-        </div>
-    </motion.div>
-);
+        </motion.div>
+    );
+};
+
 
 const LoadingSkeleton = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

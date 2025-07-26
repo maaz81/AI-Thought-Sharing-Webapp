@@ -9,6 +9,7 @@ import ProfilePage from "./components/profile/ProfilePage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import UpdatePost from "./components/profile/UpdatePost";
 import UpdateProfile from "./components/profile/UpdateProfile";
+import PostDetails from "./components/dashboard/PostDetails";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/" element={<PostCard />} />
+        <Route path="/post/:postId" element={<PostDetails />} />
 
 
         <Route element={<PrivateRoute />}>

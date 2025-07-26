@@ -1,6 +1,5 @@
 const Post = require('../models/Post');
 const User = require('../models/User');
-const PostDetails = require('../models/PostDetails');
 
 const getPosts = async (req, res) => {
   try {
@@ -13,6 +12,28 @@ const getPosts = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+const getSpecificPost = async (req, res) => {
+  const postId = req.params.postId;
+  console.log('fetching post with postId:', postId);
+  // Check if postId is valid
+  if (!postId || postId === 'undefined') {
+    return res.status(400).json({ error: 'Post ID is required and must be valid.' });
+  }
+
+  try {
+    const postDetails = await Post.findById(postId); // Use findById if using _id
+    if (!postDetails) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    res.status(200).json(postDetails);
+  } catch (error) {
+    console.error('Error fetching post:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 
 const createPosts = async (req, res) => {
   try {
@@ -36,7 +57,7 @@ const createPosts = async (req, res) => {
       dislike: '0',
       visibility
     });
-  
+
     await User.findByIdAndUpdate(
       req.userId,
       { $push: { posts: post._id } },
@@ -84,4 +105,4 @@ const searchBar = async (req, res) => {
 
 
 
-module.exports = { getPosts, createPosts, searchBar };
+module.exports = { getPosts, getSpecificPost, createPosts, searchBar };
