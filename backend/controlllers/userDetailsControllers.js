@@ -94,4 +94,23 @@ const getUserDetails = async (req,res) =>{
   }
 }
 
-module.exports = { createUserDetails , getUserDetails };
+const getUserPhoto = async (req,res) =>{
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userDetails = await UserDetails.findOne({ userid: userId });
+    if (!userDetails) {
+      return res.status(404).json({ message: 'User details not found' });
+    }
+    const photo = userDetails.basic_info.photo;
+    res.status(200).json(photo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to retrieve user details', error: err.message });
+  }
+}
+
+module.exports = { createUserDetails , getUserDetails,getUserPhoto };

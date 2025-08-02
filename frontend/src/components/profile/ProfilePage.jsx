@@ -24,7 +24,7 @@ const ProfilePage = () => {
         const [profileRes, statsRes, userDataDetails] = await Promise.all([
           axios.get('http://localhost:5000/profile/', { withCredentials: true }),
           axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
-          axios.get('http://localhost:5000/api/profile/details', { withCredentials: true })
+          axios.get('http://localhost:5000/api/profile/userphoto', { withCredentials: true })
         ]);
 
         setUserData(profileRes.data);
@@ -84,7 +84,7 @@ const ProfilePage = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Profile Header */}
@@ -97,7 +97,7 @@ const ProfilePage = () => {
                 <button onClick={() => navigate('/profile/update')}>
                   {userDetails ? (
                     <img
-                       src={`http://localhost:5000/uploads/${userDetails.basic_info.photo}`}
+                       src={`http://localhost:5000/uploads/${userDetails}`}
                       alt="Profile"
                       className="h-full w-full object-cover"
                     />
