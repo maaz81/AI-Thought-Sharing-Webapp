@@ -21,16 +21,7 @@ const createUserDetails = async (req, res) => {
       location,
       education,
       keySkills,
-      interests,
-      email,
-      phone,
-      linkedin,
-      github,
-      twitter,
-      website,
-      facebook,
-      instagram,
-      youtube,
+      interests
     } = req.body;
 
     if (!name || name.trim() === '') {

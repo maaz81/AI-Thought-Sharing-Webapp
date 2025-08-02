@@ -9,6 +9,7 @@ const ProfilePage = () => {
 
   const [activeTab, setActiveTab] = useState("posts");
   const [userData, setUserData] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     posts: 0,
@@ -20,13 +21,16 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const [profileRes, statsRes] = await Promise.all([
+        const [profileRes, statsRes, userDataDetails] = await Promise.all([
           axios.get('http://localhost:5000/profile/', { withCredentials: true }),
-          axios.get('http://localhost:5000/profile/stats', { withCredentials: true })
+          axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
+          axios.get('http://localhost:5000/api/profile/details', { withCredentials: true })
         ]);
 
         setUserData(profileRes.data);
+        setUserDetails(userDataDetails.data);
         setStats(statsRes.data)
+        
 
       } catch (error) {
         console.error('Error fetching profile data', error);
@@ -34,8 +38,6 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
-
-    console.log(stats);
 
     fetchUserData();
   }, []);
@@ -92,11 +94,17 @@ const ProfilePage = () => {
           <div className="flex items-end -mt-16 mb-4">
             <div className="h-24 w-24 rounded-full border-4 border-white bg-white shadow-md overflow-hidden">
               <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400">
-                <button
-                  onClick={() => navigate('/profile/update')}>
-                  <FiUser className="text-4xl" />
+                <button onClick={() => navigate('/profile/update')}>
+                  {userDetails ? (
+                    <img
+                       src={`http://localhost:5000/uploads/${userDetails.basic_info.photo}`}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <FiUser className="text-4xl" />
+                  )}
                 </button>
-
               </div>
             </div>
             <div className="ml-6">
