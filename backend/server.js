@@ -30,7 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 connectDB();
 
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
 app.use('/', postRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);

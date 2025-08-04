@@ -27,7 +27,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/users/login",
+        "http://localhost:5000/api/auth/login",
         formData,
         {
           withCredentials: true // ✅ Important for cookie-based auth
