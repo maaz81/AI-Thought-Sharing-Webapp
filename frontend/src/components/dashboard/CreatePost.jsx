@@ -42,7 +42,7 @@ const CreatePost = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/post/create',
+                'http://localhost:5000/api/post/create',
                 postData,
                 { withCredentials: true }
             );

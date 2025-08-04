@@ -20,7 +20,7 @@ const PostCard = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch("http://localhost:5000/post");
+                const response = await fetch("http://localhost:5000/api/post");
 
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 

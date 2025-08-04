@@ -31,7 +31,7 @@ connectDB();
 
 // Routes
 app.use('/api/auth', userRoutes);
-app.use('/', postRoutes);
+app.use('/api', postRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)

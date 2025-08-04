@@ -14,7 +14,7 @@ const PostDetails = () => {
     useEffect(() => {
         const fetchPage = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/post/${postId}`);
+                const response = await axios.get(`http://localhost:5000/api/post/${postId}`);
                 setPage(response.data);
             } catch (error) {
                 console.error("Failed to fetch page:", error);
