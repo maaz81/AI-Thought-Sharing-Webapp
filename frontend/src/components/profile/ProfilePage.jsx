@@ -9,6 +9,7 @@ const ProfilePage = () => {
 
   const [activeTab, setActiveTab] = useState("posts");
   const [userData, setUserData] = useState(null);
+  const [userPhoto, setUserPhoto] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -19,28 +20,34 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const [profileRes, statsRes, userDataDetails] = await Promise.all([
-          axios.get('http://localhost:5000/profile/', { withCredentials: true }),
-          axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
-          axios.get('http://localhost:5000/api/profile/userphoto', { withCredentials: true })
-        ]);
+  const fetchUserData = async () => {
+    try {
+      const [profileRes, statsRes, userPhotoRes] = await Promise.all([
+        axios.get('http://localhost:5000/profile/', { withCredentials: true }),
+        axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
+        axios.get('http://localhost:5000/api/profile/userphoto', { withCredentials: true })
+      ]);
 
-        setUserData(profileRes.data);
-        setUserDetails(userDataDetails.data);
-        setStats(statsRes.data)
-        
+      setUserData(profileRes.data);
+      setStats(statsRes.data);
 
-      } catch (error) {
-        console.error('Error fetching profile data', error);
-      } finally {
-        setLoading(false);
+      const photoFilename = userPhotoRes.data;
+      if (photoFilename) {
+        setUserPhoto(`http://localhost:5000/uploads/${photoFilename}`);
       }
-    };
 
-    fetchUserData();
-  }, []);
+      setUserDetails(userPhotoRes.data);
+
+    } catch (error) {
+      console.error('Error fetching profile data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUserData();
+}, []);
+
 
 
   const renderContent = () => {
@@ -84,6 +91,9 @@ const ProfilePage = () => {
       </div>
     );
   }
+  console.log(userDetails);
+  console.log(userPhoto);
+  
   
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -97,7 +107,7 @@ const ProfilePage = () => {
                 <button onClick={() => navigate('/profile/update')}>
                   {userDetails ? (
                     <img
-                       src={`http://localhost:5000/uploads/${userDetails}`}
+                       src={userPhoto}
                       alt="Profile"
                       className="h-full w-full object-cover"
                     />
