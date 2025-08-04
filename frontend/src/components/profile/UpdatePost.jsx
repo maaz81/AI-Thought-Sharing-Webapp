@@ -14,7 +14,7 @@ const UpdatePost = () => {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/profile/post/${id}`, {
+                const res = await axios.get(`http://localhost:5000/api/update/post/${id}`, {
                     withCredentials: true
                 });
                 setPost({
@@ -36,7 +36,7 @@ const UpdatePost = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await axios.put(`http://localhost:5000/profile/post/${id}`, post, {
+            await axios.put(`http://localhost:5000/api/update/post/${id}`, post, {
                 withCredentials: true
             });
             navigate('/profile', { state: { message: 'Post updated successfully!' } });

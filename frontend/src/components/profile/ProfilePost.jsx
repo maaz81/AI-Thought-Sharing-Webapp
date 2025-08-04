@@ -52,7 +52,7 @@ const ProfilePost = () => {
 
         setDeletingId(postId);
         try {
-            await axios.delete(`http://localhost:5000/profile/post/${postId}`, {
+            await axios.delete(`http://localhost:5000/api/update/post/${postId}`, {
                 withCredentials: true,
             });
 

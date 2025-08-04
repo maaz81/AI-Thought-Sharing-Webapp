@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const postDetailsRoutes = require('./routes/postDetailsRoutes');
+const updatePostRoutes = require('./routes/updatePostRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
@@ -32,6 +33,7 @@ connectDB();
 // Routes
 app.use('/api/auth', userRoutes);
 app.use('/api', postRoutes);
+app.use('/api/update',updatePostRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
