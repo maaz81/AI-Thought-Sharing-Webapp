@@ -38,6 +38,7 @@ app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
 app.use('/api/update/profile', userDetailsRoutes)
+app.use('/api/setpost', require('./routes/setPostRoutes'));
 
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);

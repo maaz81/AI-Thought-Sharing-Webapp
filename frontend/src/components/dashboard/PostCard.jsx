@@ -20,25 +20,32 @@ const PostCard = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch("http://localhost:5000/api/post");
 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                // Fetch from both endpoints using axios
+                const [res1, res2] = await Promise.all([
+                    axios.get("http://localhost:5000/api/post"),
+                    axios.get("http://localhost:5000/api/setpost/getposts"),
+                ]);
 
-                const data = await response.json();
-                setStatus(response.status);
+                setStatus(res1.status); // or you can set based on one or both
 
-                if (Array.isArray(data)) {
-                    const enhancedPosts = data.map(post => ({
-                        ...post,
-                        likes: post.likes || 0,
-                        dislikes: post.dislikes || 0,
-                        userReaction: null,
-                        createdAt: new Date(post.createdAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                        })
-                    })).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                // Combine data from both responses
+                const combinedData = [...res1.data, ...res2.data];
+
+                if (Array.isArray(combinedData)) {
+                    const enhancedPosts = combinedData
+                        .map((post) => ({
+                            ...post,
+                            likes: post.likes || 0,
+                            dislikes: post.dislikes || 0,
+                            userReaction: null,
+                            createdAt: new Date(post.createdAt).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                            }),
+                        }))
+                        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
                     setPosts(enhancedPosts);
                 } else {
@@ -56,6 +63,7 @@ const PostCard = () => {
 
         fetchPosts();
     }, []);
+
 
     useEffect(() => {
         const socket = io('http://localhost:5000');
@@ -144,13 +152,13 @@ const PostCard = () => {
         }
     };
 
-    const filteredPosts = posts.filter(post => 
+    const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (post.tags && post.tags.some(tag => 
+        (post.tags && post.tags.some(tag =>
             tag.toLowerCase().includes(searchQuery.toLowerCase())
         )
-    ))
+        ))
 
     if (loading) return <LoadingSkeleton />;
     if (error) return <ErrorDisplay error={error} />;
@@ -158,7 +166,7 @@ const PostCard = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
             <Header />
-            
+
             <div className="flex-1">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Search Bar */}
@@ -171,7 +179,7 @@ const PostCard = () => {
                         {/* Post List */}
                         <div className={`${selectedPost ? 'lg:w-1/2' : 'w-full'} transition-all duration-300`}>
                             <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Posts</h2>
-                            
+
                             {filteredPosts.length === 0 ? (
                                 <NoPosts status={status} />
                             ) : (
@@ -200,7 +208,7 @@ const PostCard = () => {
                         {/* Post Details */}
                         <AnimatePresence>
                             {selectedPost && (
-                                <motion.div 
+                                <motion.div
                                     className="lg:w-1/2 sticky top-28 self-start"
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -222,13 +230,13 @@ const PostCard = () => {
                                                 ✕
                                             </button>
                                         </div>
-                                        
+
                                         <div className="prose max-w-none text-gray-700">
                                             {selectedPost.content.split('\n').map((paragraph, i) => (
                                                 <p key={i}>{paragraph}</p>
                                             ))}
                                         </div>
-                                        
+
                                         {selectedPost.tags?.length > 0 && (
                                             <div className="flex flex-wrap gap-2">
                                                 {selectedPost.tags.map((tag, index) => (
@@ -241,7 +249,7 @@ const PostCard = () => {
                                                 ))}
                                             </div>
                                         )}
-                                        
+
                                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                                             <div className="flex space-x-4">
                                                 <button
@@ -259,7 +267,7 @@ const PostCard = () => {
                                                     <span>{selectedPost.dislikes}</span>
                                                 </button>
                                             </div>
-                                            
+
                                             <button className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                                                 <span>Share</span>
                                                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -274,7 +282,7 @@ const PostCard = () => {
                     </div>
                 </div>
             </div>
-            
+
             <Footer />
         </div>
     );
@@ -289,7 +297,7 @@ const PostCardDisplay = ({ post, handleReaction, onClick }) => {
     };
 
     return (
-        <motion.div 
+        <motion.div
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
             className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-100"
@@ -302,7 +310,7 @@ const PostCardDisplay = ({ post, handleReaction, onClick }) => {
                     </h2>
                     <span className="text-xs text-gray-500">{post.createdAt}</span>
                 </div>
-                
+
                 <p className="text-gray-600 line-clamp-3">{post.content}</p>
 
                 {post.tags?.length > 0 && (
@@ -341,7 +349,7 @@ const PostCardDisplay = ({ post, handleReaction, onClick }) => {
                             <span className="text-sm">{post.dislikes}</span>
                         </button>
                     </div>
-                    
+
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
