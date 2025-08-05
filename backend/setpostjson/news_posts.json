@@ -1,6 +1,6 @@
 [
   {
-    "id": "ddab6d0c-f850-4ae8-97da-483625e5c06f",
+    "_id": "ddab6d0c-f850-4ae8-97da-483625e5c06f",
     "title": "World News Trends in News",
     "content": "This article explores the evolving landscape of world news coverage, focusing on the increasing attention to global crime and political instability. It highlights how news organizations are adapting to real-time international reporting, using digital platforms to deliver urgent stories. The role of media in shaping public opinion and political discourse is also discussed. With international issues becoming more interconnected, world news coverage is more important than ever in offering context and clarity.",
     "tags": [
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "id": "b78785ab-8d9d-4cc7-ad80-3403fa68175b",
+    "_id": "b78785ab-8d9d-4cc7-ad80-3403fa68175b",
     "title": "Economy Trends in News",
     "content": "This article examines how media outlets report on economic issues, with a particular focus on how politics influence coverage. It discusses the rise of business journalism, data-driven reporting, and the growing demand for accessible economic insights. From inflation updates to market crashes, economic news shapes public behavior and policy. Additionally, the article explores how crime and natural disasters are increasingly seen through an economic lens in news narratives.",
     "tags": [
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "id": "faa62b87-bb9e-4e49-8722-7c731d2f3514",
+    "_id": "faa62b87-bb9e-4e49-8722-7c731d2f3514",
     "title": "World News Trends in News",
     "content": "This article delves into the trends shaping global news reporting, particularly the rising focus on extreme weather events and their socio-political impacts. As climate change becomes more urgent, weather-related coverage has expanded dramatically across international media. The article also discusses how world news integrates science and data to convey urgency, and how audiences respond to stories about environmental crises, global diplomacy, and humanitarian efforts.",
     "tags": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": "10884c5a-4741-4874-8891-5966cceb1f6e",
+    "_id": "10884c5a-4741-4874-8891-5966cceb1f6e",
     "title": "Politics Trends in News",
     "content": "This article explores how media coverage of politics has evolved in the digital age. It highlights the rise of 24/7 news cycles, fact-checking, and the role of crime reporting in political discourse. It also investigates the polarization of media narratives and how journalistic bias can influence voter perception. The article emphasizes the importance of balanced reporting in sustaining democratic processes and informed civic engagement.",
     "tags": [
@@ -40,7 +40,7 @@
     ]
   },
   {
-    "id": "d39479c0-319a-4dc0-9372-5fca783e86fa",
+    "_id": "d39479c0-319a-4dc0-9372-5fca783e86fa",
     "title": "Weather Trends in News",
     "content": "This article discusses how economic concerns are increasingly tied to weather events in news reporting. With climate-related disasters on the rise, journalists now focus on how storms, floods, and droughts affect industries, jobs, and infrastructure. The article also touches on the growing collaboration between meteorologists and reporters to provide real-time, science-backed weather updates that inform and protect the public while raising awareness of long-term climate risks.",
     "tags": [
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "id": "29b6a09b-57b1-40a0-9335-e5eb118fe700",
+    "_id": "29b6a09b-57b1-40a0-9335-e5eb118fe700",
     "title": "Politics Trends in News",
     "content": "This article analyzes how news outlets are covering political developments in relation to crime and the economy. It explores trends in investigative journalism, corruption exposés, and policy debates, emphasizing the interplay between law enforcement issues and political leadership. The article also reviews how economic shifts influence political platforms and how public opinion is shaped by media framing of controversial events.",
     "tags": [
@@ -60,7 +60,7 @@
     ]
   },
   {
-    "id": "abcf2259-9a01-41e8-af32-c85abfd2621d",
+    "_id": "abcf2259-9a01-41e8-af32-c85abfd2621d",
     "title": "Crime Trends in News",
     "content": "This article examines how crime reporting has changed with global and technological advancements. It looks at how crime stories are now contextualized within world news and political agendas. The article also discusses the ethical responsibilities of journalists in covering sensitive issues, avoiding sensationalism, and protecting victims’ identities. With real-time updates and social media influence, the landscape of crime journalism continues to evolve rapidly.",
     "tags": [
@@ -70,7 +70,7 @@
     ]
   },
   {
-    "id": "d4ca1c91-c9c7-4538-ad3d-85fd4c6709b9",
+    "_id": "d4ca1c91-c9c7-4538-ad3d-85fd4c6709b9",
     "title": "Weather Trends in News",
     "content": "This article explores the surge in weather-related journalism driven by global climate change. It highlights the role of real-time alerts, disaster coverage, and economic consequences tied to extreme conditions. From wildfires to hurricanes, weather coverage has become central to public safety and global awareness. The article also discusses how weather reporting intersects with crime and infrastructure damage in shaping news priorities.",
     "tags": [
@@ -80,7 +80,7 @@
     ]
   },
   {
-    "id": "eb32e6b0-b3d8-4c24-af8c-8002fff69b25",
+    "_id": "eb32e6b0-b3d8-4c24-af8c-8002fff69b25",
     "title": "Economy Trends in News",
     "content": "This article reviews how economic reporting has evolved in the age of digital media. It covers how crime, global instability, and political reforms influence market confidence and investor behavior. The article explains how news platforms use analytics and expert commentary to make complex financial topics accessible to general audiences. From budget announcements to unemployment rates, economic news remains a pillar of modern journalism.",
     "tags": [
@@ -90,7 +90,7 @@
     ]
   },
   {
-    "id": "841e17aa-be86-4843-864d-036d136491f7",
+    "_id": "841e17aa-be86-4843-864d-036d136491f7",
     "title": "Economy Trends in News",
     "content": "This article explores the intersection of politics and economics in news reporting. It examines how political decisions—such as trade policies, interest rates, and government spending—affect the economy and how these topics are portrayed in global media. It also addresses how crime, fraud, and corruption cases are covered under economic headlines, influencing public trust in institutions and markets.",
     "tags": [

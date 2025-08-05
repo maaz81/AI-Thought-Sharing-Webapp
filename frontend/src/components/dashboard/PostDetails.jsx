@@ -11,21 +11,31 @@ const PostDetails = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchPage = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/post/${postId}`);
-                setPage(response.data);
-            } catch (error) {
-                console.error("Failed to fetch page:", error);
-                setError("Failed to fetch the page.");
-            } finally {
-                setLoading(false);
-            }
-        };
+useEffect(() => {
+    const fetchPage = async () => {
+        setLoading(true);
+        setError(null);
 
-        fetchPage();
-    }, [postId]);
+        try {
+            // Try the first request
+            const res1 = await axios.get(`http://localhost:5000/api/post/${postId}`);
+            setPage(res1.data);
+        } catch (err1) {
+            try {
+                // If first fails, try the second
+                const res2 = await axios.get(`http://localhost:5000/api/setpost/getposts/${postId}`);
+                setPage(res2.data);
+            } catch (err2) {
+                console.error("Both requests failed:", err1, err2);
+                setError("Failed to fetch the page from both sources.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchPage();
+}, [postId]);
 
     if (loading) {
         return (

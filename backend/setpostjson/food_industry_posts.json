@@ -1,6 +1,6 @@
 [
   {
-    "id": "2cfec688-f304-45b0-b458-f3bfe90b0de8",
+    "_id": "2cfec688-f304-45b0-b458-f3bfe90b0de8",
     "title": "Recipes Trends in Food_Industry",
     "content": "This article explores how food delivery services are influencing modern recipe trends in the food industry. With the rise of ghost kitchens and meal kit subscriptions, consumers are now experimenting with new cuisines and recreating restaurant-quality meals at home. The piece also discusses how recipe development is adapting to accommodate convenience, dietary preferences, and global flavors. Whether it's quick gourmet meals or fusion street food, this trend is redefining how people cook and experience food.",
     "tags": [
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "id": "a8220982-fef7-4c26-ae8c-6950ad9bb699",
+    "_id": "a8220982-fef7-4c26-ae8c-6950ad9bb699",
     "title": "Vegan Trends in Food_Industry",
     "content": "This article examines the growing impact of veganism on the food industry. It highlights how restaurants and recipe developers are embracing plant-based alternatives to meet the rising demand for ethical, sustainable, and health-conscious meals. From vegan cheese and meat substitutes to creative dishes made from legumes, grains, and vegetables, the movement is reshaping menus and consumer habits. The piece also explores how food delivery platforms are expanding their vegan offerings to reach a wider audience.",
     "tags": [
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "id": "de6fea90-3414-4d0a-9a9f-616e22cae115",
+    "_id": "de6fea90-3414-4d0a-9a9f-616e22cae115",
     "title": "Food Delivery Trends in Food_Industry",
     "content": "This article covers the latest innovations and developments in the food delivery sector. It explores how delivery apps are transforming restaurant operations, increasing access to a variety of cuisines, and driving demand for more sustainable packaging. The rise of street food vendors on delivery platforms and partnerships with cloud kitchens are also discussed. As consumer expectations evolve, the article provides insight into how speed, convenience, and quality are shaping the future of food delivery.",
     "tags": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": "95fdd50b-fc75-4bf6-a6dd-1ab633682375",
+    "_id": "95fdd50b-fc75-4bf6-a6dd-1ab633682375",
     "title": "Recipes Trends in Food_Industry",
     "content": "This article dives into the evolution of recipes inspired by global street food. As street food gains popularity, home cooks and chefs alike are incorporating bold, accessible flavors into their recipes. The article explores trending ingredients, fusion dishes, and how social media is influencing what people cook at home. From Korean corn dogs to Mexican elote, these vibrant and easy-to-make dishes reflect a new wave of culinary creativity fueled by cultural curiosity.",
     "tags": [
@@ -40,7 +40,7 @@
     ]
   },
   {
-    "id": "75d89f06-0478-4315-b6ee-7b18611c7291",
+    "_id": "75d89f06-0478-4315-b6ee-7b18611c7291",
     "title": "Food Delivery Trends in Food_Industry",
     "content": "This article highlights how street food culture is adapting to modern food delivery services. Vendors and small eateries are now leveraging apps to reach broader audiences without physical locations. It also covers the challenges and innovations of packaging street food for delivery while maintaining taste and quality. As customers crave authentic and affordable experiences, this trend is helping street food businesses scale and thrive in the digital age.",
     "tags": [
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "id": "ab198fd7-c932-4e32-bdff-84597d2aaec1",
+    "_id": "ab198fd7-c932-4e32-bdff-84597d2aaec1",
     "title": "Restaurants Trends in Food_Industry",
     "content": "This article explores how restaurant trends are being shaped by changing consumer preferences and technology. With the growth of recipes focused on health, sustainability, and speed, restaurants are adjusting their offerings to match. The article also examines the role of plant-based menus, seasonal ingredients, and chef-driven concepts. As delivery and digital ordering become standard, restaurants must balance in-house experiences with off-site convenience to stay competitive in the evolving food landscape.",
     "tags": [
@@ -60,7 +60,7 @@
     ]
   },
   {
-    "id": "0a53219a-6277-44c9-b68a-a9b21aa7dd1a",
+    "_id": "0a53219a-6277-44c9-b68a-a9b21aa7dd1a",
     "title": "Street Food Trends in Food_Industry",
     "content": "This article discusses the rise of street food as a mainstream trend in the global food industry. Once considered informal dining, street food is now being elevated by restaurateurs and embraced by food delivery platforms. The article explores how vegan street food is gaining traction, with vendors offering creative plant-based takes on traditional favorites. It also highlights how social media is helping vendors reach new audiences and how street food culture fosters culinary innovation.",
     "tags": [
@@ -70,7 +70,7 @@
     ]
   },
   {
-    "id": "3ae7719a-f2a0-4388-a536-ddab3e9fa047",
+    "_id": "3ae7719a-f2a0-4388-a536-ddab3e9fa047",
     "title": "Recipes Trends in Food_Industry",
     "content": "This article explores how modern recipe trends are drawing inspiration from street food culture. The rise of casual, flavor-packed dishes is changing how people cook at home. It highlights how social platforms like TikTok and Instagram are fueling recipe trends, from quick dumpling recipes to creative takes on traditional street snacks. The article also explores the importance of accessibility, minimal ingredients, and cultural fusion in today's most popular recipes.",
     "tags": [
@@ -80,7 +80,7 @@
     ]
   },
   {
-    "id": "49891037-4e71-4a69-9811-ba77c7afa0ea",
+    "_id": "49891037-4e71-4a69-9811-ba77c7afa0ea",
     "title": "Food Delivery Trends in Food_Industry",
     "content": "This article covers how restaurants are adapting to the booming food delivery industry. It highlights the shift to ghost kitchens, menu optimization for delivery, and digital marketing strategies. With more customers ordering in, restaurants are creating packaging that maintains food quality and crafting delivery-only menus. The article also examines how consumer data is helping restaurants improve service and personalize the delivery experience, creating a more convenient and customer-focused model.",
     "tags": [
@@ -90,7 +90,7 @@
     ]
   },
   {
-    "id": "ef4894a1-104b-4545-b289-157e119eb774",
+    "_id": "ef4894a1-104b-4545-b289-157e119eb774",
     "title": "Food Delivery Trends in Food_Industry",
     "content": "This article explores how food delivery is shaping recipe development and dining habits. As people opt for convenience, chefs and food brands are designing recipes specifically for delivery—easy to transport, quick to prepare, and designed to stay fresh longer. The article also discusses how vegan and plant-based options are becoming more available through delivery platforms, reflecting broader dietary shifts. These trends are influencing everything from portion sizes to flavor profiles in today's food delivery menus.",
     "tags": [

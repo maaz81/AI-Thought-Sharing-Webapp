@@ -1,6 +1,6 @@
 [
   {
-    "id": "12017517-fb83-4b23-a3fb-e899222c611c",
+    "_id": "12017517-fb83-4b23-a3fb-e899222c611c",
     "title": "Economy Trends in India",
     "content": "This article explores key economic trends in India, with a focus on the startup ecosystem's rapid growth. It examines factors driving innovation, government policies supporting entrepreneurship, and how India's economic landscape is shifting in response to global markets. Additionally, the article discusses how tourism and political stability play essential roles in boosting regional development. From job creation to digital expansion, the Indian economy is witnessing a transformation fueled by bold investments and vibrant sectors.",
     "tags": [
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "id": "14f4fd15-2eaf-4d01-9d66-db4223e70453",
+    "_id": "14f4fd15-2eaf-4d01-9d66-db4223e70453",
     "title": "Tourism Trends in India",
     "content": "This article provides an in-depth look at India's evolving tourism landscape. It explores the impact of domestic travel, heritage conservation, and international visitor growth. New trends like eco-tourism, spiritual tourism, and digital travel experiences are highlighted. The role of political stability and cultural richness in attracting global attention is also discussed. Whether it’s exploring the Himalayas or discovering coastal retreats, India’s tourism sector is becoming more dynamic and diverse than ever before.",
     "tags": [
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "id": "a23f97c5-b0cc-4cb3-89d6-f8f7423799c1",
+    "_id": "a23f97c5-b0cc-4cb3-89d6-f8f7423799c1",
     "title": "Politics Trends in India",
     "content": "This article examines current political trends in India, including regional shifts, youth participation, and digital campaigning. It also highlights how cultural movements influence political discourse, as well as the growing impact of startups in shaping public opinion and political engagement through technology. The intersection of culture, policy, and innovation offers new perspectives on governance, transparency, and voter awareness. As India's political landscape modernizes, the article reveals how these dynamics are changing the national dialogue.",
     "tags": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": "e670bbff-436e-488f-a304-43daa9cf6e77",
+    "_id": "e670bbff-436e-488f-a304-43daa9cf6e77",
     "title": "Culture Trends in India",
     "content": "This article explores the vibrant cultural trends unfolding across India, including the resurgence of regional art, fusion music, and digital storytelling. It also delves into how globalization is influencing traditional practices while preserving heritage. Cultural festivals, cinema, and fashion are also evolving, reflecting a blend of old and new. As India's identity continues to diversify, culture remains a unifying force across generations and regions, impacting tourism, politics, and even entrepreneurship.",
     "tags": [
@@ -40,7 +40,7 @@
     ]
   },
   {
-    "id": "b3554e90-e465-4772-a967-8583706b1481",
+    "_id": "b3554e90-e465-4772-a967-8583706b1481",
     "title": "Tourism Trends in India",
     "content": "This article uncovers how India's tourism industry is being shaped by cultural richness, startup innovation, and political initiatives. From immersive heritage experiences to tech-driven travel apps, India is offering more personalized travel options. Government support and startup ventures in travel and hospitality are also improving accessibility and sustainability. Whether it’s heritage walks, culinary tours, or rural tourism, India’s evolving tourism landscape reflects its dynamic economy and cultural pride.",
     "tags": [
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "id": "fd861187-be79-4d88-a79a-a697d6f648d2",
+    "_id": "fd861187-be79-4d88-a79a-a697d6f648d2",
     "title": "Culture Trends in India",
     "content": "This article examines how economic development is influencing India's cultural identity. It explores how cultural industries like film, music, and fashion are growing alongside the startup boom. With increasing access to digital platforms, artists and entrepreneurs are finding innovative ways to share cultural narratives. The article also explores how economic policies are shaping museum funding, heritage preservation, and creative arts investment, making culture a critical part of India's development story.",
     "tags": [
@@ -60,7 +60,7 @@
     ]
   },
   {
-    "id": "26701dd9-bde2-494f-96e7-3729dd66be73",
+    "_id": "26701dd9-bde2-494f-96e7-3729dd66be73",
     "title": "Startups Trends in India",
     "content": "This article provides insights into the rapid rise of startups across India, particularly in tourism and economic sectors. It highlights how innovation, youth entrepreneurship, and government support are fueling new ventures in travel, fintech, edtech, and sustainability. With India becoming one of the largest startup ecosystems globally, the article discusses regional startup hubs, funding patterns, and the challenges ahead. These startups are redefining traditional industries while supporting India’s digital and economic ambitions.",
     "tags": [
@@ -70,7 +70,7 @@
     ]
   },
   {
-    "id": "595cbe0a-ecb5-4f07-80d3-aaf92f58cd0d",
+    "_id": "595cbe0a-ecb5-4f07-80d3-aaf92f58cd0d",
     "title": "Culture Trends in India",
     "content": "This article explores how India's political and startup scenes are influencing cultural trends. From digital activism to cultural entrepreneurship, young innovators are merging tech with tradition. The article also examines the role of policy in shaping national identity, supporting cultural initiatives, and managing diversity. As India modernizes, its cultural evolution is intertwined with politics and business, creating a unique environment where tradition meets innovation and public engagement is on the rise.",
     "tags": [
@@ -80,7 +80,7 @@
     ]
   },
   {
-    "id": "5deab7f3-8b02-4638-994a-d1ce2175f4c3",
+    "_id": "5deab7f3-8b02-4638-994a-d1ce2175f4c3",
     "title": "Tourism Trends in India",
     "content": "This article focuses on how startup innovation is transforming India’s tourism sector. From digital booking platforms to AI-powered travel assistants, startups are enhancing convenience and accessibility. The article also discusses the role of political stability and economic development in attracting more visitors, both domestic and international. With new travel niches like eco-tourism and heritage trails, India is becoming a more attractive destination, fueled by entrepreneurship and smart tourism strategies.",
     "tags": [
@@ -90,7 +90,7 @@
     ]
   },
   {
-    "id": "02eb354e-c17b-4cbc-acd9-adc5d7426c60",
+    "_id": "02eb354e-c17b-4cbc-acd9-adc5d7426c60",
     "title": "Culture Trends in India",
     "content": "This article highlights how tourism is influencing cultural expression across India. It explores how cultural sites, art festivals, and traditional practices are being promoted to attract visitors and preserve heritage. The rise of cultural startups is also discussed, showcasing how entrepreneurs are bridging the gap between tradition and technology. With support from the economy and tourism sectors, India's diverse culture is being documented, digitized, and celebrated on global platforms.",
     "tags": [

@@ -1,6 +1,6 @@
 [
   {
-    "id": "a814dc96-5354-413b-bb30-1deac277e140",
+    "_id": "a814dc96-5354-413b-bb30-1deac277e140",
     "title": "IoT Trends in Technology",
     "content": "This article explores the latest innovations and use cases in the Internet of Things (IoT), from smart homes to industrial automation. It examines how IoT is increasingly integrated with blockchain for secure data exchange and AI for predictive analytics. These technologies are transforming healthcare, agriculture, and manufacturing sectors by enhancing connectivity, reducing human intervention, and improving efficiency across networks.",
     "tags": [
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "id": "ff3b9d50-79f8-4c22-8e03-e9836c9693fa",
+    "_id": "ff3b9d50-79f8-4c22-8e03-e9836c9693fa",
     "title": "IoT Trends in Technology",
     "content": "The article focuses on how IoT is evolving through AI-powered systems and blockchain integration. From smart cities to connected vehicles, IoT is becoming the backbone of real-time data-driven decision-making. Enhanced cybersecurity measures, low-latency communication, and energy-efficient sensors are also discussed as key trends influencing the future of IoT infrastructure.",
     "tags": [
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "id": "0dbc1c4f-fd16-43b1-9f7d-9c679c74d4b9",
+    "_id": "0dbc1c4f-fd16-43b1-9f7d-9c679c74d4b9",
     "title": "AI Trends in Technology",
     "content": "This article covers the rapid advancements in artificial intelligence across various domains including healthcare, finance, and transportation. It explores how AI is enhanced by IoT and 5G connectivity, enabling faster data processing, automation, and real-time decision-making. The article also touches on ethical concerns, regulation, and future AI-powered solutions.",
     "tags": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": "61d71923-7808-423e-97eb-d104cccd67d2",
+    "_id": "61d71923-7808-423e-97eb-d104cccd67d2",
     "title": "AI Trends in Technology",
     "content": "Focusing on emerging trends in artificial intelligence, this article examines how machine learning and neural networks are transforming industries. The integration of AI with blockchain enhances data security and transparency, while applications like chatbots, virtual assistants, and automated diagnostics continue to advance. The article also discusses growing adoption across sectors and the importance of responsible AI deployment.",
     "tags": [
@@ -40,7 +40,7 @@
     ]
   },
   {
-    "id": "88c2d39a-f8b7-4fb8-bd1e-97673233b04c",
+    "_id": "88c2d39a-f8b7-4fb8-bd1e-97673233b04c",
     "title": "Quantum Computing Trends in Technology",
     "content": "This article provides an in-depth look into how quantum computing is pushing the boundaries of computational speed and complexity. It also explores how 5G and blockchain technologies are enabling faster data transfer and secure quantum transactions. Applications in cryptography, materials science, and AI optimization are also discussed as major breakthroughs fueled by quantum capabilities.",
     "tags": [
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "id": "bd808b9c-ac2a-40b1-a061-c4e4895000bf",
+    "_id": "bd808b9c-ac2a-40b1-a061-c4e4895000bf",
     "title": "Blockchain Trends in Technology",
     "content": "This article highlights the transformative impact of blockchain in sectors like finance, healthcare, and supply chain. It also discusses how blockchain complements quantum computing for secure and efficient data processing. Additionally, the integration with 5G networks allows for more scalable and decentralized systems, with real-world applications like NFTs, smart contracts, and decentralized finance (DeFi).",
     "tags": [
@@ -60,7 +60,7 @@
     ]
   },
   {
-    "id": "2836a0b4-45cf-4563-97a8-64b96567e54e",
+    "_id": "2836a0b4-45cf-4563-97a8-64b96567e54e",
     "title": "AI Trends in Technology",
     "content": "Exploring the increasing role of AI in modern applications, this article discusses breakthroughs in natural language processing, autonomous systems, and generative AI. It also highlights how AI systems rely on IoT sensors for contextual awareness and how 5G networks support the massive data requirements needed for real-time AI insights. The convergence of these technologies is reshaping business and consumer experiences.",
     "tags": [
@@ -70,7 +70,7 @@
     ]
   },
   {
-    "id": "5801cc6a-6c18-41f9-be89-10df6bfe429e",
+    "_id": "5801cc6a-6c18-41f9-be89-10df6bfe429e",
     "title": "AI Trends in Technology",
     "content": "This article looks at the intersection of artificial intelligence and quantum computing, emphasizing how quantum systems may soon dramatically enhance AI performance. It also covers how 5G networks are improving the scalability of AI-driven services. From quantum-enhanced algorithms to real-time decision-making in smart environments, this article presents a forward-looking view of AI’s evolution.",
     "tags": [
@@ -80,7 +80,7 @@
     ]
   },
   {
-    "id": "dcbeddcc-d31e-422c-9674-4f38ea3e16d3",
+    "_id": "dcbeddcc-d31e-422c-9674-4f38ea3e16d3",
     "title": "IoT Trends in Technology",
     "content": "The article covers advancements in IoT technology and its convergence with 5G, AI, and blockchain to build smarter systems. Topics include predictive maintenance, smart grids, connected health devices, and autonomous vehicles. By enabling ultra-reliable low-latency communication, these technologies together form the foundation for the next generation of interconnected devices.",
     "tags": [
@@ -90,7 +90,7 @@
     ]
   },
   {
-    "id": "65a1acda-8479-4c94-979b-397eea073ada",
+    "_id": "65a1acda-8479-4c94-979b-397eea073ada",
     "title": "AI Trends in Technology",
     "content": "This article examines how AI is enhancing IoT frameworks and being powered by 5G for real-time analytics and automation. It also delves into how quantum computing will shape future AI algorithms by boosting their processing capabilities. Together, these technologies enable breakthroughs in areas like autonomous vehicles, fraud detection, and digital twins.",
     "tags": [
