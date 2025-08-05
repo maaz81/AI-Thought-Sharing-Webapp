@@ -37,7 +37,7 @@ app.use('/api/update',updatePostRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
-app.use('/api/profile', userDetailsRoutes)
+app.use('/api/update/profile', userDetailsRoutes)
 
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);

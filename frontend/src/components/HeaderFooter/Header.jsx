@@ -9,7 +9,7 @@ const Header = () => {
   useEffect(() => {
     const fetchUserPhoto = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/profile/userphoto", {
+        const res = await axios.get("http://localhost:5000/api/update/profile/userphoto", {
           withCredentials: true,
         });
 

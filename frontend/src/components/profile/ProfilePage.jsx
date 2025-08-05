@@ -25,7 +25,7 @@ const ProfilePage = () => {
       const [profileRes, statsRes, userPhotoRes] = await Promise.all([
         axios.get('http://localhost:5000/profile/', { withCredentials: true }),
         axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
-        axios.get('http://localhost:5000/api/profile/userphoto', { withCredentials: true })
+        axios.get('http://localhost:5000/api/update/profile/userphoto', { withCredentials: true })
       ]);
 
       setUserData(profileRes.data);

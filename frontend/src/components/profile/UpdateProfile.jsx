@@ -42,7 +42,7 @@ const UpdateProfile = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/profile/details', {
+        const res = await axios.get('http://localhost:5000/api/update/profile/details', {
           withCredentials: true
         });
 
@@ -151,7 +151,7 @@ const UpdateProfile = () => {
         formDataToSend.append('photo', formData.photo);
       }
 
-      const response = await axios.post('http://localhost:5000/api/profile/update', formDataToSend, {
+      const response = await axios.post('http://localhost:5000/api/update/profile/update', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
