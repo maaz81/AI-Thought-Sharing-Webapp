@@ -164,7 +164,7 @@ const PostCard = () => {
     if (error) return <ErrorDisplay error={error} />;
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 dark:text-white">
             <Header />
 
             <div className="flex-1">
@@ -178,7 +178,7 @@ const PostCard = () => {
                     <div className={`flex flex-col lg:flex-row gap-8 transition-all duration-300 ${selectedPost ? 'lg:flex-row' : ''}`}>
                         {/* Post List */}
                         <div className={`${selectedPost ? 'lg:w-1/2' : 'w-full'} transition-all duration-300`}>
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Posts</h2>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-6 dark:text-white">Recent Posts</h2>
 
                             {filteredPosts.length === 0 ? (
                                 <NoPosts status={status} />

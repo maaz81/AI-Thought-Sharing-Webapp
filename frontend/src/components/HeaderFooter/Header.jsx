@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import defaultAvatar from '../../assets/avatar.jpeg';
+import { useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Header = () => {
   const [userPhoto, setUserPhoto] = useState(null);
@@ -25,14 +27,18 @@ const Header = () => {
 
     fetchUserPhoto();
   }, []);
+  const { darkMode, toggleDarkMode } = useContext(ThemeContext);
 
   return (
-    <header className="bg-blue-600 text-white shadow-md">
+    <header className="bg-blue-600 text-white shadow-md dark:bg-gray-900 dark:text-white">
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
         <Link to="/" className="text-2xl font-bold">
           📝 PostShare
         </Link>
         <nav className="space-x-4 flex items-center">
+          <button onClick={toggleDarkMode}>
+            {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          </button>
           <Link to="/" className="hover:underline">Home</Link>
           <Link to="/profile/post" className="hover:underline">Create Post</Link>
           <Link to="/profile">

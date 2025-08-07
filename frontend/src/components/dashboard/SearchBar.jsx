@@ -32,7 +32,7 @@ const SearchBar = () => {
 
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
+        <div className="max-w-2xl mx-auto p-4 dark:bg-gray-900 dark:text-white">
             <h1 className="text-2xl font-semibold mb-4 text-center">Search Posts</h1>
             <div className="flex gap-2">
                 <input
@@ -41,7 +41,7 @@ const SearchBar = () => {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-black"
                 />
                 <button
                     onClick={handleSearch}
