@@ -133,7 +133,7 @@ const UpdatePost = () => {
                             <input
                                 id="title"
                                 type="text"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
                                 value={post.title}
                                 onChange={(e) => setPost({ ...post, title: e.target.value })}
                                 required
@@ -146,7 +146,7 @@ const UpdatePost = () => {
                             </label>
                             <textarea
                                 id="content"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px]"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px] dark:text-black"
                                 value={post.content}
                                 onChange={(e) => setPost({ ...post, content: e.target.value })}
                                 required
@@ -160,7 +160,7 @@ const UpdatePost = () => {
                             <input
                                 id="tags"
                                 type="text"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
                                 value={post.tags.join(', ')}
                                 onChange={(e) =>
                                     setPost({ ...post, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) })

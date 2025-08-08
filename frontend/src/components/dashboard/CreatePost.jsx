@@ -75,7 +75,7 @@ const CreatePost = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 dark:bg-gray-900 dark:text-white">
             <div className="max-w-2xl mx-auto">
                 <div className="bg-white shadow-xl rounded-lg overflow-hidden">
                     {/* Header */}

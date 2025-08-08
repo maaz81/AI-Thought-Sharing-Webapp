@@ -195,7 +195,7 @@ const UpdateProfile = () => {
             name="basic_info.name"
             value={formData.basic_info.name}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             required
           />
         </div>
@@ -207,7 +207,7 @@ const UpdateProfile = () => {
             name="basic_info.age"
             value={formData.basic_info.age}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
           />
         </div>
 
@@ -217,7 +217,7 @@ const UpdateProfile = () => {
             name="basic_info.gender"
             value={formData.basic_info.gender}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
           >
             <option value="">Select Gender</option>
             <option value="male">Male</option>
@@ -234,7 +234,7 @@ const UpdateProfile = () => {
             name="basic_info.profession"
             value={formData.basic_info.profession}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             required
           />
         </div>
@@ -246,7 +246,7 @@ const UpdateProfile = () => {
             value={formData.basic_info.bio}
             onChange={handleChange}
             rows="3"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             placeholder="Tell us about yourself..."
           ></textarea>
         </div>
@@ -258,7 +258,7 @@ const UpdateProfile = () => {
             name="basic_info.location"
             value={formData.basic_info.location}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             placeholder="City, Country"
           />
         </div>
@@ -276,7 +276,7 @@ const UpdateProfile = () => {
             name="professional.education"
             value={formData.professional.education}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             placeholder="Degrees, institutions, etc."
           />
         </div>
@@ -288,7 +288,7 @@ const UpdateProfile = () => {
             name="professional.keySkills"
             value={formData.professional.keySkills}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             placeholder="Separate skills with commas"
           />
         </div>
@@ -300,7 +300,7 @@ const UpdateProfile = () => {
             name="professional.interests"
             value={formData.professional.interests}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             placeholder="Your hobbies and interests"
           />
         </div>
@@ -318,7 +318,7 @@ const UpdateProfile = () => {
             name="contact.email"
             value={formData.contact.email}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             required
           />
         </div>
@@ -330,7 +330,7 @@ const UpdateProfile = () => {
             name="contact.phone"
             value={formData.contact.phone}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
           />
         </div>
       </div>
@@ -351,7 +351,7 @@ const UpdateProfile = () => {
               name="socialLinks.linkedin"
               value={formData.socialLinks.linkedin}
               onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
               placeholder="username"
             />
           </div>
@@ -368,7 +368,7 @@ const UpdateProfile = () => {
               name="socialLinks.github"
               value={formData.socialLinks.github}
               onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
               placeholder="username"
             />
           </div>
@@ -385,7 +385,7 @@ const UpdateProfile = () => {
               name="socialLinks.twitter"
               value={formData.socialLinks.twitter}
               onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
               placeholder="username"
             />
           </div>
@@ -398,7 +398,7 @@ const UpdateProfile = () => {
             name="socialLinks.website"
             value={formData.socialLinks.website}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
             placeholder="https://example.com"
           />
         </div>
@@ -414,7 +414,7 @@ const UpdateProfile = () => {
               name="socialLinks.facebook"
               value={formData.socialLinks.facebook}
               onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
               placeholder="username"
             />
           </div>
@@ -431,7 +431,7 @@ const UpdateProfile = () => {
               name="socialLinks.instagram"
               value={formData.socialLinks.instagram}
               onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
               placeholder="username"
             />
           </div>
@@ -448,7 +448,7 @@ const UpdateProfile = () => {
               name="socialLinks.youtube"
               value={formData.socialLinks.youtube}
               onChange={handleChange}
-              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-black"
               placeholder="channel"
             />
           </div>

@@ -76,15 +76,15 @@ const ProfilePost = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-6 dark:pt-4 dark:pl-8">
                 <h2 className="text-2xl font-bold text-gray-800">Your Posts</h2>
-                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full dark:mr-4">
                     {posts.length} {posts.length === 1 ? 'post' : 'posts'}
                 </span>
             </div>
 
             {posts.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                <div className="text-center py-12 bg-white rounded-xl shadow-sm dark:bg-gray-900 dark:text-white">
                     <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                         <FiEdit2 className="text-gray-400 text-2xl" />
                     </div>

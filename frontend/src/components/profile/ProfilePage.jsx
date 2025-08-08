@@ -96,7 +96,7 @@ const ProfilePage = () => {
   
   
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-900 dark:text-white">
       {/* Profile Header */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-32"></div>
