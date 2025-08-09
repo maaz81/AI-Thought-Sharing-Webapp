@@ -113,4 +113,23 @@ const getUserPhoto = async (req,res) =>{
   }
 }
 
-module.exports = { createUserDetails , getUserDetails,getUserPhoto };
+const getUserBio = async (req,res) =>{
+  try {
+    const userId = req.userId;
+    if (!userId){
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const userDetails = await UserDetails.findOne({ userid: userId });
+    if (!userDetails) {
+      return res.status(404).json({ message: 'User details not found' });
+    }
+    const bio = userDetails.basic_info.bio;
+    res.status(200).json(bio);
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).json({ message: 'Failed to retrieve user bio', error: err.message });
+  }
+}
+
+module.exports = { createUserDetails , getUserDetails,getUserPhoto, getUserBio };

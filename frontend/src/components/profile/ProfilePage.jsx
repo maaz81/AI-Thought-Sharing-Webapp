@@ -18,6 +18,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [userData, setUserData] = useState(null);
   const [userPhoto, setUserPhoto] = useState(null);
+  const [userBio, setUserBio] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -30,10 +31,11 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const [profileRes, statsRes, userPhotoRes] = await Promise.all([
+        const [profileRes, statsRes, userPhotoRes, userBioRes] = await Promise.all([
           axios.get('http://localhost:5000/profile/', { withCredentials: true }),
           axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
-          axios.get('http://localhost:5000/api/update/profile/userphoto', { withCredentials: true })
+          axios.get('http://localhost:5000/api/update/profile/userphoto', { withCredentials: true }),
+          axios.get('http://localhost:5000/api/update/profile/userbio', { withCredentials: true })
         ]);
 
         setUserData(profileRes.data);
@@ -45,6 +47,7 @@ const ProfilePage = () => {
         }
 
         setUserDetails(userPhotoRes.data);
+        setUserBio(userBioRes.data || "No bio available");
 
       } catch (error) {
         console.error('Error fetching profile data', error);
@@ -150,7 +153,7 @@ const ProfilePage = () => {
                 {userData?.username || "User"}
               </h1>
               <p className="text-gray-600 mb-3">
-                {userData?.bio || "No bio yet"}
+                {userBio}
               </p>
               
             </div>
