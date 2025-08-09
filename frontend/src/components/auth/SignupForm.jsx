@@ -56,7 +56,7 @@ const SignupForm = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-black"
               required
             />
           </div>
@@ -67,7 +67,7 @@ const SignupForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-black"
               required
             />
           </div>
@@ -78,7 +78,7 @@ const SignupForm = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-black"
               required
             />
           </div>
@@ -90,7 +90,7 @@ const SignupForm = () => {
                 value="user"
                 checked={formData.role === "user"}
                 onChange={handleChange}
-                className="form-radio h-4 w-4 text-blue-600"
+                className="form-radio h-4 w-4 text-blue-600 dark:text-black"
               />
               <span className="ml-2 text-gray-700">User</span>
             </label>
@@ -101,7 +101,7 @@ const SignupForm = () => {
                 value="admin"
                 checked={formData.role === "admin"}
                 onChange={handleChange}
-                className="form-radio h-4 w-4 text-blue-600"
+                className="form-radio h-4 w-4 text-blue-600 dark:text-black"
               />
               <span className="ml-2 text-gray-700">Admin</span>
             </label>

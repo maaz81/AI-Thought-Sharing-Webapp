@@ -97,7 +97,7 @@ const CreatePost = () => {
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
                                 placeholder="What's your post about?"
                                 required
                             />
@@ -117,7 +117,7 @@ const CreatePost = () => {
                                     setWordCount(words.filter(Boolean).length);
                                 }}
 
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px]"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px] dark:text-black"
                                 placeholder="Write your thoughts here..."
                                 required
                             />
@@ -132,7 +132,7 @@ const CreatePost = () => {
                                 type="text"
                                 value={tags}
                                 onChange={(e) => setTags(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
                                 placeholder="react, javascript, webdev (comma separated)"
                             />
                             <p className="mt-1 text-xs text-gray-500">
@@ -183,7 +183,7 @@ const CreatePost = () => {
                                 <button
                                     type="button"
                                     onClick={() => setVisibility("public")}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${visibility === "public"
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 dark:text-black rounded-lg border transition-all ${visibility === "public"
                                         ? "bg-blue-50 border-blue-500 text-blue-700"
                                         : "border-gray-300 hover:bg-gray-50"
                                         }`}
@@ -195,7 +195,7 @@ const CreatePost = () => {
                                 <button
                                     type="button"
                                     onClick={() => setVisibility("private")}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${visibility === "private"
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 dark:text-black rounded-lg border transition-all ${visibility === "private"
                                         ? "bg-blue-50 border-blue-500 text-blue-700"
                                         : "border-gray-300 hover:bg-gray-50"
                                         }`}
