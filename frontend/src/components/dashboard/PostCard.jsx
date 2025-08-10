@@ -15,54 +15,69 @@ const PostCard = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        const fetchPosts = async () => {
+   useEffect(() => {
+    const fetchPosts = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            let res1Data = [];
+            let res2Data = [];
+
             try {
-                setLoading(true);
-                setError(null);
-
-                // Fetch from both endpoints using axios
-                const [res1, res2] = await Promise.all([
-                    axios.get("http://localhost:5000/api/post"),
-                    axios.get("http://localhost:5000/api/setpost/getposts"),
-                ]);
-
-                setStatus(res1.status); // or you can set based on one or both
-
-                // Combine data from both responses
-                const combinedData = [...res1.data, ...res2.data];
-
-                if (Array.isArray(combinedData)) {
-                    const enhancedPosts = combinedData
-                        .map((post) => ({
-                            ...post,
-                            likes: post.likes || 0,
-                            dislikes: post.dislikes || 0,
-                            userReaction: null,
-                            createdAt: new Date(post.createdAt).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                            }),
-                        }))
-                        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-                    setPosts(enhancedPosts);
-                } else {
-                    setPosts([]);
+                const res1 = await axios.get("http://localhost:5000/api/post");
+                if (Array.isArray(res1.data)) {
+                    res1Data = res1.data;
                 }
-            } catch (error) {
-                console.error("Failed to fetch posts:", error);
-                setStatus(error.message);
-                setError(error.message);
-                setPosts([]);
-            } finally {
-                setLoading(false);
+            } catch (err) {
+                console.warn("res1 fetch failed, defaulting to empty array");
+                res1Data = [];
             }
-        };
 
-        fetchPosts();
-    }, []);
+            try {
+                const res2 = await axios.get("http://localhost:5000/api/setpost/getposts");
+                if (Array.isArray(res2.data)) {
+                    res2Data = res2.data;
+                }
+            } catch (err) {
+                console.warn("res2 fetch failed, defaulting to empty array");
+                res2Data = [];
+            }
+
+            // Combine res1 (guaranteed or empty) + res2
+            const combinedData = [...res1Data, ...res2Data];
+
+            if (combinedData.length > 0) {
+                const enhancedPosts = combinedData
+                    .map((post) => ({
+                        ...post,
+                        likes: post.likes || 0,
+                        dislikes: post.dislikes || 0,
+                        userReaction: null,
+                        createdAt: new Date(post.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                        }),
+                    }))
+                    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+                setPosts(enhancedPosts);
+            } else {
+                setPosts([]);
+            }
+        } catch (error) {
+            console.error("Failed to fetch posts:", error);
+            setError(error.message);
+            setPosts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchPosts();
+}, []);
+
 
 
     useEffect(() => {
