@@ -4,15 +4,34 @@ const PostDetails = require('../models/PostDetails')
 
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
+    const posts = await PostDetails.find({ visibility: 'public' })
+      .populate({
+        path: 'postid',
+        select: 'title content tags'
+      })
+      .lean();
+
     if (!posts || posts.length === 0) {
       return res.status(404).json({ message: 'Posts not available' });
     }
-    res.status(200).json(posts);
+
+    // Flatten structure
+    const flatPosts = posts.map(p => ({
+      _id: p._id,
+      title: p.postid?.title || "",
+      content: p.postid?.content || "",
+      tags: p.postid?.tags || [],
+      visibility: p.visibility,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt
+    }));
+
+    res.status(200).json(flatPosts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 const getSpecificPost = async (req, res) => {
   const postId = req.params.postId;
