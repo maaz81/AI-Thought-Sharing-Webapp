@@ -68,8 +68,8 @@ const Header = () => {
           </button>
 
           {/* Links */}
-          <Link to="/" className="hover:underline">
-            Home
+          <Link to="/pricing" className="hover:underline">
+            Pricing
           </Link>
           <Link to="/profile/post" className="hover:underline">
             Create Post

@@ -10,6 +10,7 @@ import PrivateRoute from "./components/auth/PrivateRoute";
 import UpdatePost from "./components/profile/UpdatePost";
 import UpdateProfile from "./components/profile/UpdateProfile";
 import PostDetails from "./components/dashboard/PostDetails";
+import Pricing from "./components/pricing/Pricing";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/" element={<PostCard />} />
         <Route path="/post/:postId" element={<PostDetails />} />
 
