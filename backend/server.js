@@ -3,15 +3,16 @@ const http = require('http');
 const socketIo = require('socket.io');
 const envSecret = require('./config/env');
 const connectDB = require('./config/db');
-const userRoutes = require('./routes/userRoutes');
-const postRoutes = require('./routes/postRoutes');
-const profileRoutes = require('./routes/profileRoutes');
-const postDetailsRoutes = require('./routes/postDetailsRoutes');
-const updatePostRoutes = require('./routes/updatePostRoutes');
-const aiRoutes = require('./routes/aiRoutes');
+const userRoutes = require('./routes/user/userRoutes');
+const postRoutes = require('./routes/user/postRoutes');
+const profileRoutes = require('./routes/user/profileRoutes');
+const postDetailsRoutes = require('./routes/user/postDetailsRoutes');
+const updatePostRoutes = require('./routes/user/updatePostRoutes');
+const aiRoutes = require('./routes/user/aiRoutes');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
-const userDetailsRoutes = require('./routes/userDetailsRoutes');
+const userDetailsRoutes = require('./routes/user/userDetailsRoutes');
+const setPostRoutes = require('./routes/user/setPostRoutes');
 const path = require('path');
 
 
@@ -38,7 +39,7 @@ app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
 app.use('/api/update/profile', userDetailsRoutes)
-app.use('/api/setpost', require('./routes/setPostRoutes'));
+app.use('/api/setpost', setPostRoutes);
 
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);

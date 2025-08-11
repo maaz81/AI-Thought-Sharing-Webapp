@@ -1,6 +1,6 @@
-const User = require('../models/User');
-const UserDetails = require('../models/UserDetails');
-const { generateToken } = require('../utils/generateToken');
+const User = require('../../models/User');
+const UserDetails = require('../../models/UserDetails');
+const { generateToken } = require('../../utils/generateToken');
 const bcrypt = require('bcrypt');
 
 const registerUser = async (req, res) => {

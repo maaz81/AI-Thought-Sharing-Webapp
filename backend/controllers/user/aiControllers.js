@@ -1,4 +1,4 @@
-const openRouterClient = require('../utils/openaiClient');
+const openRouterClient = require('../../utils/openaiClient');
 
 const generatePostSuggestions = async (req, res) => {
   const { title, description, tags } = req.body;

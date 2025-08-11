@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import defaultAvatar from "../../assets/avatar.jpeg";
+import InsightShareLogo from "../../assets/InsightShare Logo.png";
 import { ThemeContext } from "../context/ThemeContext";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 
@@ -9,7 +10,6 @@ const Header = () => {
   const [userPhoto, setUserPhoto] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserPhoto = async () => {
@@ -34,21 +34,15 @@ const Header = () => {
     fetchUserPhoto();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
-      setIsLoggedIn(false);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
   return (
     <header className="bg-blue-600 text-white shadow-md dark:bg-gray-900 dark:text-white">
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-        <Link to="/" className="text-2xl font-bold">
-          📝 PostShare
+        <Link to="/" className="flex items-center">
+          <img
+            src={InsightShareLogo}
+            alt="Logo"
+            className="h-44 w-auto object-contain"
+          />
         </Link>
 
         <nav className="space-x-9 flex items-center">
@@ -81,10 +75,7 @@ const Header = () => {
             Create Post
           </Link>
 
-          {/* Profile Photo (Always Visible) */}
-
-
-          {/* Logout Button (Only if Logged In) */}
+          {/* Profile / Login */}
           {isLoggedIn ? (
             <Link to="/profile">
               <img
@@ -105,10 +96,8 @@ const Header = () => {
               >
                 Login
               </button>
-
             </Link>
           )}
-
         </nav>
       </div>
     </header>

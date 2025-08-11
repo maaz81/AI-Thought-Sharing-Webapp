@@ -1,5 +1,5 @@
-const { getUserProfile,getUserPost, getUserStats } = require('../controllers/profileControllers');
-const protectRoutes = require('../middleware/authMiddleware')
+const { getUserProfile,getUserPost, getUserStats } = require('../../controllers/user/profileControllers');
+const protectRoutes = require('../../middleware/authMiddleware')
 const express = require('express');
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 const express = require('express');
-const protectRoutes = require('../middleware/authMiddleware');
-const { postLikeDetails, getLikeDetails } = require('../controllers/postDetailsControllers');
+const protectRoutes = require('../../middleware/authMiddleware');
+const { postLikeDetails, getLikeDetails } = require('../../controllers/user/postDetailsControllers');
 
 const router = express.Router();
 

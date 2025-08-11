@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const getAllPosts = (req, res) => {
-  const dirPath = path.join(__dirname, '../setpostjson');
+  const dirPath = path.join(__dirname, '../../setpostjson');
 
   fs.readdir(dirPath, (err, files) => {
     if (err) {

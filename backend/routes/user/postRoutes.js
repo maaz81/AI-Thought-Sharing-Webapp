@@ -1,6 +1,6 @@
 const express = require('express');
-const { getPosts, getSpecificPost, createPosts, searchBar} = require('../controllers/postControllers');
-const protectRoutes = require('../middleware/authMiddleware');
+const { getPosts, getSpecificPost, createPosts, searchBar} = require('../../controllers/user/postControllers');
+const protectRoutes = require('../../middleware/authMiddleware');
 
 const router = express.Router();
 
