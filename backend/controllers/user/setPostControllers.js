@@ -35,7 +35,7 @@ const getSpecificPost = (req, res) => {
     return res.status(400).json({ error: 'Post ID is required and must be valid.' });
   }
 
-  const dirPath = path.join(__dirname, '../setpostjson');
+  const dirPath = path.join(__dirname, '../../setpostjson');
   let allPosts = [];
 
   try {
