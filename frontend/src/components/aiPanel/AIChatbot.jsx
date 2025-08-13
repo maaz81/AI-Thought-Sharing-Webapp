@@ -23,7 +23,7 @@ const AIChatbot = () => {
   }
 
   return (
-    <div className="p-4 border rounded w-full max-w-md mx-auto">
+    <div className="p-4 border rounded w-full max-w-md mx-auto dark:bg-gray-900 dark:text-white">
       <div className="h-80 overflow-y-auto space-y-2 mb-2">
         {messages.map((msg, i) => (
           <div key={i} className={`text-sm ${msg.sender === 'user' ? 'text-right' : 'text-left text-blue-500'}`}>
@@ -33,7 +33,7 @@ const AIChatbot = () => {
       </div>
       <div className="flex gap-2">
         <input
-          className="border flex-1 p-2"
+          className="border flex-1 p-2 dark:text-white dark:bg-gray-800"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask AI anything..."
