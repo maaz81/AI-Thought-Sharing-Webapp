@@ -15,6 +15,7 @@ const userDetailsRoutes = require('./routes/user/userDetailsRoutes');
 const setPostRoutes = require('./routes/user/setPostRoutes');
 const path = require('path');
 
+const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
 
 
 // Setup Express App
@@ -40,6 +41,10 @@ app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
 app.use('/api/update/profile', userDetailsRoutes)
 app.use('/api/setpost', setPostRoutes);
+
+
+// Admin Routes
+app.use('/api/admin', adminAuthRoutes);
 
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);
