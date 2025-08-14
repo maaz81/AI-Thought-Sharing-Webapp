@@ -1,6 +1,6 @@
-const Post = require('../../models/Post');
-const User = require('../../models/User');
-const PostDetails = require('../../models/PostDetails')
+const Post = require('../../models/user/Post');
+const User = require('../../models/user/User');
+const PostDetails = require('../../models/user/PostDetails')
 
 const getPosts = async (req, res) => {
   try {

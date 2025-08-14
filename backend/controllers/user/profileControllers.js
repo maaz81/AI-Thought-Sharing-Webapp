@@ -1,5 +1,5 @@
-const User = require('../../models/User');
-const Post = require('../../models/Post');
+const User = require('../../models/user/User');
+const Post = require('../../models/user/Post');
 
 const getUserProfile = async (req, res) => {
   try {

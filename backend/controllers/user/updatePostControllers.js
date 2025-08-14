@@ -1,6 +1,6 @@
 const { json } = require('express');
-const PostDetails = require('../../models/PostDetails');
-const Post = require('../../models/Post');
+const PostDetails = require('../../models/user/PostDetails');
+const Post = require('../../models/user/Post');
 
 const postUpdateDetails = async (req, res) => {
   const { title, content, tags, visibility } = req.body;
