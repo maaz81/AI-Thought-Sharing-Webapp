@@ -308,7 +308,7 @@ const PostCardDisplay = ({ post, handleReaction, onClick }) => {
 
     const goToPostDetails = (e) => {
         e.stopPropagation(); // Prevent card selection
-        navigate(`/post/${post._id}`);
+        navigate(`/post/${post.postId || post._id}`);
     };
 
     return (

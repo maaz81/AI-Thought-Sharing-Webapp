@@ -7,7 +7,7 @@ const getPosts = async (req, res) => {
     const posts = await PostDetails.find({ visibility: 'public' })
       .populate({
         path: 'postid',
-        select: 'title content tags'
+        select: '_id title content tags'
       })
       .lean();
 
@@ -18,6 +18,7 @@ const getPosts = async (req, res) => {
     // Flatten structure
     const flatPosts = posts.map(p => ({
       _id: p._id,
+      postId: p.postid?._id || null,
       title: p.postid?.title || "",
       content: p.postid?.content || "",
       tags: p.postid?.tags || [],
