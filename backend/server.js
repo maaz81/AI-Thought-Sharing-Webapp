@@ -16,7 +16,8 @@ const setPostRoutes = require('./routes/user/setPostRoutes');
 const path = require('path');
 
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
-const { dashboard } = require('./controllers/admin/adminDashboard');
+const  dashboard  = require('./routes/admin/adminDashboardRoutes');
+const  adminPostRoutes  = require('./routes/admin/adminPostRoutes');
 
 
 // Setup Express App
@@ -47,6 +48,7 @@ app.use('/api/setpost', setPostRoutes);
 // Admin Routes
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admin/dashboard', dashboard);
+app.use('/api/admin/posts', adminPostRoutes);
 
 
 // Create HTTP server for Socket.IO
