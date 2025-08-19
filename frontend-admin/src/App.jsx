@@ -24,12 +24,11 @@ function App() {
         />
         <Route
           path="/posts"
-          // element={
-          //   <ProtectedRoute>
-          //     <PostsPage />
-          //   </ProtectedRoute>
-          // }
-          element={<PostsPage/>}
+          element={
+            <ProtectedRoute>
+              <PostsPage />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </Router>
