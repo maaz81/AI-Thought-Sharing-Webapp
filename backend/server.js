@@ -19,15 +19,24 @@ const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
 const  dashboard  = require('./routes/admin/adminDashboardRoutes');
 const  adminPostRoutes  = require('./routes/admin/adminPostRoutes');
 
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
 
 // Setup Express App
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(cors({
-  origin: "http://localhost:5173",  // 👈 Your frontend port
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
@@ -57,10 +66,12 @@ const server = http.createServer(app);
 // Setup Socket.IO
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
+
 
 // Make io globally available (for controllers to use)
 app.set('io', io);
