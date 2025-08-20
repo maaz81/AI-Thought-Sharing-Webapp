@@ -1,14 +1,7 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts, deletePost } from '../../../features/posts/postsSlice';
+import { usePosts } from '../../../hooks/usePosts';
 
 const PostsPage = () => {
-  const dispatch = useDispatch();
-  const { list, loading, error } = useSelector((state) => state.posts);
-
-  useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
+  const { posts, loading, error, handleDelete } = usePosts();
 
   return (
     <div className="p-6">
@@ -26,13 +19,13 @@ const PostsPage = () => {
           </tr>
         </thead>
         <tbody>
-          {list.map((post) => (
+          {posts.map((post) => (
             <tr key={post._id}>
               <td className="border p-2">{post.title}</td>
-              <td className="border p-2">{post.author || "Unknown"}</td>
+              <td className="border p-2">{post.author || 'Unknown'}</td>
               <td className="border p-2">
                 <button
-                  onClick={() => dispatch(deletePost(post._id))}
+                  onClick={() => handleDelete(post._id)}
                   className="bg-red-500 text-white px-3 py-1 rounded"
                 >
                   Delete
@@ -40,7 +33,7 @@ const PostsPage = () => {
               </td>
             </tr>
           ))}
-          {list.length === 0 && !loading && (
+          {posts.length === 0 && !loading && (
             <tr>
               <td colSpan="3" className="text-center p-3">
                 No posts found
