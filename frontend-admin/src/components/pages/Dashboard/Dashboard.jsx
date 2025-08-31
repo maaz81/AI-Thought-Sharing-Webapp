@@ -1,6 +1,7 @@
 import { logoutAdmin } from '../../../features/auth/authSlice';
 import { useDispatch } from 'react-redux';
 import { useDashboard } from '../../../hooks/useDashboard';
+import  Card  from '../../cards and charts/Card'
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -33,6 +34,8 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+
+      <Card />
     </div>
   );
 };

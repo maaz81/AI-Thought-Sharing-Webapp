@@ -7,29 +7,21 @@ import ProtectedRoute from './components/protectedRoutes/ProtectedRoute';
 function App() {
   return (
     <Router>
-      <nav className="bg-gray-800 text-white p-4 flex gap-4">
+      <nav className="p-4 flex gap-4">
         <Link to="/dashboard">Dashboard</Link>
         <Link to="/posts">Posts</Link>
       </nav>
 
       <Routes>
+        {/* Public Route */}
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/posts"
-          element={
-            <ProtectedRoute>
-              <PostsPage />
-            </ProtectedRoute>
-          }
-        />
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/posts" element={<PostsPage />} />
+        </Route>
       </Routes>
     </Router>
   );
