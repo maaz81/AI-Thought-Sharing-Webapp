@@ -16,8 +16,6 @@ const setPostRoutes = require('./routes/user/setPostRoutes');
 const path = require('path');
 
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
-const  dashboard  = require('./routes/admin/adminDashboardRoutes');
-const  adminPostRoutes  = require('./routes/admin/adminPostRoutes');
 
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
 
@@ -56,8 +54,8 @@ app.use('/api/setpost', setPostRoutes);
 
 // Admin Routes
 app.use('/api/admin', adminAuthRoutes);
-app.use('/api/admin/dashboard', dashboard);
-app.use('/api/admin/posts', adminPostRoutes);
+
+
 
 
 // Create HTTP server for Socket.IO

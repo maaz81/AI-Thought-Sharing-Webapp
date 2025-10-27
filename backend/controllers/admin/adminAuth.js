@@ -2,8 +2,6 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const router = express.Router();
-
 const login = (req, res) => {
   const { email, password } = req.body;
 
@@ -14,7 +12,7 @@ const login = (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // true in production
-      sameSite: 'Strict', // or 'Lax', depending on your use case
+      // sameSite: 'Strict', // or 'Lax', depending on your use case
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 

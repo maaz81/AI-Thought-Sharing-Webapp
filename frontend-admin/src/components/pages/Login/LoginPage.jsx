@@ -18,7 +18,7 @@ const LoginPage = () => {
     dispatch(loginAdmin(form));
   };
 
-  if (isAuthenticated) return <Navigate to="/dashboard" />;
+  if (isAuthenticated) return <Navigate to="/" />;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 px-4">
