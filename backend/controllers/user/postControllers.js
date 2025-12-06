@@ -103,24 +103,31 @@ const createPosts = async (req, res) => {
   }
 };
 
-const searchBar = async (req, res) => {
-  const { query } = req.query;
 
+const searchBar = async (req, res) => {
   try {
-    const regex = new RegExp(query, 'i'); // case-insensitive
-    if (!query || query.trim() === '') {
-      return res.status(400).json({ message: 'Search query is required' });
+    const { query } = req.query;
+
+    if (!query || !query.trim()) {
+      return res
+        .status(400)
+        .json({ message: 'Search query is required', results: [] });
     }
+
+    const regex = new RegExp(query.trim(), 'i'); // case-insensitive
+
     const results = await Post.find({
       $or: [
-        { title: { $regex: regex } },
-        { tags: { $regex: regex } }
-      ]
+        { title: regex },
+        { content: regex }, // you might want this too
+        { tags: regex },    // works if tags is array of strings or string
+      ],
     });
 
-    res.json({ results });
+    return res.json({ results });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Search error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 

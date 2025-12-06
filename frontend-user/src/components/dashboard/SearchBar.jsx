@@ -9,22 +9,35 @@ const SearchBar = () => {
     const handleSearch = async () => {
         if (!query.trim()) {
             setResults([]);
+            setError('');
             return;
         }
 
         setLoading(true);
         setError('');
+
         try {
-            const res = await axios.get(`http://localhost:5000/search?query=${encodeURIComponent(query)}`);
-            setResults(Array.isArray(res.data.results) ? res.data.results : []);
+            const res = await axios.get('http://localhost:5000/api/search', {
+                params: { query },
+            });
+
             console.log('Raw Axios response:', res.data);
 
+            setResults(Array.isArray(res.data.results) ? res.data.results : []);
         } catch (err) {
-            setError('Something went wrong. Please try again.');
+            console.error('Search error:', err.response?.data || err.message);
+            setError(
+                err.response?.data?.message || 'Something went wrong. Please try again.'
+            );
         } finally {
             setLoading(false);
         }
     };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') handleSearch();
+    };
+
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') handleSearch();
