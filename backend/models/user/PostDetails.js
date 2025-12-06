@@ -1,40 +1,58 @@
-const  mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const PostDetailsSchema = mongoose.Schema({
-    like:{
+    
+    // store list of user IDs who liked
+    likedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        }
+    ],
+
+    // store list of user IDs who disliked
+    dislikedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        }
+    ],
+
+    // auto counts – no need to store as string
+    like: {
+        type: Number,
+        default: 0,
+    },
+    dislike: {
+        type: Number,
+        default: 0,
+    },
+
+    // comment field (fine)
+    comment: {
         type: String,
-        required: true,
-        default: '0'
     },
-    dislike:{
-        type: String,
-        required: true,
-        default: '0'
-    },
-    comment:{
-        type: String
-    },
-    visibility:{
+
+    // visibility
+    visibility: {
         type: String,
         enum: ['public','private'],
         default: 'public',
-        required: true
     },
-    update:{
+
+    // last update
+    update: {
         type: Date,
-        default: null
+        default: null,
     },
-    postid:{
+
+    postid: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'Post',
         required: true
     },
-    userid:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        required: true
-    },
-},{
+
+}, {
     timestamps: true,
 });
 
