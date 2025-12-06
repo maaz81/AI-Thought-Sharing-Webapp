@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios'
+import { Link } from 'react-router-dom';
+
+
 const SearchBar = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -43,6 +46,33 @@ const SearchBar = () => {
         if (e.key === 'Enter') handleSearch();
     };
 
+    const getSnippet = (content, query) => {
+        if (!content) return "";
+
+        const lowerContent = content.toLowerCase();
+        const lowerQuery = query.toLowerCase();
+
+        const index = lowerContent.indexOf(lowerQuery);
+
+        // If the word is not found, return first 60 chars
+        if (index === -1) {
+            return content.substring(0, 60) + (content.length > 60 ? "..." : "");
+        }
+
+        // Snippet with 30 chars before and after the keyword
+        const start = Math.max(0, index - 30);
+        const end = Math.min(content.length, index + query.length + 30);
+
+        let snippet = content.substring(start, end);
+
+        return snippet + "...";
+    };
+
+    const highlightText = (text, query) => {
+        const regex = new RegExp(`(${query})`, "gi");
+        return text.replace(regex, "<mark>$1</mark>");
+    };
+
 
     return (
         <div className="max-w-2xl mx-auto p-4 dark:bg-gray-900 dark:text-white">
@@ -70,27 +100,39 @@ const SearchBar = () => {
             <ul className="mt-6 space-y-4">
                 {Array.isArray(results) && results.length > 0 ? (
                     results.map((post) => (
-                        <li key={post._id} className="border p-4 rounded-md shadow-sm">
-                            <h3 className="text-lg font-semibold">{post.title}</h3>
-                            <p className="text-md ">{post.content}</p>
-                            {post.tags?.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-2">
-                                    {post.tags.map((tag, i) => (
-                                        <span
-                                            key={i}
-                                            className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs"
-                                        >
-                                            #{tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </li>
+                        <Link to={`/post/${post._id}`} key={post._id}>
+                            <li className="border p-4 rounded-md shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                <h3 className="text-lg font-semibold">{post.title}</h3>
+                                <p
+                                    className="text-md"
+                                    dangerouslySetInnerHTML={{
+                                        __html: highlightText(getSnippet(post.content, query), query)
+                                    }}
+                                ></p>
+
+
+                                {post.tags?.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        {post.tags.map((tag, i) => (
+                                            <span
+                                                key={i}
+                                                className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs"
+                                            >
+                                                #{tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </li>
+                        </Link>
                     ))
                 ) : (
                     !loading &&
-                    query &&
-                    <p className="mt-4 text-gray-500">No results found for "{query}".</p>
+                    query.trim() !== "" && (
+                        <p className="mt-4 text-gray-500">
+                            No results found for "{query}".
+                        </p>
+                    )
                 )}
             </ul>
 
