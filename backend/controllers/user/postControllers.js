@@ -16,16 +16,24 @@ const getPosts = async (req, res) => {
     }
 
     // Flatten structure
-    const flatPosts = posts.map(p => ({
-      _id: p._id,
-      postId: p.postid?._id || null,
-      title: p.postid?.title || "",
-      content: p.postid?.content || "",
-      tags: p.postid?.tags || [],
-      visibility: p.visibility,
-      createdAt: p.createdAt,
-      updatedAt: p.updatedAt
-    }));
+    const flatPosts = posts
+      .map(p => ({
+        _id: p._id,
+        postId: p.postid?._id || null,
+        title: p.postid?.title,
+        content: p.postid?.content,
+        tags: p.postid?.tags,
+        visibility: p.visibility,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt
+      }))
+      .filter(p =>
+        p.title &&
+        p.content &&
+        Array.isArray(p.tags) &&
+        p.tags.length > 0
+      );
+
 
     res.status(200).json(flatPosts);
   } catch (err) {
@@ -64,11 +72,24 @@ const createPosts = async (req, res) => {
 
     const { title, content, tags, visibility } = req.body;
 
+    // ✅ ALL required: title, content, tags
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    if (!content || content.trim() === "") {
+      return res.status(400).json({ error: "Content is required" });
+    }
+
+    if (!tags || !Array.isArray(tags) || tags.length === 0) {
+      return res.status(400).json({ error: "At least one tag is required" });
+    }
+
     const post = await Post.create({
-      title,
-      content,
+      title: title.trim(),
+      content: content.trim(),
       tags,
-      userid: req.userId // Use the userId from the authenticated request
+      userid: req.userId
     });
 
     const postDetails = await PostDetails.create({
@@ -91,17 +112,21 @@ const createPosts = async (req, res) => {
       { new: true }
     );
 
-    // Emit real-time event after creating a post
     const io = req.app.get('io');
-    io.emit('postCreated', post);
-
-
+    io.emit('postCreated', {
+      _id: post._id,
+      title: post.title,
+      content: post.content,
+      tags: post.tags,
+      visibility
+    });
 
     res.status(200).json(post);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 const searchBar = async (req, res) => {
