@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom';
 
 
-const SearchBar = () => {
+const SearchBar = ({ onSearch }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -13,6 +13,7 @@ const SearchBar = () => {
         if (!query.trim()) {
             setResults([]);
             setError('');
+            if (onSearch) onSearch(query);
             return;
         }
 
@@ -27,6 +28,7 @@ const SearchBar = () => {
             console.log('Raw Axios response:', res.data);
 
             setResults(Array.isArray(res.data.results) ? res.data.results : []);
+            if (onSearch) onSearch(query);
         } catch (err) {
             console.error('Search error:', err.response?.data || err.message);
             setError(
@@ -36,11 +38,6 @@ const SearchBar = () => {
             setLoading(false);
         }
     };
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') handleSearch();
-    };
-
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') handleSearch();
@@ -70,13 +67,13 @@ const SearchBar = () => {
 
     const highlightText = (text, query) => {
         const regex = new RegExp(`(${query})`, "gi");
-        return text.replace(regex, "<mark>$1</mark>");
+        return text.replace(regex, "<mark class='bg-brand-accent text-brand-text font-semibold'>$1</mark>");
     };
 
 
     return (
-        <div className="max-w-2xl mx-auto p-4 dark:bg-gray-900 dark:text-white">
-            <h1 className="text-2xl font-semibold mb-4 text-center">Search Posts</h1>
+        <div className="max-w-2xl mx-auto dark:bg-brandDark-bg dark:text-brandDark-text">
+            <h1 className="text-2xl font-semibold mb-4 text-center text-brand-text dark:text-brandDark-text">Search Posts</h1>
             <div className="flex gap-2">
                 <input
                     type="text"
@@ -84,27 +81,27 @@ const SearchBar = () => {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-black"
+                    className="flex-1 px-4 py-2 border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-brandDark-surface dark:text-brandDark-text dark:border-brandDark-border"
                 />
                 <button
                     onClick={handleSearch}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    className="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primaryHover transition-colors"
                 >
                     Search
                 </button>
             </div>
 
-            {loading && <p className="mt-4 text-blue-600">Searching...</p>}
-            {error && <p className="mt-4 text-red-500">{error}</p>}
+            {loading && <p className="mt-4 text-brand-primary">Searching...</p>}
+            {error && <p className="mt-4 text-state-error">{error}</p>}
 
             <ul className="mt-6 space-y-4">
                 {Array.isArray(results) && results.length > 0 ? (
                     results.map((post) => (
                         <Link to={`/post/${post._id}`} key={post._id}>
-                            <li className="border p-4 rounded-md shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                                <h3 className="text-lg font-semibold">{post.title}</h3>
+                            <li className="border border-brand-border bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border p-4 rounded-xl shadow-soft cursor-pointer hover:shadow-md transition-all duration-200">
+                                <h3 className="text-lg font-semibold text-brand-text dark:text-brandDark-text">{post.title}</h3>
                                 <p
-                                    className="text-md"
+                                    className="text-sm text-brand-text/80 dark:text-brandDark-text/80 mt-2"
                                     dangerouslySetInnerHTML={{
                                         __html: highlightText(getSnippet(post.content, query), query)
                                     }}
@@ -112,11 +109,11 @@ const SearchBar = () => {
 
 
                                 {post.tags?.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-2">
+                                    <div className="mt-3 flex flex-wrap gap-2">
                                         {post.tags.map((tag, i) => (
                                             <span
                                                 key={i}
-                                                className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs"
+                                                className="bg-brand-primary/10 text-brand-primary dark:text-brand-primary dark:bg-brand-primary/20 px-2.5 py-1 rounded-full text-xs"
                                             >
                                                 #{tag}
                                             </span>
@@ -129,7 +126,7 @@ const SearchBar = () => {
                 ) : (
                     !loading &&
                     query.trim() !== "" && (
-                        <p className="mt-4 text-gray-500">
+                        <p className="mt-4 text-brand-muted dark:text-brandDark-muted text-center">
                             No results found for "{query}".
                         </p>
                     )
