@@ -1,182 +1,199 @@
 import { useState, useEffect } from "react";
-import Header from '../HeaderFooter/Header';
-import Footer from '../HeaderFooter/Footer';
+import Header from "../HeaderFooter/Header";
+import Footer from "../HeaderFooter/Footer";
 import SearchBar from "./SearchBar";
-import axios from 'axios';
-import { io } from 'socket.io-client';
+import axios from "axios";
+import { io } from "socket.io-client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+
+// 🔹 helper to format a post consistently
+const formatPost = (post) => ({
+  ...post,
+  likes: post.likes || 0,
+  dislikes: post.dislikes || 0,
+  userReaction: post.userReaction || null,
+  createdAt: new Date(post.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }),
+});
 
 const PostCard = () => {
-    const [posts, setPosts] = useState([]);
-    const [selectedPost, setSelectedPost] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState(null);
-    const [error, setError] = useState(null);
-    const [searchQuery, setSearchQuery] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState(null);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-   useEffect(() => {
+  // 🔹 Initial fetch
+  useEffect(() => {
     const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        let res1Data = [];
+        let res2Data = [];
+
         try {
-            setLoading(true);
-            setError(null);
-
-            let res1Data = [];
-            let res2Data = [];
-
-            try {
-                const res1 = await axios.get("http://localhost:5000/api/post");
-                if (Array.isArray(res1.data)) {
-                    res1Data = res1.data;
-                }
-            } catch (err) {
-                console.warn("res1 fetch failed, defaulting to empty array");
-                res1Data = [];
-            }
-
-            try {
-                const res2 = await axios.get("http://localhost:5000/api/setpost/getposts");
-                if (Array.isArray(res2.data)) {
-                    res2Data = res2.data;
-                }
-            } catch (err) {
-                console.warn("res2 fetch failed, defaulting to empty array");
-                res2Data = [];
-            }
-
-            // Combine res1 (guaranteed or empty) + res2
-            const combinedData = [...res1Data, ...res2Data];
-
-            if (combinedData.length > 0) {
-                const enhancedPosts = combinedData
-                    .map((post) => ({
-                        ...post,
-                        likes: post.likes || 0,
-                        dislikes: post.dislikes || 0,
-                        userReaction: null,
-                        createdAt: new Date(post.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                        }),
-                    }))
-                    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-                setPosts(enhancedPosts);
-            } else {
-                setPosts([]);
-            }
-        } catch (error) {
-            console.error("Failed to fetch posts:", error);
-            setError(error.message);
-            setPosts([]);
-        } finally {
-            setLoading(false);
+          const res1 = await axios.get("http://localhost:5000/api/post");
+          if (Array.isArray(res1.data)) {
+            res1Data = res1.data;
+          }
+        } catch (err) {
+          console.warn("res1 fetch failed, defaulting to empty array");
+          res1Data = [];
         }
+
+        try {
+          const res2 = await axios.get(
+            "http://localhost:5000/api/setpost/getposts"
+          );
+          if (Array.isArray(res2.data)) {
+            res2Data = res2.data;
+          }
+        } catch (err) {
+          console.warn("res2 fetch failed, defaulting to empty array");
+          res2Data = [];
+        }
+
+        const combinedData = [...res1Data, ...res2Data];
+
+        if (combinedData.length > 0) {
+          const enhancedPosts = combinedData
+            .filter((post) => post.visibility === "public") // ✅ only public
+            .map(formatPost)
+            .sort(
+              (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+            );
+
+          setPosts(enhancedPosts);
+        } else {
+          setPosts([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+        setError(error.message);
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchPosts();
-}, []);
+  }, []);
 
+  // 🔹 Socket listeners
+  useEffect(() => {
+    const socket = io("http://localhost:5000");
 
+    socket.on("postCreated", (newPost) => {
+      // ignore private posts in public feed
+      if (newPost.visibility !== "public") return;
 
-    useEffect(() => {
-        const socket = io('http://localhost:5000');
+      setPosts((prev) => [formatPost(newPost), ...prev]);
+    });
 
-        socket.on('postCreated', (newPost) => {
-            setPosts((prev) => [{
-                ...newPost,
-                createdAt: new Date(newPost.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                })
-            }, ...prev]);
-        });
-
-        socket.on('postUpdated', (updatedPost) => {
-            setPosts((prev) =>
-                prev.map((post) => (post._id === updatedPost._id ? {
-                    ...updatedPost,
-                    createdAt: post.createdAt // Preserve formatted date
-                } : post))
-            );
-        });
-
-        socket.on('postDeleted', (deletedPostId) => {
-            setPosts((prev) => prev.filter((post) => post._id !== deletedPostId));
-        });
-
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
-
-    const handleReaction = async (postId, reactionType) => {
-        try {
-            await axios.post(
-                `http://localhost:5000/profile/like/${postId}`,
-                { reaction: reactionType },
-                {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-
-            setPosts(prevPosts =>
-                prevPosts.map(post => {
-                    if (post._id !== postId) return post;
-
-                    let newLikes = post.likes || 0;
-                    let newDislikes = post.dislikes || 0;
-                    let newUserReaction = post.userReaction;
-
-                    if (reactionType === 'like') {
-                        if (post.userReaction === 'like') {
-                            newLikes -= 1;
-                            newUserReaction = null;
-                        } else {
-                            newLikes += 1;
-                            if (post.userReaction === 'dislike') newDislikes -= 1;
-                            newUserReaction = 'like';
-                        }
-                    } else if (reactionType === 'dislike') {
-                        if (post.userReaction === 'dislike') {
-                            newDislikes -= 1;
-                            newUserReaction = null;
-                        } else {
-                            newDislikes += 1;
-                            if (post.userReaction === 'like') newLikes -= 1;
-                            newUserReaction = 'dislike';
-                        }
-                    }
-
-                    return {
-                        ...post,
-                        likes: newLikes,
-                        dislikes: newDislikes,
-                        userReaction: newUserReaction,
-                    };
-                })
-            );
-        } catch (error) {
-            console.error('Reaction error:', error);
-            alert('You need to be logged in to react to posts.');
+    socket.on("postUpdated", (updatedPost) => {
+      setPosts((prev) => {
+        // if post turned private → remove from feed
+        if (updatedPost.visibility !== "public") {
+          return prev.filter((post) => post._id !== updatedPost._id);
         }
+
+        // else update in place
+        return prev.map((post) =>
+          post._id === updatedPost._id
+            ? {
+                ...post,
+                ...formatPost(updatedPost),
+                createdAt: post.createdAt, // keep existing formatted date
+              }
+            : post
+        );
+      });
+    });
+
+    socket.on("postDeleted", (deletedPostId) => {
+      setPosts((prev) => prev.filter((post) => post._id !== deletedPostId));
+    });
+
+    return () => {
+      socket.disconnect();
     };
+  }, []);
 
-    const filteredPosts = posts.filter(post =>
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (post.tags && post.tags.some(tag =>
-            tag.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+  const handleReaction = async (postId, reactionType) => {
+    try {
+      await axios.post(
+        `http://localhost:5000/profile/like/${postId}`,
+        { reaction: reactionType },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
+          if (post._id !== postId) return post;
+
+          let newLikes = post.likes || 0;
+          let newDislikes = post.dislikes || 0;
+          let newUserReaction = post.userReaction;
+
+          if (reactionType === "like") {
+            if (post.userReaction === "like") {
+              newLikes -= 1;
+              newUserReaction = null;
+            } else {
+              newLikes += 1;
+              if (post.userReaction === "dislike") newDislikes -= 1;
+              newUserReaction = "like";
+            }
+          } else if (reactionType === "dislike") {
+            if (post.userReaction === "dislike") {
+              newDislikes -= 1;
+              newUserReaction = null;
+            } else {
+              newDislikes += 1;
+              if (post.userReaction === "like") newLikes -= 1;
+              newUserReaction = "dislike";
+            }
+          }
+
+          return {
+            ...post,
+            likes: newLikes,
+            dislikes: newDislikes,
+            userReaction: newUserReaction,
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Reaction error:", error);
+      alert("You need to be logged in to react to posts.");
+    }
+  };
+
+  const filteredPosts = posts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (post.tags &&
+        post.tags.some((tag) =>
+          tag.toLowerCase().includes(searchQuery.toLowerCase())
         ))
+  );
 
-    if (loading) return <LoadingSkeleton />;
-    if (error) return <ErrorDisplay error={error} />;
+  if (loading) return <LoadingSkeleton />;
+  if (error) return <ErrorDisplay error={error} />;
+
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 dark:text-white">
