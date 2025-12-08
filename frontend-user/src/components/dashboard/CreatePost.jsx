@@ -16,16 +16,10 @@ const CreatePost = () => {
     const [suggestedDescription, setSuggestedDescription] = useState([]);
     const [suggestedTags, setSuggestedTags] = useState([]);
     const [aiLoading, setAiLoading] = useState(false);
-
     const [showChat, setShowChat] = useState(false);
 
     const displayAiChat = () => {
-        if (!showChat) {
-            setShowChat(true);
-        }
-        else {
-            setShowChat(false);
-        }
+        setShowChat(!showChat);
     };
 
     const handleSubmit = async (e) => {
@@ -75,29 +69,30 @@ const CreatePost = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 dark:bg-gray-900 dark:text-white">
+        <div className="min-h-screen bg-brand-bg py-8 px-4 sm:px-6 lg:px-8 dark:bg-brandDark-bg dark:text-brandDark-text transition-colors duration-200">
             <div className="max-w-2xl mx-auto">
-                <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+                {/* Main Card */}
+                <div className="bg-brand-surface shadow-soft rounded-2xl overflow-hidden border border-brand-border dark:bg-brandDark-surface dark:border-brandDark-border transition-all duration-300 hover:shadow-lg">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+                    <div className="bg-gradient-to-r from-brand-primary to-brand-primary/90 p-6">
                         <h2 className="text-2xl font-bold text-white flex items-center">
-                            <FiPlus className="mr-2" /> Create New Post
+                            <FiPlus className="mr-3" /> Create New Post
                         </h2>
-                        <p className="text-blue-100 mt-1">Share your thoughts with the community</p>
+                        <p className="text-brand-bg/90 mt-2">Share your thoughts with the community</p>
                     </div>
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
                         {/* Title Field */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-brand-text mb-2 dark:text-brandDark-text">
                                 Title
                             </label>
                             <input
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
+                                className="w-full px-4 py-3 border border-brand-border rounded-2xl focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border dark:text-brandDark-text dark:placeholder:text-brandDark-muted"
                                 placeholder="What's your post about?"
                                 required
                             />
@@ -105,9 +100,14 @@ const CreatePost = () => {
 
                         {/* Content Field */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Content
-                            </label>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-sm font-medium text-brand-text dark:text-brandDark-text">
+                                    Content
+                                </label>
+                                <span className="text-xs text-brand-muted dark:text-brandDark-muted">
+                                    {wordCount} words {wordCount >= 50 ? "✓" : ""}
+                                </span>
+                            </div>
                             <textarea
                                 value={content}
                                 onChange={(e) => {
@@ -116,8 +116,7 @@ const CreatePost = () => {
                                     const words = value.trim().split(/\s+/);
                                     setWordCount(words.filter(Boolean).length);
                                 }}
-
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px] dark:text-black"
+                                className="w-full px-4 py-3 border border-brand-border rounded-2xl focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border dark:text-brandDark-text dark:placeholder:text-brandDark-muted min-h-[200px] resize-y"
                                 placeholder="Write your thoughts here..."
                                 required
                             />
@@ -125,17 +124,17 @@ const CreatePost = () => {
 
                         {/* Tags Field */}
                         <div>
-                            <label className="text-sm font-medium text-gray-700 mb-1 flex items-center">
-                                <FiTag className="mr-1" /> Tags
+                            <label className="text-sm font-medium text-brand-text mb-2 flex items-center dark:text-brandDark-text">
+                                <FiTag className="mr-2" /> Tags
                             </label>
                             <input
                                 type="text"
                                 value={tags}
                                 onChange={(e) => setTags(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
+                                className="w-full px-4 py-3 border border-brand-border rounded-2xl focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border dark:text-brandDark-text dark:placeholder:text-brandDark-muted"
                                 placeholder="react, javascript, webdev (comma separated)"
                             />
-                            <p className="mt-1 text-xs text-gray-500">
+                            <p className="mt-2 text-xs text-brand-muted dark:text-brandDark-muted">
                                 Add relevant tags to help others find your post
                             </p>
                         </div>
@@ -156,36 +155,49 @@ const CreatePost = () => {
                                         setSuggestedTitles(titles || []);
                                         setSuggestedDescription(descriptions || []);
                                         setSuggestedTags(tags || []);
-
                                     } catch (err) {
                                         console.error("AI Error:", err);
                                     } finally {
                                         setAiLoading(false);
                                     }
                                 }}
-                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium transition-all ${wordCount < 50 || aiLoading
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-green-600 hover:bg-green-700"
+                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-2xl shadow-sm text-white font-medium transition-all duration-300 ${wordCount < 50 || aiLoading
+                                    ? "bg-brand-muted cursor-not-allowed dark:bg-brandDark-muted"
+                                    : "bg-gradient-to-r from-state-success to-state-info hover:opacity-90 transform hover:scale-[1.02]"
                                     }`}
                             >
-                                {aiLoading ? "Generating Suggestions..." : "✨ AI Suggestion"}
+                                {aiLoading ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="mr-2">✨</span>
+                                        Get AI Suggestions
+                                    </>
+                                )}
                             </button>
-                            <p className="text-xs text-gray-500 mt-1">Enabled after 50+ words in content</p>
+                            <p className="text-xs text-brand-muted dark:text-brandDark-muted mt-2 text-center">
+                                {wordCount < 50 ? `Write ${50 - wordCount} more words to unlock AI suggestions` : "AI suggestions unlocked!"}
+                            </p>
                         </div>
-
 
                         {/* Visibility Toggle */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-brand-text mb-3 dark:text-brandDark-text">
                                 Visibility
                             </label>
                             <div className="flex gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setVisibility("public")}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 dark:text-black rounded-lg border transition-all ${visibility === "public"
-                                        ? "bg-blue-50 border-blue-500 text-blue-700"
-                                        : "border-gray-300 hover:bg-gray-50"
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border transition-all duration-300 ${visibility === "public"
+                                        ? "bg-brand-primary/10 border-brand-primary text-brand-primary dark:bg-brand-primary/20 dark:border-brand-primary dark:text-white"
+                                        : "border-brand-border hover:bg-brand-bg dark:border-brandDark-border dark:hover:bg-brandDark-bg"
                                         }`}
                                 >
                                     <FiGlobe />
@@ -195,9 +207,9 @@ const CreatePost = () => {
                                 <button
                                     type="button"
                                     onClick={() => setVisibility("private")}
-                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 dark:text-black rounded-lg border transition-all ${visibility === "private"
-                                        ? "bg-blue-50 border-blue-500 text-blue-700"
-                                        : "border-gray-300 hover:bg-gray-50"
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border transition-all duration-300 ${visibility === "private"
+                                        ? "bg-brand-primary/10 border-brand-primary text-brand-primary dark:bg-brand-primary/20 dark:border-brand-primary dark:text-white"
+                                        : "border-brand-border hover:bg-brand-bg dark:border-brandDark-border dark:hover:bg-brandDark-bg"
                                         }`}
                                 >
                                     <FiLock />
@@ -208,13 +220,13 @@ const CreatePost = () => {
                         </div>
 
                         {/* Submit Button */}
-                        <div className="pt-2">
+                        <div className="pt-4">
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ${isSubmitting
-                                    ? "bg-blue-400 cursor-not-allowed"
-                                    : "bg-blue-600 hover:bg-blue-700"
+                                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-2xl shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-all duration-300 transform hover:scale-[1.02] ${isSubmitting
+                                    ? "bg-brand-primary/70 cursor-not-allowed"
+                                    : "bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:shadow-lg"
                                     }`}
                             >
                                 {isSubmitting ? (
@@ -229,7 +241,7 @@ const CreatePost = () => {
                             </button>
                         </div>
 
-
+                        {/* AI Suggestion Panel */}
                         <AiSuggestionPanel
                             titles={suggestedTitles}
                             descriptions={suggestedDescription}
@@ -239,24 +251,18 @@ const CreatePost = () => {
                             onSelectTags={setTags}
                         />
 
-
-
                         {/* Status Message */}
                         {message.text && (
-                            <div className={`mt-4 p-4 rounded-lg ${message.type === "success"
-                                ? "bg-green-50 text-green-800"
-                                : "bg-red-50 text-red-800"
+                            <div className={`mt-6 p-4 rounded-2xl border ${message.type === "success"
+                                ? "bg-state-success/10 border-state-success text-state-success dark:bg-state-success/20"
+                                : "bg-state-error/10 border-state-error text-state-error dark:bg-state-error/20"
                                 }`}>
                                 <div className="flex items-start">
-                                    <div className="flex-shrink-0">
+                                    <div className="flex-shrink-0 pt-0.5">
                                         {message.type === "success" ? (
-                                            <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                            </svg>
+                                            <FiCheck className="h-5 w-5" />
                                         ) : (
-                                            <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                            </svg>
+                                            <FiX className="h-5 w-5" />
                                         )}
                                     </div>
                                     <div className="ml-3">
@@ -271,26 +277,24 @@ const CreatePost = () => {
                 </div>
 
                 {/* Help Text */}
-                <div className="mt-6 text-center text-sm text-gray-500">
+                <div className="mt-6 text-center text-sm text-brand-muted dark:text-brandDark-muted">
                     <p>Your post will be visible to {visibility === "public" ? "everyone" : "only you"}.</p>
                 </div>
             </div>
 
-
-
             {/* Enhanced Chat UI */}
             {showChat ? (
-                <div className="fixed bottom-6 right-6 w-full max-w-md bg-white shadow-xl rounded-t-2xl overflow-hidden border border-gray-200 flex flex-col"
+                <div className="fixed bottom-6 right-6 w-full max-w-md bg-brand-surface shadow-soft rounded-2xl overflow-hidden border border-brand-border dark:bg-brandDark-surface dark:border-brandDark-border flex flex-col animate-slide-up"
                     style={{ height: '650px' }}>
                     {/* Chat Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex justify-between items-center">
-                        <div className="flex items-center space-x-2">
-                            <FiMessageSquare className="text-white text-lg" />
+                    <div className="bg-gradient-to-r from-brand-primary to-brand-primary/90 p-4 flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                            <FiMessageSquare className="text-white text-xl" />
                             <h3 className="text-white font-semibold">AI Writing Assistant</h3>
                         </div>
                         <button
                             onClick={displayAiChat}
-                            className="p-1 rounded-full hover:bg-blue-800 transition-colors text-white"
+                            className="p-2 rounded-full hover:bg-brand-primaryHover transition-colors text-white"
                             aria-label="Close chat"
                         >
                             <FiX className="h-5 w-5" />
@@ -305,16 +309,14 @@ const CreatePost = () => {
             ) : (
                 <button
                     onClick={displayAiChat}
-                    className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                    className="fixed bottom-6 right-6 bg-gradient-to-r from-brand-primary to-brand-primaryHover text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center animate-fade-in transform hover:scale-110"
                     aria-label="Open AI chat"
                 >
                     <FiMessageSquare className="h-6 w-6" />
                     <span className="sr-only">Chat with AI</span>
                 </button>
             )}
-
-
-        </div >
+        </div>
     );
 };
 
