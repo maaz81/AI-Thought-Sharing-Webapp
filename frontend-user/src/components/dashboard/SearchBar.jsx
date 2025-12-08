@@ -73,7 +73,7 @@ const SearchBar = ({ onSearch }) => {
 
     return (
         <div className="max-w-2xl mx-auto dark:bg-brandDark-bg dark:text-brandDark-text">
-            <h1 className="text-2xl font-semibold mb-4 text-center text-brand-text dark:text-brandDark-text">Search Posts</h1>
+            <h1 className="text-2xl font-semibold mb-4 text-center text-brand-text dark:text-brandDark-text mt-8">Search Posts</h1>
             <div className="flex gap-2">
                 <input
                     type="text"
