@@ -7,7 +7,10 @@ import {
   FiStar, 
   FiLoader, 
   FiEdit2, 
-  FiLogOut 
+  FiLogOut,
+  FiMapPin,
+  FiCalendar,
+  FiUsers
 } from "react-icons/fi";
 import ProfilePost from "./ProfilePost";
 import { useNavigate } from "react-router-dom";
@@ -74,26 +77,38 @@ const ProfilePage = () => {
         return <ProfilePost />;
       case "comments":
         return (
-          <div className="p-6 text-center text-gray-500">
-            <FiMessageSquare className="mx-auto text-4xl mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium">Your Comments</h3>
-            <p>Comments you've made on posts will appear here</p>
+          <div className="p-8 text-center">
+            <FiMessageSquare className="mx-auto text-5xl mb-4 text-brand-muted/40 dark:text-brandDark-muted/40" />
+            <h3 className="text-xl font-semibold text-brand-text dark:text-brandDark-text mb-2">
+              Your Comments
+            </h3>
+            <p className="text-brand-muted dark:text-brandDark-muted max-w-md mx-auto">
+              Comments you've made on posts will appear here
+            </p>
           </div>
         );
       case "replies":
         return (
-          <div className="p-6 text-center text-gray-500">
-            <FiCornerUpLeft className="mx-auto text-4xl mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium">Your Replies</h3>
-            <p>Replies to your comments will appear here</p>
+          <div className="p-8 text-center">
+            <FiCornerUpLeft className="mx-auto text-5xl mb-4 text-brand-muted/40 dark:text-brandDark-muted/40" />
+            <h3 className="text-xl font-semibold text-brand-text dark:text-brandDark-text mb-2">
+              Your Replies
+            </h3>
+            <p className="text-brand-muted dark:text-brandDark-muted max-w-md mx-auto">
+              Replies to your comments will appear here
+            </p>
           </div>
         );
       case "contributions":
         return (
-          <div className="p-6 text-center text-gray-500">
-            <FiStar className="mx-auto text-4xl mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium">Your Contributions</h3>
-            <p>Your community contributions will appear here</p>
+          <div className="p-8 text-center">
+            <FiStar className="mx-auto text-5xl mb-4 text-brand-muted/40 dark:text-brandDark-muted/40" />
+            <h3 className="text-xl font-semibold text-brand-text dark:text-brandDark-text mb-2">
+              Your Contributions
+            </h3>
+            <p className="text-brand-muted dark:text-brandDark-muted max-w-md mx-auto">
+              Your community contributions will appear here
+            </p>
           </div>
         );
       default:
@@ -103,83 +118,130 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px]">
-        <FiLoader className="animate-spin text-4xl text-blue-500 mb-4" />
-        <p className="text-gray-600">Loading your profile...</p>
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-brand-border dark:border-brandDark-border border-t-brand-primary rounded-full animate-spin"></div>
+          <FiLoader className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-brand-primary text-xl" />
+        </div>
+        <p className="mt-4 text-brand-muted dark:text-brandDark-muted">
+          Loading your profile...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-900 dark:text-white">
+    <div className="container mx-auto px-4 py-8 transition-colors duration-300">
       {/* Profile Header */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8 relative">
+      <div className="bg-brand-surface dark:bg-brandDark-surface rounded-2xl shadow-soft overflow-hidden mb-8 relative transition-colors duration-300">
+        {/* Background Banner */}
+        <div className="bg-gradient-to-r from-brand-primary via-brand-primary/80 to-brand-accent/50 h-40"></div>
+        
         {/* Action buttons */}
-        <div className="absolute top-4 right-4 flex space-x-2">
+        <div className="absolute top-4 right-4 flex space-x-3">
           <button
             onClick={() => navigate('/profile/update')}
-            className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all"
+            className="flex items-center px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:from-brand-primaryHover hover:to-brand-primary rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-brand-primary/50"
           >
-            <FiEdit2 className="mr-1" /> Edit
+            <FiEdit2 className="mr-2" /> Edit Profile
           </button>
           <button
             onClick={handleLogout}
-            className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md shadow-sm transition-all"
+            className="flex items-center px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-state-error/90 to-state-error hover:from-state-error hover:to-state-error/90 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-state-error/50"
           >
-            <FiLogOut className="mr-1" /> Logout
+            <FiLogOut className="mr-2" /> Logout
           </button>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-32"></div>
-        <div className="px-6 pb-6 relative">
-          <div className="flex items-end -mt-16 mb-4">
-            <div className="h-24 w-24 rounded-full border-4 border-white bg-white shadow-md overflow-hidden">
-              <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400">
-                <button onClick={() => navigate('/profile/update')}>
-                  {userDetails ? (
-                    <img
-                      src={userPhoto}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <FiUser className="text-4xl" />
-                  )}
-                </button>
+        <div className="px-8 pb-8 relative">
+          {/* Profile Image & Info */}
+          <div className="flex flex-col md:flex-row items-start md:items-end -mt-20 mb-6">
+            <div className="relative mb-6 md:mb-0">
+              <div className="h-40 w-40 rounded-2xl border-4 border-brand-surface dark:border-brandDark-surface bg-white dark:bg-brandDark-surface shadow-soft overflow-hidden transition-colors duration-300 group">
+                {userPhoto ? (
+                  <img
+                    src={userPhoto}
+                    alt="Profile"
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-br from-brand-bg to-brand-border dark:from-brandDark-border dark:to-brandDark-bg flex items-center justify-center">
+                    <FiUser className="text-5xl text-brand-muted dark:text-brandDark-muted" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 rounded-2xl"></div>
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-state-success text-white text-xs font-bold px-2 py-1 rounded-full">
+                Online
               </div>
             </div>
-            <div className="ml-6">
-              <h1 className="text-2xl mb-1 font-bold text-gray-900">
-                {userData?.username || "User"}
-              </h1>
-              <p className="text-gray-600 mb-3">
-                {userBio}
-              </p>
-              
+            
+            <div className="md:ml-8 flex-1">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-brand-text dark:text-brandDark-text mb-2">
+                    {userData?.username || "User"}
+                  </h1>
+                  <p className="text-brand-muted dark:text-brandDark-muted text-lg mb-4 max-w-2xl">
+                    {userBio}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Object.entries(stats).map(([key, value]) => (
+                  <div 
+                    key={key}
+                    className="bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 border border-brand-border dark:border-brandDark-border transition-colors duration-300 hover:shadow-md"
+                  >
+                    <div className="text-2xl font-bold text-brand-text dark:text-brandDark-text mb-1">
+                      {value}
+                    </div>
+                    <div className="text-sm text-brand-muted dark:text-brandDark-muted capitalize">
+                      {key}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">
-        {["posts", "comments", "replies", "contributions"].map((tab) => (
+      <div className="flex space-x-3 mb-8 overflow-x-auto pb-3">
+        {[
+          { id: "posts", label: "Posts", count: stats.posts },
+          { id: "comments", label: "Comments", count: stats.comments },
+          { id: "replies", label: "Replies", count: stats.replies },
+          { id: "contributions", label: "Contributions", count: stats.contributions }
+        ].map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
-              activeTab === tab
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+              activeTab === tab.id
+                ? "bg-gradient-to-r from-brand-primary to-brand-primaryHover text-white shadow-lg"
+                : "bg-brand-surface dark:bg-brandDark-surface text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg border border-brand-border dark:border-brandDark-border hover:shadow-md"
             }`}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            <span>{tab.label}</span>
+            {tab.count > 0 && (
+              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                activeTab === tab.id 
+                  ? "bg-white/20" 
+                  : "bg-brand-bg dark:bg-brandDark-bg"
+              }`}>
+                {tab.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-brand-surface dark:bg-brandDark-surface rounded-2xl shadow-soft overflow-hidden transition-colors duration-300">
         {renderContent()}
       </div>
     </div>

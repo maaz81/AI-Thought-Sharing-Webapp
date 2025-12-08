@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { 
+  FiEdit2, 
+  FiX, 
+  FiEye, 
+  FiLock, 
+  FiSave, 
+  FiLoader, 
+  FiTag,
+  FiAlertCircle,
+  FiArrowLeft
+} from 'react-icons/fi';
 
 const UpdatePost = () => {
     const { id } = useParams();
@@ -19,7 +30,6 @@ const UpdatePost = () => {
                 });
                 setPost({
                     ...res.data,
-                    // Ensure tags is always an array
                     tags: Array.isArray(res.data.tags) ? res.data.tags : []
                 });
             } catch (err) {
@@ -56,15 +66,15 @@ const UpdatePost = () => {
 
     if (loading) {
         return (
-            <div className="max-w-2xl mx-auto p-6">
-                <div className="animate-pulse space-y-4">
-                    <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-                    <div className="h-10 bg-gray-200 rounded"></div>
-                    <div className="h-40 bg-gray-200 rounded"></div>
-                    <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="container mx-auto px-4 py-12">
+                <div className="max-w-2xl mx-auto space-y-6">
+                    <div className="h-8 bg-brand-border dark:bg-brandDark-border rounded w-1/3 animate-pulse"></div>
+                    <div className="h-12 bg-brand-border dark:bg-brandDark-border rounded animate-pulse"></div>
+                    <div className="h-48 bg-brand-border dark:bg-brandDark-border rounded animate-pulse"></div>
+                    <div className="h-12 bg-brand-border dark:bg-brandDark-border rounded animate-pulse"></div>
                     <div className="flex space-x-4">
-                        <div className="h-10 bg-gray-200 rounded w-24"></div>
-                        <div className="h-10 bg-gray-200 rounded w-24"></div>
+                        <div className="h-12 bg-brand-border dark:bg-brandDark-border rounded w-32 animate-pulse"></div>
+                        <div className="h-12 bg-brand-border dark:bg-brandDark-border rounded w-32 animate-pulse"></div>
                     </div>
                 </div>
             </div>
@@ -73,18 +83,22 @@ const UpdatePost = () => {
 
     if (!post) {
         return (
-            <div className="max-w-2xl mx-auto p-6">
-                <div className="bg-red-50 border-l-4 border-red-500 p-4">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm text-red-700">
-                                {error || 'Post not found or you may not have permission to edit it.'}
-                            </p>
+            <div className="container mx-auto px-4 py-12">
+                <div className="max-w-2xl mx-auto">
+                    <div className="bg-state-error/10 border-l-4 border-state-error p-5 rounded-r-lg">
+                        <div className="flex items-start">
+                            <FiAlertCircle className="h-6 w-6 text-state-error mt-0.5 mr-3 flex-shrink-0" />
+                            <div>
+                                <p className="text-state-error font-medium">
+                                    {error || 'Post not found or you may not have permission to edit it.'}
+                                </p>
+                                <button
+                                    onClick={() => navigate('/profile')}
+                                    className="mt-4 inline-flex items-center text-sm text-brand-primary hover:text-brand-primaryHover transition-colors"
+                                >
+                                    <FiArrowLeft className="mr-2" /> Back to Profile
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,150 +111,203 @@ const UpdatePost = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="max-w-2xl mx-auto p-4 sm:p-6"
+            className="container mx-auto px-4 py-8"
         >
-            <form onSubmit={handleUpdate} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="p-6 sm:p-8">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                        <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        Edit Post
-                    </h2>
-
-                    {error && (
-                        <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-sm text-red-700">
-                                        {error}
-                                    </p>
-                                </div>
+            <form onSubmit={handleUpdate} className="max-w-2xl mx-auto">
+                <div className="bg-brand-surface dark:bg-brandDark-surface rounded-2xl shadow-soft overflow-hidden border border-brand-border dark:border-brandDark-border transition-colors duration-300">
+                    {/* Header */}
+                    <div className="border-b border-brand-border dark:border-brandDark-border px-6 py-4 bg-gradient-to-r from-brand-bg/50 to-transparent dark:from-brandDark-bg/50">
+                        <div className="flex items-center">
+                            <div className="p-2.5 rounded-xl bg-gradient-to-br from-brand-primary/10 to-brand-accent/10 mr-4">
+                                <FiEdit2 className="text-2xl text-brand-primary" />
                             </div>
-                        </div>
-                    )}
-
-                    <div className="space-y-6">
-                        <div>
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                                Title
-                            </label>
-                            <input
-                                id="title"
-                                type="text"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
-                                value={post.title}
-                                onChange={(e) => setPost({ ...post, title: e.target.value })}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-                                Content
-                            </label>
-                            <textarea
-                                id="content"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[200px] dark:text-black"
-                                value={post.content}
-                                onChange={(e) => setPost({ ...post, content: e.target.value })}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
-                                Tags (comma separated)
-                            </label>
-                            <input
-                                id="tags"
-                                type="text"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition dark:text-black"
-                                value={post.tags.join(', ')}
-                                onChange={(e) =>
-                                    setPost({ ...post, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) })
-                                }
-                                placeholder="technology, programming, web"
-                            />
-                            <p className="mt-1 text-xs text-gray-500">
-                                Separate tags with commas
-                            </p>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Visibility
-                            </label>
-                            <div className="flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setPost({ ...post, visibility: 'public' })}
-                                    className={`flex items-center px-4 py-2 rounded-lg border transition ${
-                                        post.visibility === 'public'
-                                            ? 'bg-blue-50 border-blue-500 text-blue-700'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    Public
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setPost({ ...post, visibility: 'private' })}
-                                    className={`flex items-center px-4 py-2 rounded-lg border transition ${
-                                        post.visibility === 'private'
-                                            ? 'bg-blue-50 border-blue-500 text-blue-700'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                    Private
-                                </button>
+                            <div>
+                                <h2 className="text-2xl font-bold text-brand-text dark:text-brandDark-text">
+                                    Edit Post
+                                </h2>
+                                <p className="text-sm text-brand-muted dark:text-brandDark-muted">
+                                    Update your post content and settings
+                                </p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="bg-gray-50 px-6 sm:px-8 py-4 border-t border-gray-200 flex justify-end space-x-3">
-                    <button
-                        type="button"
-                        onClick={confirmCancel}
-                        disabled={isSubmitting}
-                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`px-4 py-2 rounded-lg text-white transition ${
-                            isSubmitting 
-                                ? 'bg-blue-400 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-700'
-                        } flex items-center`}
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Saving...
-                            </>
-                        ) : (
-                            'Save Changes'
+                    <div className="p-6 md:p-8">
+                        {error && (
+                            <div className="mb-8 bg-state-error/10 border border-state-error/20 rounded-xl p-4">
+                                <div className="flex items-start">
+                                    <FiAlertCircle className="h-5 w-5 text-state-error mt-0.5 mr-3 flex-shrink-0" />
+                                    <div>
+                                        <p className="text-sm text-state-error font-medium">
+                                            {error}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => setError(null)}
+                                        className="ml-auto text-state-error hover:text-state-error/80"
+                                    >
+                                        <FiX />
+                                    </button>
+                                </div>
+                            </div>
                         )}
-                    </button>
+
+                        <div className="space-y-8">
+                            {/* Title Field */}
+                            <div className="group">
+                                <label htmlFor="title" className="block text-sm font-medium text-brand-text dark:text-brandDark-text mb-3">
+                                    Title
+                                </label>
+                                <input
+                                    id="title"
+                                    type="text"
+                                    className="w-full px-5 py-3.5 bg-brand-bg dark:bg-brandDark-bg border-2 border-brand-border dark:border-brandDark-border rounded-xl focus:border-brand-primary focus:ring-3 focus:ring-brand-primary/20 text-brand-text dark:text-brandDark-text placeholder:text-brand-muted dark:placeholder:text-brandDark-muted transition-colors duration-200 outline-none"
+                                    value={post.title}
+                                    onChange={(e) => setPost({ ...post, title: e.target.value })}
+                                    required
+                                    placeholder="Enter post title"
+                                />
+                            </div>
+
+                            {/* Content Field */}
+                            <div className="group">
+                                <label htmlFor="content" className="block text-sm font-medium text-brand-text dark:text-brandDark-text mb-3">
+                                    Content
+                                </label>
+                                <textarea
+                                    id="content"
+                                    className="w-full px-5 py-3.5 bg-brand-bg dark:bg-brandDark-bg border-2 border-brand-border dark:border-brandDark-border rounded-xl focus:border-brand-primary focus:ring-3 focus:ring-brand-primary/20 text-brand-text dark:text-brandDark-text placeholder:text-brand-muted dark:placeholder:text-brandDark-muted min-h-[250px] resize-y transition-colors duration-200 outline-none"
+                                    value={post.content}
+                                    onChange={(e) => setPost({ ...post, content: e.target.value })}
+                                    required
+                                    placeholder="Write your post content here..."
+                                />
+                                <div className="flex justify-between items-center mt-2">
+                                    <p className="text-xs text-brand-muted dark:text-brandDark-muted">
+                                        Markdown is supported
+                                    </p>
+                                    <span className="text-xs text-brand-muted dark:text-brandDark-muted">
+                                        {post.content.length} characters
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Tags Field */}
+                            <div className="group">
+                                <div className="flex items-center justify-between mb-3">
+                                    <label htmlFor="tags" className="text-sm font-medium text-brand-text dark:text-brandDark-text">
+                                        Tags
+                                    </label>
+                                    <FiTag className="text-brand-muted dark:text-brandDark-muted" />
+                                </div>
+                                <input
+                                    id="tags"
+                                    type="text"
+                                    className="w-full px-5 py-3.5 bg-brand-bg dark:bg-brandDark-bg border-2 border-brand-border dark:border-brandDark-border rounded-xl focus:border-brand-primary focus:ring-3 focus:ring-brand-primary/20 text-brand-text dark:text-brandDark-text placeholder:text-brand-muted dark:placeholder:text-brandDark-muted transition-colors duration-200 outline-none"
+                                    value={post.tags.join(', ')}
+                                    onChange={(e) =>
+                                        setPost({ ...post, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) })
+                                    }
+                                    placeholder="technology, programming, web development"
+                                />
+                                <p className="mt-2 text-sm text-brand-muted dark:text-brandDark-muted">
+                                    Separate tags with commas. {post.tags.length} tag(s) added.
+                                </p>
+                                
+                                {/* Tags Preview */}
+                                {post.tags.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        {post.tags.map((tag, index) => (
+                                            <span
+                                                key={index}
+                                                className="inline-flex items-center px-3 py-1.5 bg-brand-primary/10 text-brand-primary text-xs font-medium rounded-lg"
+                                            >
+                                                <FiTag className="mr-1.5" size={12} /> {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Visibility Toggle */}
+                            <div className="group">
+                                <label className="block text-sm font-medium text-brand-text dark:text-brandDark-text mb-4">
+                                    Visibility
+                                </label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setPost({ ...post, visibility: 'public' })}
+                                        className={`flex items-center justify-center px-6 py-4 rounded-xl border-2 transition-all duration-300 ${
+                                            post.visibility === 'public'
+                                                ? 'border-brand-primary bg-brand-primary/5 text-brand-primary shadow-md'
+                                                : 'border-brand-border dark:border-brandDark-border text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg hover:border-brand-border/60'
+                                        }`}
+                                    >
+                                        <FiEye className="mr-3 text-xl" />
+                                        <div className="text-left">
+                                            <div className="font-medium">Public</div>
+                                            <div className="text-xs text-brand-muted dark:text-brandDark-muted mt-1">
+                                                Visible to everyone
+                                            </div>
+                                        </div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPost({ ...post, visibility: 'private' })}
+                                        className={`flex items-center justify-center px-6 py-4 rounded-xl border-2 transition-all duration-300 ${
+                                            post.visibility === 'private'
+                                                ? 'border-brand-primary bg-brand-primary/5 text-brand-primary shadow-md'
+                                                : 'border-brand-border dark:border-brandDark-border text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg hover:border-brand-border/60'
+                                        }`}
+                                    >
+                                        <FiLock className="mr-3 text-xl" />
+                                        <div className="text-left">
+                                            <div className="font-medium">Private</div>
+                                            <div className="text-xs text-brand-muted dark:text-brandDark-muted mt-1">
+                                                Only visible to you
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="border-t border-brand-border dark:border-brandDark-border px-6 py-5 bg-gradient-to-r from-transparent to-brand-bg/30 dark:to-brandDark-bg/30">
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <button
+                                type="button"
+                                onClick={confirmCancel}
+                                disabled={isSubmitting}
+                                className="px-6 py-3 border-2 border-brand-border dark:border-brandDark-border text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg rounded-xl font-medium transition-all duration-300 hover:shadow-sm disabled:opacity-50 w-full sm:w-auto"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center w-full sm:w-auto ${
+                                    isSubmitting
+                                        ? 'bg-brand-primary/70 cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:from-brand-primaryHover hover:to-brand-primary hover:shadow-lg hover:-translate-y-0.5'
+                                } text-white`}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <FiLoader className="animate-spin mr-3" />
+                                        Saving Changes...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiSave className="mr-3" />
+                                        Save Changes
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </motion.div>
