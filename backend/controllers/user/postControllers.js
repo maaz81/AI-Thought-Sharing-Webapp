@@ -1,6 +1,7 @@
 const Post = require('../../models/user/Post');
 const User = require('../../models/user/User');
 const PostDetails = require('../../models/user/PostDetails')
+const { generateAutoTags } = require("../../utils/autoTagService");
 
 const getPosts = async (req, res) => {
   try {
@@ -41,7 +42,6 @@ const getPosts = async (req, res) => {
   }
 };
 
-
 const getSpecificPost = async (req, res) => {
   const postId = req.params.postId;
   console.log('fetching post with postId:', postId);
@@ -63,71 +63,129 @@ const getSpecificPost = async (req, res) => {
   }
 };
 
-
 const createPosts = async (req, res) => {
   try {
+
+    // -----------------------------
+    // 1. AUTHENTICATION CHECK
+    // -----------------------------
     if (!req.userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
+      return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const { title, content, tags, visibility } = req.body;
+    const { title, content, tags = [], visibility = "public" } = req.body;
 
-    // ✅ ALL required: title, content, tags
-    if (!title || title.trim() === "") {
+    // -----------------------------
+    // 2. VALIDATION (same as second code)
+    // -----------------------------
+    if (!title || !title.trim()) {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    if (!content || content.trim() === "") {
+    if (!content || !content.trim()) {
       return res.status(400).json({ error: "Content is required" });
     }
 
-    if (!tags || !Array.isArray(tags) || tags.length === 0) {
+    // normalize tags
+    let userTags = Array.isArray(tags) ? tags : [];
+    userTags = userTags
+      .map((t) => t.toString().trim().toLowerCase())
+      .filter(Boolean);
+
+    // Required tag condition (from second code)
+    if (userTags.length === 0) {
       return res.status(400).json({ error: "At least one tag is required" });
     }
 
+    // -----------------------------
+    // 3. AUTO-TAG SYSTEM (from first code)
+    // -----------------------------
+    let finalTags = [...userTags];
+    let autoTags = [];
+
+    if (userTags.length < 3) {
+      try {
+        autoTags = await generateAutoTags({
+          title,
+          content,
+          existingTags: userTags,
+        });
+
+        const tagSet = new Set([...userTags, ...autoTags]);
+        finalTags = Array.from(tagSet);
+      } catch (err) {
+        console.error("Auto-tagging failed:", err.message);
+        finalTags = userTags; // fallback
+      }
+    }
+
+    // -----------------------------
+    // 4. CREATE POST (from 2nd controller)
+    // -----------------------------
     const post = await Post.create({
       title: title.trim(),
       content: content.trim(),
-      tags,
-      userid: req.userId
+      tags: finalTags,
+      userid: req.userId,
+      aiMeta: {
+        autoTagged: autoTags.length > 0,
+        autoTagsUsed: autoTags,
+      }
     });
 
+    // -----------------------------
+    // 5. CREATE POST DETAILS
+    // -----------------------------
     const postDetails = await PostDetails.create({
       postid: post._id,
       userid: req.userId,
-      like: '0',
-      dislike: '0',
-      visibility
+      like: "0",
+      dislike: "0",
+      visibility,
     });
 
-    await User.findByIdAndUpdate(
-      req.userId,
-      { $push: { posts: post._id } },
-      { new: true }
-    );
-
+    // link post ↔ postDetails
     await Post.findByIdAndUpdate(
       post._id,
       { $set: { postdetailsid: postDetails._id } },
       { new: true }
     );
 
-    const io = req.app.get('io');
-    io.emit('postCreated', {
+    // -----------------------------
+    // 6. ADD POST TO USER
+    // -----------------------------
+    await User.findByIdAndUpdate(
+      req.userId,
+      { $push: { posts: post._id } },
+      { new: true }
+    );
+
+    // -----------------------------
+    // 7. SOCKET.IO EMIT
+    // -----------------------------
+    const io = req.app.get("io");
+    io.emit("postCreated", {
       _id: post._id,
       title: post.title,
       content: post.content,
       tags: post.tags,
-      visibility
+      visibility,
     });
 
-    res.status(200).json(post);
+    // -----------------------------
+    // 8. RESPONSE
+    // -----------------------------
+    res.status(200).json({
+      message: "Post created successfully",
+      post,
+      postDetails,
+    });
+
   } catch (err) {
+    console.error("Create Post Error:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
-
-
 
 const searchBar = async (req, res) => {
   try {
