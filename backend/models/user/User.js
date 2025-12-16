@@ -5,30 +5,34 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    email: {
-        type: String,
-        required:true,
-        unique:true
-    },
-    password:{
+    name: {
         type: String,
         required: true
     },
-    role:{
+    email: {
         type: String,
-        enum: ['admin','user'],
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'user'],
         default: 'user',
         required: true
     },
-    userDetails:{
+    userDetails: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'UserDetails'
+        ref: 'UserDetails'
     },
-    posts:[{
+    posts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }]
-},{
+}, {
     timestamps: true,
 })
 

@@ -5,7 +5,9 @@ import { Link } from 'react-router-dom';
 
 const SearchBar = ({ onSearch }) => {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [results, setResults] = useState([]); // Keep for compatibility if needed, but mainly use above
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -27,7 +29,14 @@ const SearchBar = ({ onSearch }) => {
 
             console.log('Raw Axios response:', res.data);
 
-            setResults(Array.isArray(res.data.results) ? res.data.results : []);
+            if (res.data.posts || res.data.users) {
+                setPosts(res.data.posts || []);
+                setUsers(res.data.users || []);
+            } else {
+                setPosts([]);
+                setUsers([]);
+            }
+
             if (onSearch) onSearch(query);
         } catch (err) {
             console.error('Search error:', err.response?.data || err.message);
@@ -94,44 +103,80 @@ const SearchBar = ({ onSearch }) => {
             {loading && <p className="mt-4 text-brand-primary">Searching...</p>}
             {error && <p className="mt-4 text-state-error">{error}</p>}
 
-            <ul className="mt-6 space-y-4">
-                {Array.isArray(results) && results.length > 0 ? (
-                    results.map((post) => (
-                        <Link to={`/post/${post._id}`} key={post._id}>
-                            <li className="border border-brand-border bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border p-4 rounded-xl shadow-soft cursor-pointer hover:shadow-md transition-all duration-200">
-                                <h3 className="text-lg font-semibold text-brand-text dark:text-brandDark-text">{post.title}</h3>
-                                <p
-                                    className="text-sm text-brand-text/80 dark:text-brandDark-text/80 mt-2"
-                                    dangerouslySetInnerHTML={{
-                                        __html: highlightText(getSnippet(post.content, query), query)
-                                    }}
-                                ></p>
-
-
-                                {post.tags?.length > 0 && (
-                                    <div className="mt-3 flex flex-wrap gap-2">
-                                        {post.tags.map((tag, i) => (
-                                            <span
-                                                key={i}
-                                                className="bg-brand-primary/10 text-brand-primary dark:text-brand-primary dark:bg-brand-primary/20 px-2.5 py-1 rounded-full text-xs"
-                                            >
-                                                #{tag}
-                                            </span>
-                                        ))}
+            <div className="mt-8">
+                {/* Users Section */}
+                {users.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-xl font-semibold mb-4 text-brand-text dark:text-brandDark-text border-b border-brand-border pb-2">Users</h2>
+                        <div className="space-y-3">
+                            {users.map((user) => (
+                                <Link to={`/profile/${user._id}`} key={user._id} className="block">
+                                    <div className="flex items-center gap-4 p-4 rounded-xl border border-brand-border bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border shadow-sm hover:shadow-md transition-all duration-200">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-primary to-brand-accent flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden shrink-0">
+                                            {user.userDetails?.basic_info?.photo ? (
+                                                <img src={`http://localhost:5000/uploads/${user.userDetails.basic_info.photo}`} alt={user.username} className="w-full h-full object-cover" />
+                                            ) : (
+                                                user.username?.[0]?.toUpperCase()
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold text-brand-text dark:text-brandDark-text">{user.username}</h3>
+                                            <p className="text-sm text-brand-muted dark:text-brandDark-muted">{user.email}</p>
+                                        </div>
                                     </div>
-                                )}
-                            </li>
-                        </Link>
-                    ))
-                ) : (
-                    !loading &&
-                    query.trim() !== "" && (
-                        <p className="mt-4 text-brand-muted dark:text-brandDark-muted text-center">
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Posts Section */}
+                {posts.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-xl font-semibold mb-4 text-brand-text dark:text-brandDark-text border-b border-brand-border pb-2">Posts</h2>
+                        <ul className="space-y-4">
+                            {posts.map((post) => (
+                                <Link to={`/post/${post._id}`} key={post._id}>
+                                    <li className="border border-brand-border bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border p-4 rounded-xl shadow-soft cursor-pointer hover:shadow-md transition-all duration-200 mb-4">
+                                        <h3 className="text-lg font-semibold text-brand-text dark:text-brandDark-text">{post.title}</h3>
+                                        <p
+                                            className="text-sm text-brand-text/80 dark:text-brandDark-text/80 mt-2"
+                                            dangerouslySetInnerHTML={{
+                                                __html: highlightText(getSnippet(post.content, query), query)
+                                            }}
+                                        ></p>
+
+
+                                        {post.tags?.length > 0 && (
+                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                {post.tags.map((tag, i) => (
+                                                    <span
+                                                        key={i}
+                                                        className="bg-brand-primary/10 text-brand-primary dark:text-brand-primary dark:bg-brand-primary/20 px-2.5 py-1 rounded-full text-xs"
+                                                    >
+                                                        #{tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </li>
+                                </Link>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {!loading && query.trim() !== "" && posts.length === 0 && users.length === 0 && (
+                    <div className="mt-8 text-center py-12 bg-brand-surface/50 dark:bg-brandDark-surface/50 rounded-2xl border border-dashed border-brand-border dark:border-brandDark-border">
+                        <p className="text-brand-muted dark:text-brandDark-muted text-lg">
                             No results found for "{query}".
                         </p>
-                    )
+                        <p className="text-sm text-brand-muted/70 dark:text-brandDark-muted/70 mt-2">
+                            Try searching for different keywords, usernames, or tags.
+                        </p>
+                    </div>
                 )}
-            </ul>
+            </div>
 
 
         </div>

@@ -203,16 +203,28 @@ const searchBar = async (req, res) => {
       $or: [
         { title: regex },
         { content: regex }, // you might want this too
-        { tags: regex },    // works if tags is array of strings or string
+        { tags: regex },
       ],
     });
 
-    return res.json({ results });
+    const userResults = await User.find({
+      $or: [
+        { username: regex },
+        { email: regex },
+      ],
+    }).select('username email userDetails')
+      .populate({
+        path: 'userDetails',
+        select: 'basic_info.photo'
+      });
+
+    return res.json({ posts: results, users: userResults });
   } catch (err) {
     console.error('Search error:', err);
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 
 
