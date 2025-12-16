@@ -39,7 +39,7 @@ const registerUser = async (req, res) => {
 
         const userDetails = await UserDetails.create({
             basic_info: {
-                name: user.name,
+                username: user.username,
                 photo: 'default.jpg' // Placeholder for default photo
             },
             userid: user._id

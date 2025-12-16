@@ -209,10 +209,11 @@ const searchBar = async (req, res) => {
 
     const userResults = await User.find({
       $or: [
+        { name: regex },
         { username: regex },
         { email: regex },
       ],
-    }).select('username email userDetails')
+    }).select('name username email userDetails')
       .populate({
         path: 'userDetails',
         select: 'basic_info.photo'

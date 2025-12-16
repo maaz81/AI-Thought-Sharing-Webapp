@@ -120,8 +120,8 @@ const SearchBar = ({ onSearch }) => {
                                             )}
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-brand-text dark:text-brandDark-text">{user.username}</h3>
-                                            <p className="text-sm text-brand-muted dark:text-brandDark-muted">{user.email}</p>
+                                            <h3 className="font-semibold text-brand-text dark:text-brandDark-text">{user.name}</h3>
+                                            <p className="text-sm text-brand-muted dark:text-brandDark-muted">{user.username}</p>
                                         </div>
                                     </div>
                                 </Link>
