@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 const registerUser = async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
+        const { name, email, password, role } = req.body;
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -13,22 +13,39 @@ const registerUser = async (req, res) => {
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
+        // Generate a unique username
+        let baseUsername = name.toLowerCase().replace(/\s+/g, '.');
+        if (!baseUsername) {
+            baseUsername = email.split('@')[0].toLowerCase();
+        }
+
+        let username = baseUsername;
+        let counter = 1;
+        let userWithSameUsername = await User.findOne({ username });
+
+        while (userWithSameUsername) {
+            username = `${baseUsername}${counter}`;
+            userWithSameUsername = await User.findOne({ username });
+            counter++;
+        }
+
         const user = await User.create({
-            username,
+            name,
             email,
             password: hashPassword,
-            role
+            role,
+            username
         });
 
         const userDetails = await UserDetails.create({
             basic_info: {
-                username: user.username,
+                name: user.name,
                 photo: 'default.jpg' // Placeholder for default photo
             },
             userid: user._id
         })
 
-        user.userDetails = [userDetails._id]; ;
+        user.userDetails = [userDetails._id];;
         await user.save();
 
         const token = generateToken(user._id);
@@ -41,7 +58,7 @@ const registerUser = async (req, res) => {
             message: 'User registered successfully',
             user: {
                 _id: user._id,
-                username: user.username,
+                name: user.name,
                 email: user.email,
                 role: user.role,
                 token: token
@@ -59,11 +76,20 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Please provide email and password' });
+        const { email, username, password } = req.body;
+
+        // Allow login with either email or username
+        const identifier = email || username;
+
+        if (!identifier || !password) {
+            return res.status(400).json({ message: 'Please provide email/username and password' });
         }
-        const user = await User.findOne({ email });
+
+        // Find user by either email or username
+        const user = await User.findOne({
+            $or: [{ email: identifier }, { username: identifier }]
+        });
+
         if (!user) {
             return res.status(400).json({ message: 'User not registered' })
         }
@@ -81,6 +107,7 @@ const loginUser = async (req, res) => {
         }).status(201).json({
             message: 'user logedin',
             user: {
+                _id: user._id,
                 username: user.username,
                 email: user.email,
                 role: user.role,
@@ -90,13 +117,14 @@ const loginUser = async (req, res) => {
 
 
     } catch (error) {
-        res.status(400).json({ message: 'User not found' });
+        console.error("Login Check Error:", error);
+        res.status(500).json({ message: 'Server error during login' });
     }
 }
 
-const logoutUser = async(req,res)=>{
+const logoutUser = async (req, res) => {
     res.clearCookie('token');
-    res.json({message: 'Logout User'})
+    res.json({ message: 'Logout User' })
 }
 
-module.exports = { registerUser, loginUser , logoutUser };
+module.exports = { registerUser, loginUser, logoutUser };

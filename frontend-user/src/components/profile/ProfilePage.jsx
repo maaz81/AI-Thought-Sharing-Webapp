@@ -209,10 +209,13 @@ const ProfilePage = () => {
             <div className="md:ml-8 flex-1">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-brand-text dark:text-brandDark-text mb-2">
-                    {userData?.username || "User"}
+                  <h1 className="text-3xl md:text-4xl font-bold text-brand-text dark:text-brandDark-text mb-1">
+                    {userData?.name || "User"}
                   </h1>
-                  <p className="text-brand-muted dark:text-brandDark-muted text-lg mb-4 max-w-2xl">
+                  <p className="text-xl text-brand-muted dark:text-brandDark-muted font-medium mb-3">
+                    @{userData?.username || "username"}
+                  </p>
+                  <p className="text-brand-text dark:text-brandDark-text text-lg mb-4 max-w-2xl">
                     {userBio}
                   </p>
                 </div>

@@ -9,39 +9,40 @@ const getUserProfile = async (req, res) => {
     }
 
     res.json({
+      name: user.name,
       username: user.username,
       email: user.email,
       role: user.role
     });
 
-    
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-const getUserPost=  async (req, res) => {
-    try {
-        const userPosts = await Post.find({ userid: req.userId });
-        res.json(userPosts);
-        
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+const getUserPost = async (req, res) => {
+  try {
+    const userPosts = await Post.find({ userid: req.userId });
+    res.json(userPosts);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-const getUserStats = async (req, res)=>{
-   try {
-        const userPosts = await Post.find({ userid: req.userId });
-        res.json({
-          posts: userPosts.length,
-          })
-        
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+const getUserStats = async (req, res) => {
+  try {
+    const userPosts = await Post.find({ userid: req.userId });
+    res.json({
+      posts: userPosts.length,
+    })
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
 
-module.exports = { getUserProfile,getUserPost, getUserStats };
+module.exports = { getUserProfile, getUserPost, getUserStats };
