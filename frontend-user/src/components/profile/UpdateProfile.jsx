@@ -73,7 +73,7 @@ const UpdateProfile = () => {
 
         setFormData({
           basic_info: {
-            name: data?.basic_info?.username || '',
+            name: data?.basic_info?.name || '',
             age: data?.basic_info?.age || '',
             gender: data?.basic_info?.gender || '',
             profession: data?.basic_info?.profession || '',
@@ -117,7 +117,7 @@ const UpdateProfile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     const keys = name.split(".");
-    
+
     if (keys.length === 2) {
       const [parentKey, childKey] = keys;
       setFormData((prevData) => ({
@@ -230,11 +230,10 @@ const UpdateProfile = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveSection(tab.id)}
-                    className={`flex items-center px-5 py-4 text-sm font-medium whitespace-nowrap transition-all duration-300 border-b-2 ${
-                      activeSection === tab.id
+                    className={`flex items-center px-5 py-4 text-sm font-medium whitespace-nowrap transition-all duration-300 border-b-2 ${activeSection === tab.id
                         ? 'border-brand-primary text-brand-primary'
                         : 'border-transparent text-brand-muted dark:text-brandDark-muted hover:text-brand-text dark:hover:text-brandDark-text'
-                    }`}
+                      }`}
                   >
                     <Icon className="mr-2.5 text-lg" />
                     {tab.label}
@@ -248,11 +247,10 @@ const UpdateProfile = () => {
           <form onSubmit={handleSubmit} className="p-6 md:p-8">
             {/* Success/Error Message */}
             {message && (
-              <div className={`mb-8 rounded-xl p-5 border ${
-                message.startsWith('success:') 
-                  ? 'bg-state-success/10 border-state-success/30 text-state-success' 
+              <div className={`mb-8 rounded-xl p-5 border ${message.startsWith('success:')
+                  ? 'bg-state-success/10 border-state-success/30 text-state-success'
                   : 'bg-state-error/10 border-state-error/30 text-state-error'
-              }`}>
+                }`}>
                 <div className="flex items-center">
                   {message.startsWith('success:') ? (
                     <FiCheck className="mr-3 text-xl" />
@@ -274,10 +272,10 @@ const UpdateProfile = () => {
                   <div className="relative mb-6">
                     <div className="w-36 h-36 rounded-2xl border-4 border-brand-surface dark:border-brandDark-surface shadow-soft overflow-hidden group">
                       {preview ? (
-                        <img 
-                          src={preview} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                        <img
+                          src={preview}
+                          alt="Profile"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-brand-bg to-brand-border dark:from-brandDark-border dark:to-brandDark-bg flex items-center justify-center">
@@ -551,11 +549,10 @@ const UpdateProfile = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center mx-auto ${
-                  isSubmitting
+                className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center mx-auto ${isSubmitting
                     ? 'bg-brand-primary/70 cursor-not-allowed'
                     : 'bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:from-brand-primaryHover hover:to-brand-primary hover:shadow-lg hover:-translate-y-0.5'
-                } text-white`}
+                  } text-white`}
               >
                 {isSubmitting ? (
                   <>

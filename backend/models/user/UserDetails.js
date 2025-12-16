@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const userDetailsSchema = new mongoose.Schema({
     basic_info: {
         username: String,
+        name: String,
         age: Number,
         gender: String,
         bio: String,
