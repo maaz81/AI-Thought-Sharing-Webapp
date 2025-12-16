@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const userDetailsRoutes = require('./routes/user/userDetailsRoutes');
 const setPostRoutes = require('./routes/user/setPostRoutes');
+const followerRoutes = require('./routes/user/followRoutes');
 const path = require('path');
 
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
@@ -50,6 +51,7 @@ app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
 app.use('/api/update/profile', userDetailsRoutes)
 app.use('/api/setpost', setPostRoutes);
+app.use('/api/followers', followerRoutes);
 
 
 // Admin Routes

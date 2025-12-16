@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
-import { 
-  FiUser, 
-  FiMessageSquare, 
-  FiCornerUpLeft, 
-  FiStar, 
-  FiLoader, 
-  FiEdit2, 
+import {
+  FiUser,
+  FiMessageSquare,
+  FiCornerUpLeft,
+  FiStar,
+  FiLoader,
+  FiEdit2,
   FiLogOut,
   FiMapPin,
   FiCalendar,
-  FiUsers
+  FiUsers,
+  FiUserCheck
 } from "react-icons/fi";
 import ProfilePost from "./ProfilePost";
 import { useNavigate } from "react-router-dom";
+import UserListModal from "./UserListModal";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -30,6 +32,11 @@ const ProfilePage = () => {
     replies: 0,
     contributions: 0
   });
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [loadingFollows, setLoadingFollows] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -38,7 +45,8 @@ const ProfilePage = () => {
           axios.get('http://localhost:5000/profile/', { withCredentials: true }),
           axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
           axios.get('http://localhost:5000/api/update/profile/userphoto', { withCredentials: true }),
-          axios.get('http://localhost:5000/api/update/profile/userbio', { withCredentials: true })
+          axios.get('http://localhost:5000/api/update/profile/userbio', { withCredentials: true }),
+
         ]);
 
         setUserData(profileRes.data);
@@ -60,7 +68,29 @@ const ProfilePage = () => {
     };
 
     fetchUserData();
+
   }, []);
+
+  useEffect(() => {
+    if (userData?._id) {
+      const fetchFollowData = async () => {
+        try {
+          setLoadingFollows(true);
+          const [followersRes, followingRes] = await Promise.all([
+            axios.get(`http://localhost:5000/api/followers/followers/${userData._id}`, { withCredentials: true }),
+            axios.get(`http://localhost:5000/api/followers/following/${userData._id}`, { withCredentials: true })
+          ]);
+          setFollowers(followersRes.data.followers || []);
+          setFollowing(followingRes.data.following || []);
+        } catch (error) {
+          console.error("Error fetching follow data", error);
+        } finally {
+          setLoadingFollows(false);
+        }
+      };
+      fetchFollowData();
+    }
+  }, [userData]);
 
   const handleLogout = async () => {
     try {
@@ -136,7 +166,7 @@ const ProfilePage = () => {
       <div className="bg-brand-surface dark:bg-brandDark-surface rounded-2xl shadow-soft overflow-hidden mb-8 relative transition-colors duration-300">
         {/* Background Banner */}
         <div className="bg-gradient-to-r from-brand-primary via-brand-primary/80 to-brand-accent/50 h-40"></div>
-        
+
         {/* Action buttons */}
         <div className="absolute top-4 right-4 flex space-x-3">
           <button
@@ -175,7 +205,7 @@ const ProfilePage = () => {
                 Online
               </div>
             </div>
-            
+
             <div className="md:ml-8 flex-1">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <div>
@@ -189,21 +219,49 @@ const ProfilePage = () => {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(stats).map(([key, value]) => (
-                  <div 
-                    key={key}
-                    className="bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 border border-brand-border dark:border-brandDark-border transition-colors duration-300 hover:shadow-md"
-                  >
-                    <div className="text-2xl font-bold text-brand-text dark:text-brandDark-text mb-1">
-                      {value}
-                    </div>
-                    <div className="text-sm text-brand-muted dark:text-brandDark-muted capitalize">
-                      {key}
-                    </div>
-                  </div>
-                ))}
+            </div>
+            {/* Follow Stats in Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {/* Followers */}
+              <div
+                onClick={() => setShowFollowersModal(true)}
+                className="cursor-pointer bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 border border-brand-border dark:border-brandDark-border transition-all duration-300 hover:shadow-md hover:border-brand-primary/30 group"
+              >
+                <div className="text-2xl font-bold text-brand-text dark:text-brandDark-text mb-1 group-hover:text-brand-primary transition-colors">
+                  {followers.length}
+                </div>
+                <div className="text-sm text-brand-muted dark:text-brandDark-muted capitalize flex items-center gap-2">
+                  Followers <FiUsers />
+                </div>
               </div>
+
+              {/* Following */}
+              <div
+                onClick={() => setShowFollowingModal(true)}
+                className="cursor-pointer bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 border border-brand-border dark:border-brandDark-border transition-all duration-300 hover:shadow-md hover:border-brand-primary/30 group"
+              >
+                <div className="text-2xl font-bold text-brand-text dark:text-brandDark-text mb-1 group-hover:text-brand-primary transition-colors">
+                  {following.length}
+                </div>
+                <div className="text-sm text-brand-muted dark:text-brandDark-muted capitalize flex items-center gap-2">
+                  Following <FiUsers />
+                </div>
+              </div>
+
+              {/* Existing Stats */}
+              {Object.entries(stats).map(([key, value]) => (
+                <div
+                  key={key}
+                  className="bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 border border-brand-border dark:border-brandDark-border transition-colors duration-300 hover:shadow-md"
+                >
+                  <div className="text-2xl font-bold text-brand-text dark:text-brandDark-text mb-1">
+                    {value}
+                  </div>
+                  <div className="text-sm text-brand-muted dark:text-brandDark-muted capitalize">
+                    {key}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -220,19 +278,17 @@ const ProfilePage = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-              activeTab === tab.id
-                ? "bg-gradient-to-r from-brand-primary to-brand-primaryHover text-white shadow-lg"
-                : "bg-brand-surface dark:bg-brandDark-surface text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg border border-brand-border dark:border-brandDark-border hover:shadow-md"
-            }`}
+            className={`flex items-center px-5 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${activeTab === tab.id
+              ? "bg-gradient-to-r from-brand-primary to-brand-primaryHover text-white shadow-lg"
+              : "bg-brand-surface dark:bg-brandDark-surface text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg border border-brand-border dark:border-brandDark-border hover:shadow-md"
+              }`}
           >
             <span>{tab.label}</span>
             {tab.count > 0 && (
-              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                activeTab === tab.id 
-                  ? "bg-white/20" 
-                  : "bg-brand-bg dark:bg-brandDark-bg"
-              }`}>
+              <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${activeTab === tab.id
+                ? "bg-white/20"
+                : "bg-brand-bg dark:bg-brandDark-bg"
+                }`}>
                 {tab.count}
               </span>
             )}
@@ -244,7 +300,23 @@ const ProfilePage = () => {
       <div className="bg-brand-surface dark:bg-brandDark-surface rounded-2xl shadow-soft overflow-hidden transition-colors duration-300">
         {renderContent()}
       </div>
-    </div>
+
+      <UserListModal
+        isOpen={showFollowersModal}
+        onClose={() => setShowFollowersModal(false)}
+        title="Followers"
+        users={followers}
+        isLoading={loadingFollows}
+      />
+
+      <UserListModal
+        isOpen={showFollowingModal}
+        onClose={() => setShowFollowingModal(false)}
+        title="Following"
+        users={following}
+        isLoading={loadingFollows}
+      />
+    </div >
   );
 };
 
