@@ -11,6 +11,7 @@ import UpdatePost from "./components/profile/UpdatePost";
 import UpdateProfile from "./components/profile/UpdateProfile";
 import PostDetails from "./components/dashboard/PostDetails";
 import Pricing from "./components/pricing/Pricing";
+import PublicProfile from "./components/profile/PublicProfile";
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/" element={<PostCard />} />
         <Route path="/post/:postId" element={<PostDetails />} />
+        <Route path="/profile/:username" element={<PublicProfile />} />
 
 
         <Route element={<PrivateRoute />}>
@@ -31,7 +33,7 @@ function App() {
           <Route path="/profile/update/" element={<UpdateProfile />} />
         </Route>
 
-        
+
       </Routes>
     </Router>
   );

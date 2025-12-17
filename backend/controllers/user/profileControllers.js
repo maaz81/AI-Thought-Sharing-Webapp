@@ -1,5 +1,6 @@
 const User = require('../../models/user/User');
 const Post = require('../../models/user/Post');
+const PostDetails = require('../../models/user/PostDetails');
 
 const getUserProfile = async (req, res) => {
   try {
@@ -45,4 +46,56 @@ const getUserStats = async (req, res) => {
 }
 
 
-module.exports = { getUserProfile, getUserPost, getUserStats };
+const getPublicProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username }).populate('userDetails');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch PostDetails to get likes/stats
+    const rawPosts = await PostDetails.find({ userid: user._id, visibility: 'public' })
+      .populate({
+        path: 'postid',
+        select: 'title content tags'
+      })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Flatten the structure for the frontend
+    const userPosts = rawPosts.map(pd => ({
+      _id: pd._id, // PostDetails ID
+      postId: pd.postid?._id, // Actual Post ID
+      title: pd.postid?.title,
+      content: pd.postid?.content,
+      tags: pd.postid?.tags,
+      createdAt: pd.createdAt,
+      likes: pd.like || 0,
+      dislikes: pd.dislike || 0,
+      visibility: pd.visibility
+    })).filter(post => post.title); // Filter out any broken links
+
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        userDetails: user.userDetails, // Contains photo
+        createdAt: user.createdAt
+      },
+      posts: userPosts,
+      postCount: userPosts.length
+    });
+
+  } catch (error) {
+    console.error("Get Public Profile Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+module.exports = { getUserProfile, getUserPost, getUserStats, getPublicProfile };

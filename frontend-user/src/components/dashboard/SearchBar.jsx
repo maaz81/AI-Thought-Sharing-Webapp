@@ -110,7 +110,7 @@ const SearchBar = ({ onSearch }) => {
                         <h2 className="text-xl font-semibold mb-4 text-brand-text dark:text-brandDark-text border-b border-brand-border pb-2">Users</h2>
                         <div className="space-y-3">
                             {users.map((user) => (
-                                <Link to={`/profile/${user._id}`} key={user._id} className="block">
+                                <Link to={`/profile/${user.username}`} key={user.username} className="block">
                                     <div className="flex items-center gap-4 p-4 rounded-xl border border-brand-border bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border shadow-sm hover:shadow-md transition-all duration-200">
                                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-primary to-brand-accent flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden shrink-0">
                                             {user.userDetails?.basic_info?.photo ? (
