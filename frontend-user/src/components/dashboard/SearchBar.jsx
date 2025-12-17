@@ -29,7 +29,12 @@ const SearchBar = ({ onSearch }) => {
 
             console.log('Raw Axios response:', res.data);
 
-            if (res.data.posts || res.data.users) {
+            // Handle new standardized response format
+            if (res.data.success && res.data.data) {
+                setPosts(res.data.data.posts || []);
+                setUsers(res.data.data.users || []);
+            } else if (res.data.posts || res.data.users) {
+                // Fallback for old format
                 setPosts(res.data.posts || []);
                 setUsers(res.data.users || []);
             } else {

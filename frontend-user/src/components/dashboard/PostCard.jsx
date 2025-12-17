@@ -26,7 +26,11 @@ const PostCard = () => {
 
                 try {
                     const res1 = await axios.get("http://localhost:5000/api/post");
-                    if (Array.isArray(res1.data)) {
+                    // Handle new standardized response format
+                    if (res1.data.success && res1.data.data) {
+                        res1Data = Array.isArray(res1.data.data) ? res1.data.data : [];
+                    } else if (Array.isArray(res1.data)) {
+                        // Fallback for old format
                         res1Data = res1.data;
                     }
                 } catch (err) {
@@ -36,7 +40,10 @@ const PostCard = () => {
 
                 try {
                     const res2 = await axios.get("http://localhost:5000/api/setpost/getposts");
-                    if (Array.isArray(res2.data)) {
+                    // Handle both new and old response formats
+                    if (res2.data.success && res2.data.data) {
+                        res2Data = Array.isArray(res2.data.data) ? res2.data.data : [];
+                    } else if (Array.isArray(res2.data)) {
                         res2Data = res2.data;
                     }
                 } catch (err) {

@@ -47,10 +47,32 @@ const CreatePost = () => {
         { withCredentials: true }
       );
 
-      if (response.status === 201 || response.status === 200) {
+      // Handle new standardized response format
+      if (response.data.success) {
+        const createdPost = response.data.data?.post || response.data.post;
+
+        setMessage({
+          text: createdPost?.aiMeta?.autoTagged
+            ? `Post created successfully! We also auto-added tags: ${createdPost.tags.join(", ")}`
+            : response.data.message || "Post created successfully!",
+          type: "success"
+        });
+
+        // RESET FORM
+        setTitle("");
+        setContent("");
+        setTags("");
+        setVisibility("public");
+        setWordCount(0);
+        setSuggestedTitles([]);
+        setSuggestedDescription([]);
+        setSuggestedTags([]);
+        setReviewSuggestions([]);
+
+      } else if (response.status === 201 || response.status === 200) {
+        // Fallback for old format
         const createdPost = response.data.post;
 
-        // ⭐ NEW AI-TAG MESSAGE LOGIC HERE ⭐
         setMessage({
           text: createdPost?.aiMeta?.autoTagged
             ? `Post created successfully! We also auto-added tags: ${createdPost.tags.join(", ")}`
@@ -58,7 +80,6 @@ const CreatePost = () => {
           type: "success"
         });
 
-        // RESET FORM
         setTitle("");
         setContent("");
         setTags("");
@@ -209,8 +230,8 @@ const CreatePost = () => {
                 disabled={aiLoading || wordCount < 50}
                 onClick={handleGetAISuggestions}
                 className={`w-full py-3 rounded-2xl text-white ${aiLoading || wordCount < 50
-                    ? "bg-brand-muted dark:bg-brandDark-muted cursor-not-allowed dark:text-brandDark-text"
-                    : "bg-gradient-to-r from-state-success to-state-info"
+                  ? "bg-brand-muted dark:bg-brandDark-muted cursor-not-allowed dark:text-brandDark-text"
+                  : "bg-gradient-to-r from-state-success to-state-info"
                   }`}
               >
                 {aiLoading ? "Generating..." : "✨ Get AI Suggestions"}
@@ -222,8 +243,8 @@ const CreatePost = () => {
                 disabled={aiReviewLoading || (!title && !content)}
                 onClick={handleReviewByAI}
                 className={`w-full py-3 rounded-2xl text-white ${aiReviewLoading || (!title && !content)
-                    ? "bg-brand-muted dark:bg-brandDark-muted cursor-not-allowed dark:text-brandDark-text"
-                    : "bg-gradient-to-r from-brand-primary to-brand-primaryHover"
+                  ? "bg-brand-muted dark:bg-brandDark-muted cursor-not-allowed dark:text-brandDark-text"
+                  : "bg-gradient-to-r from-brand-primary to-brand-primaryHover"
                   }`}
               >
                 {aiReviewLoading ? "Reviewing..." : "✅ Review by AI"}
@@ -250,8 +271,8 @@ const CreatePost = () => {
                   type="button"
                   onClick={() => setVisibility("public")}
                   className={`flex-1 py-3 border rounded-2xl transition-colors ${visibility === "public"
-                      ? "border-brand-primary text-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20 dark:border-brand-primary dark:text-brand-primary"
-                      : "border-brand-border dark:border-brandDark-border dark:text-brandDark-text"
+                    ? "border-brand-primary text-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20 dark:border-brand-primary dark:text-brand-primary"
+                    : "border-brand-border dark:border-brandDark-border dark:text-brandDark-text"
                     }`}
                 >
                   <FiGlobe className="inline mr-2" /> Public
@@ -261,8 +282,8 @@ const CreatePost = () => {
                   type="button"
                   onClick={() => setVisibility("private")}
                   className={`flex-1 py-3 border rounded-2xl transition-colors ${visibility === "private"
-                      ? "border-brand-primary text-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20 dark:border-brand-primary dark:text-brand-primary"
-                      : "border-brand-border dark:border-brandDark-border dark:text-brandDark-text"
+                    ? "border-brand-primary text-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20 dark:border-brand-primary dark:text-brand-primary"
+                    : "border-brand-border dark:border-brandDark-border dark:text-brandDark-text"
                     }`}
                 >
                   <FiLock className="inline mr-2" /> Private
@@ -275,8 +296,8 @@ const CreatePost = () => {
               type="submit"
               disabled={isSubmitting}
               className={`w-full py-3 text-white rounded-2xl transition-all ${isSubmitting
-                  ? "bg-brand-primary/60 dark:bg-brand-primary/40 cursor-not-allowed"
-                  : "bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:shadow-lg"
+                ? "bg-brand-primary/60 dark:bg-brand-primary/40 cursor-not-allowed"
+                : "bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:shadow-lg"
                 }`}
             >
               {isSubmitting ? "Publishing..." : "Publish Post"}
@@ -286,8 +307,8 @@ const CreatePost = () => {
             {message.text && (
               <div
                 className={`p-4 rounded-xl border ${message.type === "success"
-                    ? "border-state-success bg-state-success/10 text-state-success dark:bg-state-success/20"
-                    : "border-state-error bg-state-error/10 text-state-error dark:bg-state-error/20"
+                  ? "border-state-success bg-state-success/10 text-state-success dark:bg-state-success/20"
+                  : "border-state-error bg-state-error/10 text-state-error dark:bg-state-error/20"
                   }`}
               >
                 {message.text}

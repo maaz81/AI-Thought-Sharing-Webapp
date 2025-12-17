@@ -7,7 +7,7 @@ import { ArrowLeftIcon, CalendarIcon, TagIcon, ExclamationCircleIcon } from '@he
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PostDetails = () => {
-    const { postId } = useParams(); 
+    const { postId } = useParams();
     const navigate = useNavigate();
     const [page, setPage] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,12 +21,23 @@ const PostDetails = () => {
             try {
                 // Try the first request
                 const res1 = await axios.get(`http://localhost:5000/api/post/${postId}`);
-                setPage(res1.data);
+                // Handle new standardized response format
+                if (res1.data.success && res1.data.data) {
+                    setPage(res1.data.data);
+                } else {
+                    // Fallback for old format
+                    setPage(res1.data);
+                }
             } catch (err1) {
                 try {
                     // If first fails, try the second
                     const res2 = await axios.get(`http://localhost:5000/api/setpost/getposts/${postId}`);
-                    setPage(res2.data);
+                    // Handle new standardized response format
+                    if (res2.data.success && res2.data.data) {
+                        setPage(res2.data.data);
+                    } else {
+                        setPage(res2.data);
+                    }
                 } catch (err2) {
                     console.error("Both requests failed:", err1, err2);
                     setError("Failed to fetch the page from both sources.");
@@ -44,7 +55,7 @@ const PostDetails = () => {
         return (
             <div className="min-h-screen flex flex-col bg-brand-bg dark:bg-brandDark-bg">
                 <Header />
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="flex-1 flex items-center justify-center"
@@ -69,7 +80,7 @@ const PostDetails = () => {
         return (
             <div className="min-h-screen flex flex-col bg-brand-bg dark:bg-brandDark-bg">
                 <Header />
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex-1 flex items-center justify-center px-4"
@@ -112,8 +123,8 @@ const PostDetails = () => {
     return (
         <div className="min-h-screen flex flex-col bg-brand-bg dark:bg-brandDark-bg">
             <Header />
-            
-            <motion.main 
+
+            <motion.main
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
@@ -133,7 +144,7 @@ const PostDetails = () => {
 
                     {/* Post Content */}
                     <div className="max-w-3xl mx-auto">
-                        <motion.article 
+                        <motion.article
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.1 }}
@@ -151,7 +162,7 @@ const PostDetails = () => {
                                                 {page.title}
                                             </h1>
                                         </div>
-                                        
+
                                         <div className="flex items-center space-x-4 text-sm">
                                             <div className="flex items-center space-x-1.5 text-brand-muted dark:text-brandDark-muted">
                                                 <CalendarIcon className="w-4 h-4" />
@@ -184,12 +195,12 @@ const PostDetails = () => {
                                     {page.content?.split('\n').map((paragraph, i) => (
                                         <p key={i} className="leading-relaxed mb-4">{paragraph}</p>
                                     )) || (
-                                        <div className="text-center py-12">
-                                            <p className="text-brand-muted dark:text-brandDark-muted italic">
-                                                No content provided for this post.
-                                            </p>
-                                        </div>
-                                    )}
+                                            <div className="text-center py-12">
+                                                <p className="text-brand-muted dark:text-brandDark-muted italic">
+                                                    No content provided for this post.
+                                                </p>
+                                            </div>
+                                        )}
                                 </div>
                             </div>
 
@@ -222,7 +233,7 @@ const PostDetails = () => {
                                     >
                                         ← Back to All Posts
                                     </button>
-                                    
+
                                     <div className="flex items-center space-x-3">
                                         <button className="p-2.5 rounded-xl bg-brand-surface dark:bg-brandDark-surface text-brand-muted hover:text-brand-primary border border-brand-border dark:border-brandDark-border hover:border-brand-primary/30 transition-all duration-300 hover:scale-105">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,7 +250,7 @@ const PostDetails = () => {
                     </div>
                 </div>
             </motion.main>
-            
+
             <Footer />
         </div>
     );

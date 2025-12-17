@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const helmet = require('helmet');
 const envSecret = require('./config/env');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/user/userRoutes');
@@ -15,6 +16,7 @@ const userDetailsRoutes = require('./routes/user/userDetailsRoutes');
 const setPostRoutes = require('./routes/user/setPostRoutes');
 const followerRoutes = require('./routes/user/followRoutes');
 const path = require('path');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
 
@@ -22,7 +24,13 @@ const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
 
 // Setup Express App
 const app = express();
-app.use(express.json());
+
+// Security middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow images/uploads to be accessed
+}));
+
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 app.use(cors({
@@ -45,7 +53,7 @@ connectDB();
 // Routes
 app.use('/api/auth', userRoutes);
 app.use('/api', postRoutes);
-app.use('/api/update',updatePostRoutes);
+app.use('/api/update', updatePostRoutes);
 app.use('/profile', profileRoutes);
 app.use('/profile', postDetailsRoutes);
 app.use('/api/ai', aiRoutes)
@@ -56,8 +64,6 @@ app.use('/api/followers', followerRoutes);
 
 // Admin Routes
 app.use('/api/admin', adminAuthRoutes);
-
-
 
 
 // Create HTTP server for Socket.IO
@@ -88,6 +94,12 @@ io.on('connection', (socket) => {
 app.get('/', (req, res) => {
   res.send('hello');
 });
+
+// Handle 404 - Route not found (must be after all routes)
+app.use(notFoundHandler);
+
+// Global error handler (must be last middleware)
+app.use(errorHandler);
 
 // Start server
 server.listen(envSecret.PORT, () => {

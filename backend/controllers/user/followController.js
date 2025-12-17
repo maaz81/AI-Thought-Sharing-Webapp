@@ -7,7 +7,7 @@ const UserFeed = require("../../models/user/UserFeed")
 ===================================================== */
 exports.followUser = async (req, res) => {
   try {
-    const followerId = req.user.id;       // logged-in user
+    const followerId = req.userId;        // logged-in user (from authMiddleware)
     const followingId = req.params.userId; // user to follow
 
     if (!mongoose.Types.ObjectId.isValid(followingId)) {
@@ -69,7 +69,7 @@ exports.followUser = async (req, res) => {
 ===================================================== */
 exports.unfollowUser = async (req, res) => {
   try {
-    const followerId = req.user.id;
+    const followerId = req.userId;        // logged-in user (from authMiddleware)
     const followingId = req.params.userId;
 
     if (followerId === followingId) {
