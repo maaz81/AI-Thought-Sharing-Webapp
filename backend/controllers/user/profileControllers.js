@@ -55,8 +55,15 @@ const getPublicProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch PostDetails to get likes/stats
-    const rawPosts = await PostDetails.find({ userid: user._id, visibility: 'public' })
+    // 1. Find all posts belonging to this user
+    const posts = await Post.find({ userid: user._id }).select('_id');
+    const postIds = posts.map(p => p._id);
+
+    // 2. Fetch PostDetails for these posts, filtering by public visibility
+    const rawPosts = await PostDetails.find({
+      postid: { $in: postIds },
+      visibility: 'public'
+    })
       .populate({
         path: 'postid',
         select: 'title content tags'
