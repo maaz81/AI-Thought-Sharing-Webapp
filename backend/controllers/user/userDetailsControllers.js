@@ -25,45 +25,45 @@ const createUserDetails = async (req, res) => {
     } = req.body;
 
     if (!name || name.trim() === '') {
-      return res.status(400).json({ message: 'Username (name) is required' });
+      return res.status(400).json({ message: 'Full Name is required' });
     }
 
     const photoFilename = req.file ? req.file.filename : null;
 
-    const userDetails = await UserDetails.findOneAndUpdate(
-      { userid: userId },
-      {
-        $set: {
-          basic_info: {
-            username: name,
-            age,
-            gender,
-            profession,
-            bio,
-            location,
-            photo: photoFilename || 'default.jpg'
-          },
-          professional: {
-            education,
-            keySkills,
-            interests,
-          },
-          contact,         // ✅ uses parsed JSON
-          socialLinks      // ✅ uses parsed JSON
-        }
-      },
-      { new: true, upsert: true }
-    );
+    // Construct update object using dot notation to preserve other fields (like username)
+    const updateFields = {
+      'basic_info.name': name,
+      'basic_info.age': age,
+      'basic_info.gender': gender,
+      'basic_info.profession': profession,
+      'basic_info.bio': bio,
+      'basic_info.location': location,
+      'professional.education': education,
+      'professional.keySkills': keySkills,
+      'professional.interests': interests,
+      'contact': contact,
+      'socialLinks': socialLinks
+    };
 
-
-
-
-    const user = await User.findById(userId);
-    if (user) {
-      user.username = name;
-      await user.save();
+    // Only update photo if a new one was uploaded
+    if (photoFilename) {
+      updateFields['basic_info.photo'] = photoFilename;
     }
 
+    const userDetails = await UserDetails.findOneAndUpdate(
+      { userid: userId },
+      { $set: updateFields },
+      { new: true, upsert: true } // upsert will create if not exists
+    );
+
+    // Update the User's display name (not username which is the unique identifier)
+    const user = await User.findById(userId);
+    if (user) {
+      if (user.name !== name) {
+        user.name = name;
+        await user.save();
+      }
+    }
 
     res.status(201).json({
       message: 'User details saved successfully',
@@ -71,11 +71,14 @@ const createUserDetails = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Duplicate key error', error: err.message });
+    }
     res.status(500).json({ message: 'Failed to save user details', error: err.message });
   }
 };
 
-const getUserDetails = async (req,res) =>{
+const getUserDetails = async (req, res) => {
   try {
     const userId = req.userId;
     if (!userId) {
@@ -94,7 +97,7 @@ const getUserDetails = async (req,res) =>{
   }
 }
 
-const getUserPhoto = async (req,res) =>{
+const getUserPhoto = async (req, res) => {
   try {
     const userId = req.userId;
     if (!userId) {
@@ -113,10 +116,10 @@ const getUserPhoto = async (req,res) =>{
   }
 }
 
-const getUserBio = async (req,res) =>{
+const getUserBio = async (req, res) => {
   try {
     const userId = req.userId;
-    if (!userId){
+    if (!userId) {
       return res.status(404).json({ message: 'User not found' });
     }
     const userDetails = await UserDetails.findOne({ userid: userId });
@@ -126,10 +129,10 @@ const getUserBio = async (req,res) =>{
     const bio = userDetails.basic_info.bio;
     res.status(200).json(bio);
   }
-  catch(err){
+  catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to retrieve user bio', error: err.message });
   }
 }
 
-module.exports = { createUserDetails , getUserDetails,getUserPhoto, getUserBio };
+module.exports = { createUserDetails, getUserDetails, getUserPhoto, getUserBio };

@@ -231,8 +231,8 @@ const UpdateProfile = () => {
                     key={tab.id}
                     onClick={() => setActiveSection(tab.id)}
                     className={`flex items-center px-5 py-4 text-sm font-medium whitespace-nowrap transition-all duration-300 border-b-2 ${activeSection === tab.id
-                        ? 'border-brand-primary text-brand-primary'
-                        : 'border-transparent text-brand-muted dark:text-brandDark-muted hover:text-brand-text dark:hover:text-brandDark-text'
+                      ? 'border-brand-primary text-brand-primary'
+                      : 'border-transparent text-brand-muted dark:text-brandDark-muted hover:text-brand-text dark:hover:text-brandDark-text'
                       }`}
                   >
                     <Icon className="mr-2.5 text-lg" />
@@ -248,8 +248,8 @@ const UpdateProfile = () => {
             {/* Success/Error Message */}
             {message && (
               <div className={`mb-8 rounded-xl p-5 border ${message.startsWith('success:')
-                  ? 'bg-state-success/10 border-state-success/30 text-state-success'
-                  : 'bg-state-error/10 border-state-error/30 text-state-error'
+                ? 'bg-state-success/10 border-state-success/30 text-state-success'
+                : 'bg-state-error/10 border-state-error/30 text-state-error'
                 }`}>
                 <div className="flex items-center">
                   {message.startsWith('success:') ? (
@@ -550,8 +550,8 @@ const UpdateProfile = () => {
                 type="submit"
                 disabled={isSubmitting}
                 className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center mx-auto ${isSubmitting
-                    ? 'bg-brand-primary/70 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:from-brand-primaryHover hover:to-brand-primary hover:shadow-lg hover:-translate-y-0.5'
+                  ? 'bg-brand-primary/70 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:from-brand-primaryHover hover:to-brand-primary hover:shadow-lg hover:-translate-y-0.5'
                   } text-white`}
               >
                 {isSubmitting ? (
