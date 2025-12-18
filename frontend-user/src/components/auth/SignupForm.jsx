@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ const SignupForm = () => {
     password: "",
     role: "user", // default role
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,6 +32,9 @@ const SignupForm = () => {
       );
 
       console.log("Signup successful:", response.data);
+
+      // ✅ Save user info to local storage
+      localStorage.setItem("userInfo", JSON.stringify(response.data));
 
       setFormData({
         name: "",

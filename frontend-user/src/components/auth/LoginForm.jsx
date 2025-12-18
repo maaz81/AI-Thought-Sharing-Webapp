@@ -35,6 +35,10 @@ const LoginForm = () => {
       );
 
       console.log("Login success:", response.data);
+
+      // ✅ Save user info to local storage
+      localStorage.setItem("userInfo", JSON.stringify(response.data));
+
       alert("Login Successful!");
 
       // ✅ Reset form
