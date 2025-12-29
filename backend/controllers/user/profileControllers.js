@@ -1,6 +1,7 @@
 const User = require('../../models/user/User');
 const Post = require('../../models/user/Post');
 const PostDetails = require('../../models/user/PostDetails');
+const UserFeed = require('../../models/user/UserFeed');
 
 const getUserProfile = async (req, res) => {
   try {
@@ -10,6 +11,7 @@ const getUserProfile = async (req, res) => {
     }
 
     res.json({
+      _id: user._id,
       name: user.name,
       username: user.username,
       email: user.email,
@@ -71,6 +73,11 @@ const getPublicProfile = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
+    // 3. Fetch UserFeed for social stats
+    const userFeed = await UserFeed.findOne({ userId: user._id });
+    const followersCount = userFeed ? userFeed.followers.length : 0;
+    const followingCount = userFeed ? userFeed.following.length : 0;
+
     // Flatten the structure for the frontend
     const userPosts = rawPosts.map(pd => ({
       _id: pd._id, // PostDetails ID
@@ -95,7 +102,9 @@ const getPublicProfile = async (req, res) => {
         createdAt: user.createdAt
       },
       posts: userPosts,
-      postCount: userPosts.length
+      postCount: userPosts.length,
+      followersCount,
+      followingCount
     });
 
   } catch (error) {

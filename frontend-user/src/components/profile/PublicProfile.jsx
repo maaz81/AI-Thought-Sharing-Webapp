@@ -15,6 +15,8 @@ const PublicProfile = () => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [followLoading, setFollowLoading] = useState(false);
+    const [followersCount, setFollowersCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
 
     useEffect(() => {
         // Get current user from local storage
@@ -32,6 +34,8 @@ const PublicProfile = () => {
                 const res = await axios.get(`http://localhost:5000/profile/${username}`);
                 setProfileData(res.data.user);
                 setPosts(res.data.posts || []);
+                setFollowersCount(res.data.followersCount || 0);
+                setFollowingCount(res.data.followingCount || 0);
 
                 // Check if following
                 if (currentUser && res.data.user) {
@@ -72,9 +76,11 @@ const PublicProfile = () => {
             if (isFollowing) {
                 await axios.post(`http://localhost:5000/api/followers/unfollow/${profileData._id}`, {}, { withCredentials: true });
                 setIsFollowing(false);
+                setFollowersCount(prev => prev - 1);
             } else {
                 await axios.post(`http://localhost:5000/api/followers/follow/${profileData._id}`, {}, { withCredentials: true });
                 setIsFollowing(true);
+                setFollowersCount(prev => prev + 1);
             }
         } catch (err) {
             console.error("Follow action failed", err);
@@ -193,7 +199,14 @@ const PublicProfile = () => {
                                         <div className="font-bold text-xl text-brand-text dark:text-brandDark-text">{posts.length}</div>
                                         <div className="text-xs text-brand-muted uppercase tracking-wider">Posts</div>
                                     </div>
-                                    {/* Note: Following/Followers counts would need extra backend support or multiple fetching. Keeping it simple or fetching if critical. */}
+                                    <div className="text-center">
+                                        <div className="font-bold text-xl text-brand-text dark:text-brandDark-text">{followersCount}</div>
+                                        <div className="text-xs text-brand-muted uppercase tracking-wider">Followers</div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="font-bold text-xl text-brand-text dark:text-brandDark-text">{followingCount}</div>
+                                        <div className="text-xs text-brand-muted uppercase tracking-wider">Following</div>
+                                    </div>
                                 </div>
 
                             </div>
