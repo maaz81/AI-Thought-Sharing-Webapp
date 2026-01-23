@@ -70,6 +70,7 @@ const CreatePost = () => {
         setReviewSuggestions([]);
 
       } else if (response.status === 201 || response.status === 200) {
+        
         // Fallback for old format
         const createdPost = response.data.post;
 
