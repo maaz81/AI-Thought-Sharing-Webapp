@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axios';
 import {
   FiUser,
   FiBriefcase,
@@ -65,9 +65,7 @@ const UpdateProfile = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/update/profile/details', {
-          withCredentials: true
-        });
+        const res = await api.get('/api/update/profile/details');
 
         const data = res.data;
 
@@ -102,7 +100,7 @@ const UpdateProfile = () => {
         });
 
         if (data?.basic_info?.photo) {
-          setPreview(`http://localhost:5000/uploads/${data.basic_info.photo}`);
+          setPreview(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${data.basic_info.photo}`);
         }
 
       } catch (error) {
@@ -173,11 +171,10 @@ const UpdateProfile = () => {
         formDataToSend.append('photo', formData.photo);
       }
 
-      const response = await axios.post('http://localhost:5000/api/update/profile/update', formDataToSend, {
+      const response = await api.post('/api/update/profile/update', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        },
-        withCredentials: true
+        }
       });
 
       setMessage('success:Profile updated successfully!');

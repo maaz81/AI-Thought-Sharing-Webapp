@@ -1,5 +1,4 @@
-import { useState } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 
 const AIChatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -8,13 +7,13 @@ const AIChatbot = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-      setInput("");
+    setInput("");
 
     const userMessage = { sender: "user", text: input };
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/ai/chat", { message: input });
+      const res = await api.post("/api/ai/chat", { message: input });
       const aiMessage = { sender: "ai", text: res.data.reply };
       setMessages(prev => [...prev, aiMessage]);
     } catch (err) {

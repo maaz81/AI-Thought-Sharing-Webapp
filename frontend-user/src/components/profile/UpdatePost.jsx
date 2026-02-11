@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api/axios';
 import { motion } from 'framer-motion';
-import { 
-  FiEdit2, 
-  FiX, 
-  FiEye, 
-  FiLock, 
-  FiSave, 
-  FiLoader, 
-  FiTag,
-  FiAlertCircle,
-  FiArrowLeft
+import {
+    FiEdit2,
+    FiX,
+    FiEye,
+    FiLock,
+    FiSave,
+    FiLoader,
+    FiTag,
+    FiAlertCircle,
+    FiArrowLeft
 } from 'react-icons/fi';
 
 const UpdatePost = () => {
@@ -25,9 +25,7 @@ const UpdatePost = () => {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/update/post/${id}`, {
-                    withCredentials: true
-                });
+                const res = await api.get(`/api/update/post/${id}`);
                 setPost({
                     ...res.data,
                     tags: Array.isArray(res.data.tags) ? res.data.tags : []
@@ -46,9 +44,7 @@ const UpdatePost = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await axios.put(`http://localhost:5000/api/update/post/${id}`, post, {
-                withCredentials: true
-            });
+            await api.put(`/api/update/post/${id}`, post);
             navigate('/profile', { state: { message: 'Post updated successfully!' } });
         } catch (err) {
             console.error('Update failed:', err);
@@ -213,7 +209,7 @@ const UpdatePost = () => {
                                 <p className="mt-2 text-sm text-brand-muted dark:text-brandDark-muted">
                                     Separate tags with commas. {post.tags.length} tag(s) added.
                                 </p>
-                                
+
                                 {/* Tags Preview */}
                                 {post.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mt-3">
@@ -238,11 +234,10 @@ const UpdatePost = () => {
                                     <button
                                         type="button"
                                         onClick={() => setPost({ ...post, visibility: 'public' })}
-                                        className={`flex items-center justify-center px-6 py-4 rounded-xl border-2 transition-all duration-300 ${
-                                            post.visibility === 'public'
+                                        className={`flex items-center justify-center px-6 py-4 rounded-xl border-2 transition-all duration-300 ${post.visibility === 'public'
                                                 ? 'border-brand-primary bg-brand-primary/5 text-brand-primary shadow-md'
                                                 : 'border-brand-border dark:border-brandDark-border text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg hover:border-brand-border/60'
-                                        }`}
+                                            }`}
                                     >
                                         <FiEye className="mr-3 text-xl" />
                                         <div className="text-left">
@@ -255,11 +250,10 @@ const UpdatePost = () => {
                                     <button
                                         type="button"
                                         onClick={() => setPost({ ...post, visibility: 'private' })}
-                                        className={`flex items-center justify-center px-6 py-4 rounded-xl border-2 transition-all duration-300 ${
-                                            post.visibility === 'private'
+                                        className={`flex items-center justify-center px-6 py-4 rounded-xl border-2 transition-all duration-300 ${post.visibility === 'private'
                                                 ? 'border-brand-primary bg-brand-primary/5 text-brand-primary shadow-md'
                                                 : 'border-brand-border dark:border-brandDark-border text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg hover:border-brand-border/60'
-                                        }`}
+                                            }`}
                                     >
                                         <FiLock className="mr-3 text-xl" />
                                         <div className="text-left">
@@ -288,11 +282,10 @@ const UpdatePost = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center w-full sm:w-auto ${
-                                    isSubmitting
+                                className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center w-full sm:w-auto ${isSubmitting
                                         ? 'bg-brand-primary/70 cursor-not-allowed'
                                         : 'bg-gradient-to-r from-brand-primary to-brand-primaryHover hover:from-brand-primaryHover hover:to-brand-primary hover:shadow-lg hover:-translate-y-0.5'
-                                } text-white`}
+                                    } text-white`}
                             >
                                 {isSubmitting ? (
                                     <>

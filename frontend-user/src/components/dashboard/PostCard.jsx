@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Header from '../HeaderFooter/Header';
 import Footer from '../HeaderFooter/Footer';
 import SearchBar from "./SearchBar";
-import axios from 'axios';
+import api from "../../api/axios";
 import { io } from 'socket.io-client';
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,7 @@ const PostCard = () => {
                 let res2Data = [];
 
                 try {
-                    const res1 = await axios.get("http://localhost:5000/api/post");
+                    const res1 = await api.get("/api/post");
                     // Handle new standardized response format
                     if (res1.data.success && res1.data.data) {
                         res1Data = Array.isArray(res1.data.data) ? res1.data.data : [];
@@ -39,7 +39,7 @@ const PostCard = () => {
                 }
 
                 try {
-                    const res2 = await axios.get("http://localhost:5000/api/setpost/getposts");
+                    const res2 = await api.get("/api/setpost/getposts");
                     // Handle both new and old response formats
                     if (res2.data.success && res2.data.data) {
                         res2Data = Array.isArray(res2.data.data) ? res2.data.data : [];
@@ -90,7 +90,7 @@ const PostCard = () => {
 
 
     useEffect(() => {
-        const socket = io('http://localhost:5000');
+        const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
         socket.on("postCreated", (newPost) => {
             // agar explicitly private hai → ignore
@@ -142,15 +142,9 @@ const PostCard = () => {
 
     const handleReaction = async (postId, reactionType) => {
         try {
-            await axios.post(
-                `http://localhost:5000/profile/like/${postId}`,
+            await api.post(
+                `/profile/like/${postId}`,
                 { reaction: reactionType },
-                {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
             );
 
             setPosts(prevPosts =>

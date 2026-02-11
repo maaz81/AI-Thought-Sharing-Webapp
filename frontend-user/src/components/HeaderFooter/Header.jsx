@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../../api/axios";
 import defaultAvatar from "../../assets/avatar.jpeg";
 import InsightShareLogo from "../../assets/InsightShare Logo.png";
 import { ThemeContext } from "../context/ThemeContext";
@@ -23,12 +23,11 @@ const Header = () => {
   useEffect(() => {
     const fetchUserPhoto = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/update/profile/userphoto",
-          { withCredentials: true }
+        const res = await api.get(
+          "/api/update/profile/userphoto"
         );
         if (res.data) {
-          setUserPhoto(`http://localhost:5000/uploads/${res.data}`);
+          setUserPhoto(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${res.data}`);
           setIsLoggedIn(true);
         } else {
           setUserPhoto(null);
@@ -44,14 +43,13 @@ const Header = () => {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled 
-        ? 'bg-brand-surface/95 dark:bg-brandDark-surface/95 backdrop-blur-md border-b border-brand-border/30 dark:border-brandDark-border/30 shadow-soft' 
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+        ? 'bg-brand-surface/95 dark:bg-brandDark-surface/95 backdrop-blur-md border-b border-brand-border/30 dark:border-brandDark-border/30 shadow-soft'
         : 'bg-brand-surface dark:bg-brandDark-surface border-b border-brand-border/20 dark:border-brandDark-border/20'
-    }`}>
+      }`}>
       <div className="container">
         <div className="flex items-center justify-between h-16">
-          
+
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <div className="relative">
@@ -70,8 +68,8 @@ const Header = () => {
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {/* Pricing Link */}
-            <Link 
-              to="/pricing" 
+            <Link
+              to="/pricing"
               className="flex items-center space-x-1.5 px-4 py-2 rounded-lg 
                 text-brand-muted hover:text-brand-primary dark:text-brandDark-muted dark:hover:text-brand-primary 
                 hover:bg-brand-bg/50 dark:hover:bg-brandDark-bg/50 
@@ -83,8 +81,8 @@ const Header = () => {
             </Link>
 
             {/* Create Post Link */}
-            <Link 
-              to="/profile/post" 
+            <Link
+              to="/profile/post"
               className="flex items-center space-x-2 px-4 py-2 rounded-lg 
                 bg-gradient-to-r from-brand-primary/10 to-brand-accent/10 
                 text-brand-primary hover:text-brand-primaryHover 
@@ -158,8 +156,8 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center justify-center space-x-4 pb-4 pt-2">
-          <Link 
-            to="/pricing" 
+          <Link
+            to="/pricing"
             className="flex-1 flex items-center justify-center space-x-1.5 px-4 py-2 rounded-lg 
               text-brand-muted hover:text-brand-primary dark:text-brandDark-muted dark:hover:text-brand-primary 
               hover:bg-brand-bg/50 dark:hover:bg-brandDark-bg/50 
@@ -169,8 +167,8 @@ const Header = () => {
             <span className="font-medium">Pricing</span>
           </Link>
 
-          <Link 
-            to="/profile/post" 
+          <Link
+            to="/profile/post"
             className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg 
               bg-gradient-to-r from-brand-primary/10 to-brand-accent/10 
               text-brand-primary hover:text-brand-primaryHover 

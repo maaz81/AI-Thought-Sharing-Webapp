@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../../api/axios";
 import Header from "../HeaderFooter/Header";
 import Footer from "../HeaderFooter/Footer";
 import { FiUserPlus, FiUserCheck, FiMessageSquare, FiMapPin, FiCalendar, FiLink, FiUsers } from "react-icons/fi";
@@ -31,7 +31,7 @@ const PublicProfile = () => {
             try {
                 setLoading(true);
                 // Fetch Public Profile Data
-                const res = await axios.get(`http://localhost:5000/profile/${username}`);
+                const res = await api.get(`/profile/${username}`);
                 setProfileData(res.data.user);
                 setPosts(res.data.posts || []);
                 setFollowersCount(res.data.followersCount || 0);
@@ -42,7 +42,7 @@ const PublicProfile = () => {
                     // We need to check if *currentUser* follows *this profile user*
                     // We can fetch the current user's following list
                     try {
-                        const followingRes = await axios.get(`http://localhost:5000/api/followers/following/${currentUser._id}`, { withCredentials: true });
+                        const followingRes = await api.get(`/api/followers/following/${currentUser._id}`);
                         const followingList = followingRes.data.following || [];
                         const isFound = followingList.some(u => u._id === res.data.user._id);
                         setIsFollowing(isFound);
@@ -74,11 +74,11 @@ const PublicProfile = () => {
         setFollowLoading(true);
         try {
             if (isFollowing) {
-                await axios.post(`http://localhost:5000/api/followers/unfollow/${profileData._id}`, {}, { withCredentials: true });
+                await api.post(`/api/followers/unfollow/${profileData._id}`, {});
                 setIsFollowing(false);
                 setFollowersCount(prev => prev - 1);
             } else {
-                await axios.post(`http://localhost:5000/api/followers/follow/${profileData._id}`, {}, { withCredentials: true });
+                await api.post(`/api/followers/follow/${profileData._id}`, {});
                 setIsFollowing(true);
                 setFollowersCount(prev => prev + 1);
             }
@@ -138,7 +138,7 @@ const PublicProfile = () => {
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl border-4 border-brand-surface dark:border-brandDark-surface shadow-md overflow-hidden bg-brand-bg dark:bg-brandDark-bg">
                                         {profileData.userDetails?.basic_info?.photo && profileData.userDetails?.basic_info?.photo !== 'default.jpg' ? (
                                             <img
-                                                src={`http://localhost:5000/uploads/${profileData.userDetails.basic_info.photo}`}
+                                                src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${profileData.userDetails.basic_info.photo}`}
                                                 alt={profileData.name}
                                                 className="w-full h-full object-cover"
                                             />

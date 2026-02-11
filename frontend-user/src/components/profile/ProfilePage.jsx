@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
+import api from '../../api/axios';
 import {
   FiUser,
   FiMessageSquare,
@@ -42,10 +42,10 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       try {
         const [profileRes, statsRes, userPhotoRes, userBioRes] = await Promise.all([
-          axios.get('http://localhost:5000/profile/', { withCredentials: true }),
-          axios.get('http://localhost:5000/profile/stats', { withCredentials: true }),
-          axios.get('http://localhost:5000/api/update/profile/userphoto', { withCredentials: true }),
-          axios.get('http://localhost:5000/api/update/profile/userbio', { withCredentials: true }),
+          api.get('/profile/'),
+          api.get('/profile/stats'),
+          api.get('/api/update/profile/userphoto'),
+          api.get('/api/update/profile/userbio'),
 
         ]);
 
@@ -54,7 +54,7 @@ const ProfilePage = () => {
 
         const photoFilename = userPhotoRes.data;
         if (photoFilename) {
-          setUserPhoto(`http://localhost:5000/uploads/${photoFilename}`);
+          setUserPhoto(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${photoFilename}`);
         }
 
         setUserDetails(userPhotoRes.data);
@@ -77,8 +77,8 @@ const ProfilePage = () => {
         try {
           setLoadingFollows(true);
           const [followersRes, followingRes] = await Promise.all([
-            axios.get(`http://localhost:5000/api/followers/followers/${userData._id}`, { withCredentials: true }),
-            axios.get(`http://localhost:5000/api/followers/following/${userData._id}`, { withCredentials: true })
+            api.get(`/api/followers/followers/${userData._id}`),
+            api.get(`/api/followers/following/${userData._id}`)
           ]);
           setFollowers(followersRes.data.followers || []);
           setFollowing(followingRes.data.following || []);
@@ -94,7 +94,7 @@ const ProfilePage = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+      await api.post("/api/auth/logout", {});
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);

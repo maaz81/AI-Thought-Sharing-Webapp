@@ -49,7 +49,7 @@ const UserListModal = ({ isOpen, onClose, title, users, isLoading }) => {
                                     <div className="flex items-center gap-3">
                                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-primary to-brand-accent flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden shrink-0">
                                             {user.profilePicture ? (
-                                                <img src={`http://localhost:5000/uploads/${user.profilePicture}`} alt={user.username} className="w-full h-full object-cover" />
+                                                <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${user.profilePicture}`} alt={user.username} className="w-full h-full object-cover" />
                                             ) : (
                                                 user.username?.[0]?.toUpperCase() || '?'
                                             )}

@@ -1,16 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
-
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const navigate = useNavigate(); // ✅ React Router navigation
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,12 +25,9 @@ const LoginForm = () => {
     setErrorMsg("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData,
-        {
-          withCredentials: true // ✅ Important for cookie-based auth
-        }
+      const response = await api.post(
+        "/api/auth/login",
+        formData
       );
 
       console.log("Login success:", response.data);

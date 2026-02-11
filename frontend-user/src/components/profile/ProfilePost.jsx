@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api/axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEdit2, FiTrash2, FiClock, FiHeart, FiThumbsDown, FiTag, FiLoader, FiPlus } from 'react-icons/fi';
@@ -13,9 +13,7 @@ const ProfilePost = () => {
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/profile/post', {
-                    withCredentials: true,
-                });
+                const res = await api.get('/profile/post');
 
                 const data = res.data;
 
@@ -52,9 +50,7 @@ const ProfilePost = () => {
 
         setDeletingId(postId);
         try {
-            await axios.delete(`http://localhost:5000/api/update/post/${postId}`, {
-                withCredentials: true,
-            });
+            await api.delete(`/api/update/post/${postId}`);
 
             setPosts((prev) => prev.filter((post) => post._id !== postId));
         } catch (error) {
@@ -125,8 +121,8 @@ const ProfilePost = () => {
             ) : (
                 <div className="grid gap-6">
                     {posts.map((post) => (
-                        <div 
-                            key={post._id} 
+                        <div
+                            key={post._id}
                             className="group bg-brand-surface dark:bg-brandDark-surface rounded-2xl border border-brand-border dark:border-brandDark-border shadow-soft hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
                         >
                             <div className="p-6">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from 'axios';
+import api from "../../api/axios";
 import {
   FiPlus, FiTag, FiLock, FiGlobe, FiCheck,
   FiMessageSquare, FiX
@@ -41,10 +41,9 @@ const CreatePost = () => {
     };
 
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/post/create',
-        postData,
-        { withCredentials: true }
+      const response = await api.post(
+        '/api/post/create',
+        postData
       );
 
       // Handle new standardized response format
@@ -70,7 +69,7 @@ const CreatePost = () => {
         setReviewSuggestions([]);
 
       } else if (response.status === 201 || response.status === 200) {
-        
+
         // Fallback for old format
         const createdPost = response.data.post;
 
@@ -112,7 +111,7 @@ const CreatePost = () => {
 
     try {
       setAiLoading(true);
-      const response = await axios.post("http://localhost:5000/api/ai/suggest", {
+      const response = await api.post("/api/ai/suggest", {
         title,
         description: content,
       });
@@ -131,7 +130,7 @@ const CreatePost = () => {
 
     try {
       setAiReviewLoading(true);
-      const response = await axios.post("http://localhost:5000/api/ai/review", {
+      const response = await api.post("/api/ai/review", {
         title,
         content,
       });

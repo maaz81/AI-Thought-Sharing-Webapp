@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios'
+import api from '../../api/axios';
 import { Link } from 'react-router-dom';
 
 
@@ -23,7 +23,7 @@ const SearchBar = ({ onSearch }) => {
         setError('');
 
         try {
-            const res = await axios.get('http://localhost:5000/api/search', {
+            const res = await api.get('/api/search', {
                 params: { query },
             });
 
@@ -119,7 +119,7 @@ const SearchBar = ({ onSearch }) => {
                                     <div className="flex items-center gap-4 p-4 rounded-xl border border-brand-border bg-brand-surface dark:bg-brandDark-surface dark:border-brandDark-border shadow-sm hover:shadow-md transition-all duration-200">
                                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-primary to-brand-accent flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden shrink-0">
                                             {user.userDetails?.basic_info?.photo ? (
-                                                <img src={`http://localhost:5000/uploads/${user.userDetails.basic_info.photo}`} alt={user.username} className="w-full h-full object-cover" />
+                                                <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${user.userDetails.basic_info.photo}`} alt={user.username} className="w-full h-full object-cover" />
                                             ) : (
                                                 user.username?.[0]?.toUpperCase()
                                             )}

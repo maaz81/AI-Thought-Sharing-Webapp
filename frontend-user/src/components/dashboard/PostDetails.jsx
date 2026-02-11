@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../HeaderFooter/Header';
 import Footer from '../HeaderFooter/Footer';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api/axios';
 import { ArrowLeftIcon, CalendarIcon, TagIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,7 +20,7 @@ const PostDetails = () => {
 
             try {
                 // Try the first request
-                const res1 = await axios.get(`http://localhost:5000/api/post/${postId}`);
+                const res1 = await api.get(`/api/post/${postId}`);
                 // Handle new standardized response format
                 if (res1.data.success && res1.data.data) {
                     setPage(res1.data.data);
@@ -31,7 +31,7 @@ const PostDetails = () => {
             } catch (err1) {
                 try {
                     // If first fails, try the second
-                    const res2 = await axios.get(`http://localhost:5000/api/setpost/getposts/${postId}`);
+                    const res2 = await api.get(`/api/setpost/getposts/${postId}`);
                     // Handle new standardized response format
                     if (res2.data.success && res2.data.data) {
                         setPage(res2.data.data);

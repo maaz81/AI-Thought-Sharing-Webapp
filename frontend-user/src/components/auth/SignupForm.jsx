@@ -1,54 +1,49 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from "../../api/axios";
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "user", // default role
+    role: "user"
   });
-
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        formData,
-        {
-          withCredentials: true // ✅ CORRECT placement
-        }
-      );
-
+      const response = await api.post("/api/auth/register", formData);
       console.log("Signup successful:", response.data);
-
-      // ✅ Save user info to local storage
       localStorage.setItem("userInfo", JSON.stringify(response.data));
-
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        role: "user"
-      });
-
-      // Navigate to the home page after successful signup
+      setFormData({ name: "", email: "", password: "", role: "user" });
       navigate("/");
-
-      // Optionally redirect or show a success message
     } catch (error) {
-      console.error("Signup error:", error.response?.data || error.message);
+      const resData = error.response?.data;
+      let errorMessage = "Signup failed. Please try again.";
+
+      if (resData?.message) {
+        errorMessage = resData.message;
+      } else if (resData?.error) {
+        errorMessage = resData.error;
+      } else if (resData?.errors && Array.isArray(resData.errors)) {
+        errorMessage = resData.errors.map(err => err.message).join(", ");
+      }
+
+      console.error("Signup error:", resData || error.message);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,6 +52,11 @@ const SignupForm = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Sign Up</h2>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-600">Full Name</label>
@@ -116,8 +116,12 @@ const SignupForm = () => {
             </label>
           </div>
 
-          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-300">
-            Sign Up
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full text-white py-2 rounded-md transition duration-300 ${loading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+          >
+            {loading ? 'Signing up...' : 'Sign Up'}
           </button>
         </form>
         <p className="mt-4 text-sm text-center text-gray-600">

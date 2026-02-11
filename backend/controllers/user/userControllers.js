@@ -52,9 +52,10 @@ const registerUser = async (req, res) => {
         const token = generateToken(user._id);
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'strict',
-            maxAge: 24 * 60 * 60 * 1000
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 24 * 60 * 60 * 1000,
+            path: '/'
         }).status(201).json({
             message: 'User registered successfully',
             user: {
@@ -102,9 +103,10 @@ const loginUser = async (req, res) => {
         const token = generateToken(user._id);
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // set true in production
-            sameSite: 'strict',
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 24 * 60 * 60 * 1000,
+            path: '/'
         }).status(201).json({
             message: 'user logedin',
             user: {
@@ -124,7 +126,12 @@ const loginUser = async (req, res) => {
 }
 
 const logoutUser = async (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/'
+    });
     res.json({ message: 'Logout User' })
 }
 
