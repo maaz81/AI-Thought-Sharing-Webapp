@@ -6,6 +6,61 @@ import api from "../../api/axios";
 import { io } from 'socket.io-client';
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+
+const ReactionButton = ({
+    type,
+    active,
+    count,
+    onClick,
+    size = "md",
+}) => {
+    const Icon = type === "like" ? ThumbsUp : ThumbsDown;
+
+    const sizeStyles =
+        size === "lg"
+            ? "px-4 py-2 text-base"
+            : "px-3 py-1.5 text-sm";
+
+    const activeStyles =
+        type === "like"
+            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.35)]"
+            : "bg-rose-500/10 text-rose-600 dark:text-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.35)]";
+
+    return (
+        <motion.button
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.06 }}
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+            }}
+            className={`relative flex items-center gap-2 rounded-full font-medium transition-all duration-300 ${sizeStyles}
+                ${active ? activeStyles : "text-brand-muted hover:bg-brand-bg dark:hover:bg-brandDark-surface"}
+            `}
+        >
+            <motion.div
+                animate={active ? { scale: [1, 1.3, 1] } : {}}
+                transition={{ duration: 0.3 }}
+            >
+                <Icon
+                    size={size === "lg" ? 20 : 18}
+                    className={active ? "fill-current" : ""}
+                />
+            </motion.div>
+
+            <motion.span
+                key={count}
+                initial={{ y: -4, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.2 }}
+            >
+                {count}
+            </motion.span>
+        </motion.button>
+    );
+};
+
 
 const PostCard = () => {
     const [posts, setPosts] = useState([]);
@@ -56,22 +111,38 @@ const PostCard = () => {
 
                 if (combinedData.length > 0) {
                     const enhancedPosts = combinedData
-                        .filter((post) => post.visibility !== "private") // sirf private hatao
+                        .filter((post) => post.visibility !== "private")
+                        .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
                         .map((post) => ({
                             ...post,
-                            likes: post.likes || 0,
-                            dislikes: post.dislikes || 0,
+                            likes: post.likes ?? post.like ?? 0,
+                            dislikes: post.dislikes ?? post.dislike ?? 0,
                             userReaction: null,
                             createdAt: new Date(post.createdAt).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
                             }),
-                        }))
-                        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                        }));
 
-                    setPosts(enhancedPosts);
+                    const postsWithReactions = await Promise.all(
+                        enhancedPosts.map(async (post) => {
+                            try {
+                                const reactionId = post.postId || post._id;
+                                const { data } = await api.get(`/profile/like/${reactionId}`);
+                                return {
+                                    ...post,
+                                    likes: data.like ?? post.likes,
+                                    dislikes: data.dislike ?? post.dislikes,
+                                    userReaction: data.userReaction ?? null,
+                                };
+                            } catch {
+                                return post;
+                            }
+                        })
+                    );
 
+                    setPosts(postsWithReactions);
                 } else {
                     setPosts([]);
                 }
@@ -104,8 +175,8 @@ const PostCard = () => {
                         month: "short",
                         day: "numeric",
                     }),
-                    likes: newPost.likes || 0,
-                    dislikes: newPost.dislikes || 0,
+                    likes: newPost.likes ?? newPost.like ?? 0,
+                    dislikes: newPost.dislikes ?? newPost.dislike ?? 0,
                     userReaction: null,
                 },
                 ...prev,
@@ -124,7 +195,9 @@ const PostCard = () => {
                         ? {
                             ...post,
                             ...updatedPost,
-                            createdAt: post.createdAt, // formatted date preserve
+                            likes: updatedPost.like ?? post.likes,
+                            dislikes: updatedPost.dislike ?? post.dislikes,
+                            createdAt: post.createdAt,
                         }
                         : post
                 );
@@ -140,49 +213,38 @@ const PostCard = () => {
         };
     }, []);
 
-    const handleReaction = async (postId, reactionType) => {
+    const handleReaction = async (postId, reactionId, reactionType) => {
         try {
-            await api.post(
-                `/profile/like/${postId}`,
-                { reaction: reactionType },
+            const { data } = await api.post(
+                `/profile/like/${reactionId}`,
+                { reaction: reactionType }
             );
 
             setPosts(prevPosts =>
-                prevPosts.map(post => {
-                    if (post._id !== postId) return post;
-
-                    let newLikes = post.likes || 0;
-                    let newDislikes = post.dislikes || 0;
-                    let newUserReaction = post.userReaction;
-
-                    if (reactionType === 'like') {
-                        if (post.userReaction === 'like') {
-                            newLikes -= 1;
-                            newUserReaction = null;
-                        } else {
-                            newLikes += 1;
-                            if (post.userReaction === 'dislike') newDislikes -= 1;
-                            newUserReaction = 'like';
+                prevPosts.map(post =>
+                    post._id === postId
+                        ? {
+                            ...post,
+                            likes: data.like,
+                            dislikes: data.dislike,
+                            userReaction: data.userReaction,
                         }
-                    } else if (reactionType === 'dislike') {
-                        if (post.userReaction === 'dislike') {
-                            newDislikes -= 1;
-                            newUserReaction = null;
-                        } else {
-                            newDislikes += 1;
-                            if (post.userReaction === 'like') newLikes -= 1;
-                            newUserReaction = 'dislike';
-                        }
-                    }
-
-                    return {
-                        ...post,
-                        likes: newLikes,
-                        dislikes: newDislikes,
-                        userReaction: newUserReaction,
-                    };
-                })
+                        : post
+                )
             );
+
+            // Sync selectedPost if open
+            setSelectedPost(prev =>
+                prev && prev._id === postId
+                    ? {
+                        ...prev,
+                        likes: data.like,
+                        dislikes: data.dislike,
+                        userReaction: data.userReaction,
+                    }
+                    : prev
+            );
+
         } catch (error) {
             console.error('Reaction error:', error);
             alert('You need to be logged in to react to posts.');
@@ -195,7 +257,7 @@ const PostCard = () => {
         (post.tags && post.tags.some(tag =>
             tag.toLowerCase().includes(searchQuery.toLowerCase())
         )
-        ))
+        ));
 
     if (loading) return <LoadingSkeleton />;
     if (error) return <ErrorDisplay error={error} />;
@@ -289,20 +351,21 @@ const PostCard = () => {
 
                                         <div className="flex items-center justify-between pt-4 border-t border-brand-border dark:border-brandDark-border">
                                             <div className="flex space-x-4">
-                                                <button
-                                                    onClick={() => handleReaction(selectedPost._id, 'like')}
-                                                    className={`flex items-center space-x-1 px-4 py-2 rounded-full transition-colors ${selectedPost.userReaction === 'like' ? 'bg-state-success/10 text-state-success' : 'text-brand-muted hover:bg-brand-bg dark:hover:bg-brandDark-surface'}`}
-                                                >
-                                                    <span className="text-xl">👍</span>
-                                                    <span>{selectedPost.likes}</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleReaction(selectedPost._id, 'dislike')}
-                                                    className={`flex items-center space-x-1 px-4 py-2 rounded-full transition-colors ${selectedPost.userReaction === 'dislike' ? 'bg-state-error/10 text-state-error' : 'text-brand-muted hover:bg-brand-bg dark:hover:bg-brandDark-surface'}`}
-                                                >
-                                                    <span className="text-xl">👎</span>
-                                                    <span>{selectedPost.dislikes}</span>
-                                                </button>
+                                                <ReactionButton
+                                                    type="like"
+                                                    size="lg"
+                                                    active={selectedPost.userReaction === "like"}
+                                                    count={selectedPost.likes}
+                                                    onClick={() => handleReaction(selectedPost._id, selectedPost.postId || selectedPost._id, "like")}
+                                                />
+
+                                                <ReactionButton
+                                                    type="dislike"
+                                                    size="lg"
+                                                    active={selectedPost.userReaction === "dislike"}
+                                                    count={selectedPost.dislikes}
+                                                    onClick={() => handleReaction(selectedPost._id, selectedPost.postId || selectedPost._id, "dislike")}
+                                                />
                                             </div>
 
                                             <button className="text-brand-primary hover:text-brand-primaryHover font-medium flex items-center transition-colors">
@@ -365,26 +428,19 @@ const PostCardDisplay = ({ post, handleReaction, onClick }) => {
 
                 <div className="flex items-center justify-between pt-3">
                     <div className="flex space-x-3">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleReaction(post._id, 'like');
-                            }}
-                            className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${post.userReaction === 'like' ? 'bg-state-success/10 text-state-success' : 'text-brand-muted hover:bg-brand-bg dark:hover:bg-brandDark-surface'}`}
-                        >
-                            <span className="text-lg">👍</span>
-                            <span className="text-sm">{post.likes}</span>
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleReaction(post._id, 'dislike');
-                            }}
-                            className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${post.userReaction === 'dislike' ? 'bg-state-error/10 text-state-error' : 'text-brand-muted hover:bg-brand-bg dark:hover:bg-brandDark-surface'}`}
-                        >
-                            <span className="text-lg">👎</span>
-                            <span className="text-sm">{post.dislikes}</span>
-                        </button>
+                        <ReactionButton
+                            type="like"
+                            active={post.userReaction === "like"}
+                            count={post.likes}
+                            onClick={() => handleReaction(post._id, post.postId || post._id, "like")}
+                        />
+
+                        <ReactionButton
+                            type="dislike"
+                            active={post.userReaction === "dislike"}
+                            count={post.dislikes}
+                            onClick={() => handleReaction(post._id, post.postId || post._id, "dislike")}
+                        />
                     </div>
 
                     <button

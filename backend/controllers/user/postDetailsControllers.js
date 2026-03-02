@@ -1,76 +1,59 @@
-const { json } = require('express');
 const PostDetails = require('../../models/user/PostDetails');
 const Post = require('../../models/user/Post');
-
 
 const postLikeDetails = async (req, res) => {
     try {
         const userId = req.userId;
         const postId = req.params.id;
-        const { reaction } = req.body; // "like" or "dislike"
+        const { reaction } = req.body;
 
-        if (!userId) {
+        if (!userId)
             return res.status(401).json({ error: "User not authenticated" });
-        }
 
-        if (!["like", "dislike"].includes(reaction)) {
+        if (!["like", "dislike"].includes(reaction))
             return res.status(400).json({ error: "Invalid reaction type" });
-        }
 
-        // Find the PostDetails for this post
         let postDetails = await PostDetails.findOne({ postid: postId });
 
-        // Create PostDetails if missing
+        // Fallback: if not found by postid, try finding by PostDetails _id directly
         if (!postDetails) {
-            postDetails = new PostDetails({
+            postDetails = await PostDetails.findById(postId);
+        }
+
+        if (!postDetails) {
+            postDetails = await PostDetails.create({
                 postid: postId,
                 likedBy: [],
-                dislikedBy: [],
-                like: 0,
-                dislike: 0
+                dislikedBy: []
             });
         }
 
-        const hasLiked = postDetails.likedBy.includes(userId);
-        const hasDisliked = postDetails.dislikedBy.includes(userId);
+        const hasLiked = postDetails.likedBy.some(id => id.toString() === userId);
+        const hasDisliked = postDetails.dislikedBy.some(id => id.toString() === userId);
 
-        // -------------------------
-        //  USER CLICKED LIKE
-        // -------------------------
+        let userReaction = null;
+
         if (reaction === "like") {
             if (hasLiked) {
-                // Remove Like (toggle off)
-                postDetails.likedBy = postDetails.likedBy.filter(id => id.toString() !== userId);
+                postDetails.likedBy.pull(userId);
             } else {
-                // Add Like
-                postDetails.likedBy.push(userId);
-
-                // Remove Dislike if exists
-                if (hasDisliked) {
-                    postDetails.dislikedBy = postDetails.dislikedBy.filter(id => id.toString() !== userId);
-                }
+                postDetails.likedBy.addToSet(userId);
+                postDetails.dislikedBy.pull(userId);
+                userReaction = "like";
             }
         }
 
-        // -------------------------
-        //  USER CLICKED DISLIKE
-        // -------------------------
         if (reaction === "dislike") {
             if (hasDisliked) {
-                // Remove Dislike (toggle off)
-                postDetails.dislikedBy = postDetails.dislikedBy.filter(id => id.toString() !== userId);
+                postDetails.dislikedBy.pull(userId);
             } else {
-                // Add Dislike
-                postDetails.dislikedBy.push(userId);
-
-                // Remove Like if exists
-                if (hasLiked) {
-                    postDetails.likedBy = postDetails.likedBy.filter(id => id.toString() !== userId);
-                }
+                postDetails.dislikedBy.addToSet(userId);
+                postDetails.likedBy.pull(userId);
+                userReaction = "dislike";
             }
         }
 
-        // Update counts
+        // Sync count fields with array lengths
         postDetails.like = postDetails.likedBy.length;
         postDetails.dislike = postDetails.dislikedBy.length;
 
@@ -78,9 +61,9 @@ const postLikeDetails = async (req, res) => {
 
         return res.status(200).json({
             message: "Reaction updated successfully",
-            like: postDetails.like,
-            dislike: postDetails.dislike,
-            userReaction: reaction
+            like: postDetails.likedBy.length,
+            dislike: postDetails.dislikedBy.length,
+            userReaction
         });
 
     } catch (err) {
@@ -94,27 +77,46 @@ const getUserReaction = async (req, res) => {
         const userId = req.userId;
         const postId = req.params.id;
 
-        const postDetails = await PostDetails.findOne({ postid: postId });
+        let postDetails = await PostDetails.findOne({ postid: postId });
+
+        // Fallback: if not found by postid, try finding by PostDetails _id directly
+        if (!postDetails) {
+            postDetails = await PostDetails.findById(postId);
+        }
 
         if (!postDetails) {
-            return res.json({ userReaction: null });
+            return res.json({
+                userReaction: null,
+                like: 0,
+                dislike: 0
+            });
         }
 
         let userReaction = null;
 
-        if (postDetails.likedBy.includes(userId)) userReaction = "like";
-        if (postDetails.dislikedBy.includes(userId)) userReaction = "dislike";
+        // Only check user reaction if authenticated
+        if (userId) {
+            const hasLiked = postDetails.likedBy.some(
+                id => id.toString() === userId
+            );
+            const hasDisliked = postDetails.dislikedBy.some(
+                id => id.toString() === userId
+            );
+
+            if (hasLiked) userReaction = "like";
+            if (hasDisliked) userReaction = "dislike";
+        }
 
         return res.json({
             userReaction,
-            like: postDetails.like,
-            dislike: postDetails.dislike
+            like: postDetails.likedBy.length,
+            dislike: postDetails.dislikedBy.length
         });
 
     } catch (err) {
+        console.error("Get Reaction Error:", err);
         res.status(500).json({ error: err.message });
     }
 };
-
 
 module.exports = { postLikeDetails, getUserReaction };
