@@ -5,7 +5,7 @@ const openRouterClient = async (prompt) => {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'openai/gpt-oss-20b:free', // or deepseek-coder, if you're using that
+        model: process.env.OPENROUTER_MODEL,
         messages: [
           {
             role: 'user',

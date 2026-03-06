@@ -120,6 +120,12 @@ const CreatePost = () => {
       setSuggestedTitles(titles || []);
       setSuggestedDescription(descriptions || []);
       setSuggestedTags(tags || []);
+    } catch (err) {
+      console.error("AI Suggestion Error:", err);
+      setMessage({
+        text: err.response?.data?.error || "AI suggestion failed. Please try again.",
+        type: "error",
+      });
     } finally {
       setAiLoading(false);
     }
@@ -146,6 +152,12 @@ const CreatePost = () => {
       if (Array.isArray(suggestions)) {
         setReviewSuggestions(suggestions);
       }
+    } catch (err) {
+      console.error("AI Review Error:", err);
+      setMessage({
+        text: err.response?.data?.error || "AI review failed. Please try again.",
+        type: "error",
+      });
     } finally {
       setAiReviewLoading(false);
     }

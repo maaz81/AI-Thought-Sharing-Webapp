@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const PostDetails = require('../../models/user/PostDetails');
 const Post = require('../../models/user/Post');
 
@@ -12,6 +13,12 @@ const postLikeDetails = async (req, res) => {
 
         if (!["like", "dislike"].includes(reaction))
             return res.status(400).json({ error: "Invalid reaction type" });
+
+        // If the ID is not a valid MongoDB ObjectId (e.g. UUID from setpost),
+        // we cannot query or create PostDetails for it
+        if (!mongoose.isValidObjectId(postId)) {
+            return res.status(400).json({ error: "Invalid post ID format" });
+        }
 
         let postDetails = await PostDetails.findOne({ postid: postId });
 
@@ -76,6 +83,16 @@ const getUserReaction = async (req, res) => {
     try {
         const userId = req.userId;
         const postId = req.params.id;
+
+        // If the ID is not a valid MongoDB ObjectId (e.g. UUID from setpost),
+        // return default reaction data instead of crashing
+        if (!mongoose.isValidObjectId(postId)) {
+            return res.json({
+                userReaction: null,
+                like: 0,
+                dislike: 0
+            });
+        }
 
         let postDetails = await PostDetails.findOne({ postid: postId });
 
