@@ -18,8 +18,10 @@ const setPostRoutes = require('./routes/user/setPostRoutes');
 const followerRoutes = require('./routes/user/followRoutes');
 const path = require('path');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
-
+const dns = require('dns');
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
+
+dns.setServers(["1.1.1.1", "0.0.0.0"])
 
 const allowedOrigins = [
   'http://localhost:5173',
