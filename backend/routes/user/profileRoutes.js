@@ -6,6 +6,6 @@ const router = express.Router();
 router.get('/', protectRoutes, getUserProfile);
 router.get('/post', protectRoutes, getUserPost);
 router.get('/stats', protectRoutes, getUserStats);
-router.get('/:username', getPublicProfile); // Public route
+router.get('/:id', getPublicProfile); // Public route
 
 module.exports = router

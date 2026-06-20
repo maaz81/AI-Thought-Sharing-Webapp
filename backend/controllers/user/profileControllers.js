@@ -47,21 +47,19 @@ const getUserStats = async (req, res) => {
   }
 }
 
-
 const getPublicProfile = async (req, res) => {
   try {
-    const { username } = req.params;
-    const user = await User.findOne({ username }).populate('userDetails');
+    const { id } = req.params;
+
+    const user = await User.findById(id).populate('userDetails');
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 1. Find all posts belonging to this user
     const posts = await Post.find({ userid: user._id }).select('_id');
     const postIds = posts.map(p => p._id);
 
-    // 2. Fetch PostDetails for these posts, filtering by public visibility
     const rawPosts = await PostDetails.find({
       postid: { $in: postIds },
       visibility: 'public'
@@ -73,15 +71,11 @@ const getPublicProfile = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    // 3. Fetch UserFeed for social stats
     const userFeed = await UserFeed.findOne({ userId: user._id });
-    const followersCount = userFeed ? userFeed.followers.length : 0;
-    const followingCount = userFeed ? userFeed.following.length : 0;
 
-    // Flatten the structure for the frontend
     const userPosts = rawPosts.map(pd => ({
-      _id: pd._id, // PostDetails ID
-      postId: pd.postid?._id, // Actual Post ID
+      _id: pd._id,
+      postId: pd.postid?._id,
       title: pd.postid?.title,
       content: pd.postid?.content,
       tags: pd.postid?.tags,
@@ -89,7 +83,7 @@ const getPublicProfile = async (req, res) => {
       likes: pd.like || 0,
       dislikes: pd.dislike || 0,
       visibility: pd.visibility
-    })).filter(post => post.title); // Filter out any broken links
+    })).filter(post => post.title);
 
     res.json({
       user: {
@@ -98,13 +92,13 @@ const getPublicProfile = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        userDetails: user.userDetails, // Contains photo
+        userDetails: user.userDetails,
         createdAt: user.createdAt
       },
       posts: userPosts,
       postCount: userPosts.length,
-      followersCount,
-      followingCount
+      followersCount: userFeed?.followers?.length || 0,
+      followingCount: userFeed?.following?.length || 0
     });
 
   } catch (error) {
