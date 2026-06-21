@@ -116,150 +116,304 @@ const PublicProfile = () => {
     }
 
     return (
-        <div className="min-h-screen bg-brand-bg dark:bg-brandDark-bg flex flex-col font-sans text-brand-text dark:text-brandDark-text transition-colors duration-300">
+        <div className="min-h-screen overflow-x-hidden bg-brand-bg dark:bg-brandDark-bg text-brand-text dark:text-brandDark-text transition-colors duration-300">
             <Header />
 
             <main className="flex-1">
-                {/* Cover Image Area */}
-                <div className="h-48 md:h-64 bg-gradient-to-r from-brand-primary to-brand-accent relative overflow-hidden">
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    {/* Optional: Pattern or Abstract Shape */}
-                    <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                </div>
 
-                <div className="container px-4 mx-auto -mt-20 md:-mt-24 relative z-10 pb-12">
-                    <div className="flex flex-col md:flex-row items-start md:gap-8">
+                {/* COVER SECTION */}
+                <section className="relative h-64 md:h-80 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-primary via-purple-600 to-brand-accent" />
 
-                        {/* Profile Card Sidebar */}
-                        <div className="w-full md:w-80 lg:w-96 flex-shrink-0">
-                            <div className="bg-brand-surface dark:bg-brandDark-surface rounded-2xl shadow-soft p-6 border border-brand-border dark:border-brandDark-border backdrop-blur-sm">
-                                {/* Avatar */}
-                                <div className="relative -mt-16 mb-4">
-                                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl border-4 border-brand-surface dark:border-brandDark-surface shadow-md overflow-hidden bg-brand-bg dark:bg-brandDark-bg">
-                                        {profileData.userDetails?.basic_info?.photo && profileData.userDetails?.basic_info?.photo !== 'default.jpg' ? (
-                                            <img
-                                                src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${profileData.userDetails.basic_info.photo}`}
-                                                alt={profileData.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-primary/20 to-brand-primary/5 text-brand-primary text-5xl font-bold">
-                                                {profileData.name?.[0]?.toUpperCase() || profileData.username?.[0]?.toUpperCase()}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                    <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
 
-                                {/* Name & Bio */}
-                                <div className="mb-6">
-                                    <h1 className="text-2xl font-bold text-brand-text dark:text-brandDark-text">{profileData.name}</h1>
-                                    <p className="text-brand-muted dark:text-brandDark-muted font-medium mb-4">@{profileData.username}</p>
+                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
 
-                                    {profileData.userDetails?.basic_info?.bio && (
-                                        <p className="text-sm text-brand-text/80 dark:text-brandDark-text/80 leading-relaxed mb-4">
-                                            {profileData.userDetails.basic_info.bio}
-                                        </p>
-                                    )}
+                    <div className="absolute inset-0 bg-black/20" />
+                </section>
 
-                                    {/* Meta Info */}
-                                    <div className="space-y-2 text-sm text-brand-muted dark:text-brandDark-text/60">
-                                        {profileData.userDetails?.basic_info?.location && (
-                                            <div className="flex items-center gap-2">
-                                                <FiMapPin /> <span>{profileData.userDetails.basic_info.location}</span>
-                                            </div>
-                                        )}
-                                        <div className="flex items-center gap-2">
-                                            <FiCalendar /> <span>Joined {new Date(profileData.createdAt).toLocaleDateString()}</span>
+                {/* CONTENT */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-20 pb-16">
+
+                    <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-8">
+
+                        {/* PROFILE SIDEBAR */}
+                        <aside className="lg:sticky lg:top-24 h-fit">
+
+                            <div
+                                className="
+                bg-brand-surface/90
+                dark:bg-brandDark-surface/90
+                backdrop-blur-lg
+                rounded-3xl
+                shadow-xl
+                border
+                border-brand-border
+                dark:border-brandDark-border
+                p-6
+              "
+                            >
+
+                                {/* AVATAR */}
+                                <div className="flex justify-center">
+                                    <div className="relative -mt-20">
+                                        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white dark:border-brandDark-surface shadow-2xl">
+
+                                            {profileData.userDetails?.basic_info?.photo &&
+                                                profileData.userDetails?.basic_info?.photo !==
+                                                "default.jpg" ? (
+                                                <img
+                                                    src={`${import.meta.env.VITE_API_URL ||
+                                                        "http://localhost:5000"
+                                                        }/uploads/${profileData.userDetails.basic_info.photo
+                                                        }`}
+                                                    alt={profileData.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-primary to-brand-accent text-white text-6xl font-bold">
+                                                    {profileData.name?.[0]?.toUpperCase()}
+                                                </div>
+                                            )}
+
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Actions */}
-                                <div className="flex gap-3 mb-6">
+                                {/* USER INFO */}
+                                <div className="text-center mt-5">
+
+                                    <h1 className="text-3xl font-bold">
+                                        {profileData.name}
+                                    </h1>
+
+                                    <p className="text-brand-muted mt-1">
+                                        @{profileData.username}
+                                    </p>
+
+                                    {profileData.userDetails?.basic_info?.bio && (
+                                        <p className="mt-4 text-sm leading-relaxed text-brand-muted">
+                                            {profileData.userDetails.basic_info.bio}
+                                        </p>
+                                    )}
+
+                                </div>
+
+                                {/* META */}
+                                <div className="space-y-3 mt-6 text-sm">
+
+                                    {profileData.userDetails?.basic_info?.location && (
+                                        <div className="flex items-center gap-3">
+                                            <FiMapPin />
+                                            <span>
+                                                {profileData.userDetails.basic_info.location}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-3">
+                                        <FiCalendar />
+                                        <span>
+                                            Joined{" "}
+                                            {new Date(
+                                                profileData.createdAt
+                                            ).toLocaleDateString()}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                {/* ACTIONS */}
+                                <div className="flex gap-3 mt-6">
+
                                     {currentUser?._id !== profileData._id && (
                                         <button
                                             onClick={handleFollowToggle}
                                             disabled={followLoading}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 ${isFollowing
-                                                ? "bg-brand-surface dark:bg-brandDark-surface border-2 border-brand-border dark:border-brandDark-border text-brand-text dark:text-brandDark-text hover:bg-brand-bg dark:hover:bg-brandDark-bg"
-                                                : "bg-brand-primary text-white hover:bg-brand-primaryHover shadow-lg shadow-brand-primary/30"
-                                                }`}
+                                            className={`
+                      flex-1
+                      py-3
+                      rounded-xl
+                      font-semibold
+                      transition-all
+                      duration-300
+                      ${isFollowing
+                                                    ? "border border-brand-border"
+                                                    : "bg-brand-primary text-white shadow-lg hover:scale-105"
+                                                }
+                    `}
                                         >
-                                            {isFollowing ? <><FiUserCheck /> Following</> : <><FiUserPlus /> Follow</>}
+                                            {isFollowing ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <FiUserCheck />
+                                                    Following
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <FiUserPlus />
+                                                    Follow
+                                                </span>
+                                            )}
                                         </button>
                                     )}
-                                    <button className="p-3 rounded-xl border-2 border-brand-border dark:border-brandDark-border text-brand-muted hover:text-brand-primary hover:border-brand-primary transition-all duration-200">
+
+                                    <button
+                                        className="
+                    p-3
+                    rounded-xl
+                    border
+                    border-brand-border
+                    hover:border-brand-primary
+                    transition-all
+                  "
+                                    >
                                         <FiMessageSquare size={20} />
                                     </button>
+
                                 </div>
 
-                                {/* Follow Stats (Optional - using dummy or if available) */}
-                                <div className="flex items-center justify-around py-4 border-t border-brand-border dark:border-brandDark-border">
-                                    <div className="text-center">
-                                        <div className="font-bold text-xl text-brand-text dark:text-brandDark-text">{posts.length}</div>
-                                        <div className="text-xs text-brand-muted uppercase tracking-wider">Posts</div>
+                                {/* STATS */}
+                                <div className="grid grid-cols-3 gap-3 mt-8">
+
+                                    <div className="bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 text-center">
+                                        <div className="font-bold text-2xl">
+                                            {posts.length}
+                                        </div>
+                                        <div className="text-xs uppercase tracking-wider">
+                                            Posts
+                                        </div>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="font-bold text-xl text-brand-text dark:text-brandDark-text">{followersCount}</div>
-                                        <div className="text-xs text-brand-muted uppercase tracking-wider">Followers</div>
+
+                                    <div className="bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 text-center">
+                                        <div className="font-bold text-2xl">
+                                            {followersCount}
+                                        </div>
+                                        <div className="text-xs uppercase tracking-wider">
+                                            Followers
+                                        </div>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="font-bold text-xl text-brand-text dark:text-brandDark-text">{followingCount}</div>
-                                        <div className="text-xs text-brand-muted uppercase tracking-wider">Following</div>
+
+                                    <div className="bg-brand-bg dark:bg-brandDark-bg rounded-xl p-4 text-center">
+                                        <div className="font-bold text-2xl">
+                                            {followingCount}
+                                        </div>
+                                        <div className="text-xs uppercase tracking-wider">
+                                            Following
+                                        </div>
                                     </div>
+
                                 </div>
 
                             </div>
-                        </div>
 
-                        {/* Main Feed */}
-                        <div className="flex-1 mt-8 md:mt-24 w-full">
-                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-brand-text dark:text-brandDark-text border-b border-brand-border dark:border-brandDark-border pb-4">
-                                <span className="bg-brand-primary/10 text-brand-primary p-2 rounded-lg"><FiUsers /></span>
-                                Recent Posts
-                            </h2>
+                        </aside>
 
-                            {posts.length > 0 ? (
-                                <div className="grid gap-6">
-                                    <AnimatePresence>
+                        {/* POSTS */}
+                        <section className="min-w-0">
+
+                            <div className="bg-brand-surface dark:bg-brandDark-surface rounded-3xl p-6 shadow-lg border border-brand-border dark:border-brandDark-border">
+
+                                <h2 className="flex items-center gap-3 text-2xl font-bold mb-8">
+                                    <span className="p-2 bg-brand-primary/10 rounded-xl text-brand-primary">
+                                        <FiUsers />
+                                    </span>
+                                    Recent Posts
+                                </h2>
+
+                                {posts.length > 0 ? (
+                                    <div className="space-y-6">
+
                                         {posts.map((post, index) => (
                                             <motion.div
                                                 key={post._id}
-                                                initial={{ opacity: 0, y: 20 }}
+                                                initial={{ opacity: 0, y: 30 }}
                                                 animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="bg-brand-surface dark:bg-brandDark-surface p-6 rounded-2xl shadow-soft border border-brand-border dark:border-brandDark-border hover:shadow-md transition-shadow duration-300"
+                                                transition={{ delay: index * 0.08 }}
+                                                className="
+                        group
+                        rounded-2xl
+                        border
+                        border-brand-border
+                        dark:border-brandDark-border
+                        p-6
+                        hover:shadow-xl
+                        hover:-translate-y-1
+                        transition-all
+                        duration-300
+                      "
                                             >
-                                                <div className="mb-4">
-                                                    <h3 className="text-xl font-bold text-brand-text dark:text-brandDark-text mb-2 line-clamp-2">{post.title}</h3>
-                                                    <div className="flex items-center gap-2 text-xs text-brand-muted">
-                                                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                                                        {post.tags && post.tags.map(tag => (
-                                                            <span key={tag} className="bg-brand-bg dark:bg-brandDark-bg px-2 py-0.5 rounded-full text-brand-text/70">#{tag}</span>
-                                                        ))}
-                                                    </div>
+
+                                                <h3 className="text-xl font-bold mb-3 group-hover:text-brand-primary transition-colors">
+                                                    {post.title}
+                                                </h3>
+
+                                                <div className="flex flex-wrap gap-2 mb-4">
+
+                                                    {post.tags?.map((tag) => (
+                                                        <span
+                                                            key={tag}
+                                                            className="
+                              px-3
+                              py-1
+                              rounded-full
+                              text-xs
+                              bg-brand-primary/10
+                              text-brand-primary
+                            "
+                                                        >
+                                                            #{tag}
+                                                        </span>
+                                                    ))}
+
                                                 </div>
-                                                <p className="text-brand-text/80 dark:text-brandDark-text/80 line-clamp-3 mb-4 leading-relaxed">
+
+                                                <p className="text-brand-muted leading-relaxed line-clamp-3">
                                                     {post.content}
                                                 </p>
-                                                <div className="flex items-center justify-end">
-                                                    <a href={`/post/${post.postId || post._id}`} className="text-sm font-medium text-brand-primary hover:text-brand-primaryHover transition-colors">
-                                                        Read Full Post &rarr;
+
+                                                <div className="flex justify-between items-center mt-5">
+
+                                                    <span className="text-xs text-brand-muted">
+                                                        {new Date(
+                                                            post.createdAt
+                                                        ).toLocaleDateString()}
+                                                    </span>
+
+                                                    <a
+                                                        href={`/post/${post.postId || post._id}`}
+                                                        className="
+                            font-medium
+                            text-brand-primary
+                            hover:underline
+                          "
+                                                    >
+                                                        Read More →
                                                     </a>
+
                                                 </div>
+
                                             </motion.div>
                                         ))}
-                                    </AnimatePresence>
-                                </div>
-                            ) : (
-                                <div className="text-center py-12 bg-brand-surface dark:bg-brandDark-surface rounded-2xl border border-dashed border-brand-border dark:border-brandDark-border">
-                                    <p className="text-brand-muted dark:text-brandDark-muted">No public posts yet.</p>
-                                </div>
-                            )}
-                        </div>
+
+                                    </div>
+                                ) : (
+                                    <div className="py-20 text-center">
+                                        <p className="text-brand-muted">
+                                            No public posts available.
+                                        </p>
+                                    </div>
+                                )}
+
+                            </div>
+
+                        </section>
+
                     </div>
+
                 </div>
+
             </main>
+
             <Footer />
         </div>
     );
