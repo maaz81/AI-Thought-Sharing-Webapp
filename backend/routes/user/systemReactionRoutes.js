@@ -1,5 +1,7 @@
 const express = require("express");
 
+const router = express.Router();
+
 const protectRoutes = require(
     "../../middleware/authMiddleware"
 );
@@ -10,8 +12,6 @@ const {
 } = require(
     "../../controllers/user/systemReactionController"
 );
-
-const router = express.Router();
 
 router.get(
     "/system-like/:systemPostId",

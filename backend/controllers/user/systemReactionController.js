@@ -2,16 +2,29 @@ const SystemPostReaction = require(
     "../../models/user/SystemPostReaction"
 );
 
-const toggleSystemReaction = async (req, res) => {
+const toggleSystemReaction = async (
+    req,
+    res
+) => {
     try {
         const { systemPostId } = req.params;
+
         const { reaction } = req.body;
 
         const userId = req.userId;
 
-        if (!["like", "dislike"].includes(reaction)) {
+        if (!userId) {
+            return res.status(401).json({
+                message: "Unauthorized",
+            });
+        }
+
+        if (
+            !["like", "dislike"].includes(
+                reaction
+            )
+        ) {
             return res.status(400).json({
-                success: false,
                 message: "Invalid reaction",
             });
         }
@@ -28,37 +41,53 @@ const toggleSystemReaction = async (req, res) => {
                 });
         }
 
-        const userLiked =
+        const hasLiked =
             postReaction.likedBy.some(
-                (id) => id.toString() === userId
+                (id) =>
+                    id.toString() === userId
             );
 
-        const userDisliked =
+        const hasDisliked =
             postReaction.dislikedBy.some(
-                (id) => id.toString() === userId
+                (id) =>
+                    id.toString() === userId
             );
+
+        let userReaction = null;
 
         if (reaction === "like") {
-            if (userLiked) {
-                postReaction.likedBy.pull(userId);
+            if (hasLiked) {
+                postReaction.likedBy.pull(
+                    userId
+                );
             } else {
-                postReaction.likedBy.addToSet(userId);
+                postReaction.likedBy.addToSet(
+                    userId
+                );
 
-                if (userDisliked) {
-                    postReaction.dislikedBy.pull(userId);
-                }
+                postReaction.dislikedBy.pull(
+                    userId
+                );
+
+                userReaction = "like";
             }
         }
 
         if (reaction === "dislike") {
-            if (userDisliked) {
-                postReaction.dislikedBy.pull(userId);
+            if (hasDisliked) {
+                postReaction.dislikedBy.pull(
+                    userId
+                );
             } else {
-                postReaction.dislikedBy.addToSet(userId);
+                postReaction.dislikedBy.addToSet(
+                    userId
+                );
 
-                if (userLiked) {
-                    postReaction.likedBy.pull(userId);
-                }
+                postReaction.likedBy.pull(
+                    userId
+                );
+
+                userReaction = "dislike";
             }
         }
 
@@ -70,36 +99,21 @@ const toggleSystemReaction = async (req, res) => {
 
         await postReaction.save();
 
-        let userReaction = null;
+        return res.status(200).json({
+            message:
+                "Reaction updated successfully",
 
-        if (
-            postReaction.likedBy.some(
-                (id) => id.toString() === userId
-            )
-        ) {
-            userReaction = "like";
-        }
-
-        if (
-            postReaction.dislikedBy.some(
-                (id) => id.toString() === userId
-            )
-        ) {
-            userReaction = "dislike";
-        }
-
-        return res.json({
-            success: true,
             like: postReaction.like,
-            dislike: postReaction.dislike,
+            dislike:
+                postReaction.dislike,
+
             userReaction,
         });
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        console.error(err);
 
         return res.status(500).json({
-            success: false,
-            message: "Failed to react",
+            message: err.message,
         });
     }
 };
@@ -130,7 +144,8 @@ const getSystemReaction = async (
 
         if (
             reaction.likedBy.some(
-                (id) => id.toString() === userId
+                (id) =>
+                    id.toString() === userId
             )
         ) {
             userReaction = "like";
@@ -138,7 +153,8 @@ const getSystemReaction = async (
 
         if (
             reaction.dislikedBy.some(
-                (id) => id.toString() === userId
+                (id) =>
+                    id.toString() === userId
             )
         ) {
             userReaction = "dislike";
@@ -150,6 +166,8 @@ const getSystemReaction = async (
             userReaction,
         });
     } catch (error) {
+        console.error(error);
+
         return res.status(500).json({
             success: false,
         });
