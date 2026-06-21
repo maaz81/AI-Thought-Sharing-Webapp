@@ -69,45 +69,19 @@ const PostCard = () => {
     const [status, setStatus] = useState(null);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
-
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                let res1Data = [];
-                let res2Data = [];
+                const res = await api.get(`/api/feed?page=${page}`);
 
-                try {
-                    const res1 = await api.get("/api/post");
-                    // Handle new standardized response format
-                    if (res1.data.success && res1.data.data) {
-                        res1Data = Array.isArray(res1.data.data) ? res1.data.data : [];
-                    } else if (Array.isArray(res1.data)) {
-                        // Fallback for old format
-                        res1Data = res1.data;
-                    }
-                } catch (err) {
-                    console.warn("res1 fetch failed, defaulting to empty array");
-                    res1Data = [];
-                }
+                setHasMore(res.data.hasNextPage);
 
-                try {
-                    const res2 = await api.get("/api/setpost/getposts");
-                    // Handle both new and old response formats
-                    if (res2.data.success && res2.data.data) {
-                        res2Data = Array.isArray(res2.data.data) ? res2.data.data : [];
-                    } else if (Array.isArray(res2.data)) {
-                        res2Data = res2.data;
-                    }
-                } catch (err) {
-                    console.warn("res2 fetch failed, defaulting to empty array");
-                    res2Data = [];
-                }
-
-                // Combine res1 (guaranteed or empty) + res2
-                const combinedData = [...res1Data, ...res2Data];
+                const combinedData = res.data.data || [];
 
                 if (combinedData.length > 0) {
                     const enhancedPosts = combinedData
@@ -142,7 +116,14 @@ const PostCard = () => {
                         })
                     );
 
-                    setPosts(postsWithReactions);
+                    if (page === 1) {
+                        setPosts(postsWithReactions);
+                    } else {
+                        setPosts((prev) => [
+                            ...prev,
+                            ...postsWithReactions
+                        ]);
+                    }
                 } else {
                     setPosts([]);
                 }
@@ -155,8 +136,10 @@ const PostCard = () => {
             }
         };
 
-        fetchPosts();
-    }, []);
+        fetchPosts(page);
+    }, [page]);
+
+
 
 
 
@@ -252,10 +235,10 @@ const PostCard = () => {
     };
 
     const filteredPosts = posts.filter(post =>
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (post.title || "").toLowerCase().includes((searchQuery || "").toLowerCase()) ||
+        (post.content || "").toLowerCase().includes((searchQuery || "").toLowerCase()) ||
         (post.tags && post.tags.some(tag =>
-            tag.toLowerCase().includes(searchQuery.toLowerCase())
+            (tag || "").toLowerCase().includes((searchQuery || "").toLowerCase())
         )
         ));
 
@@ -382,6 +365,24 @@ const PostCard = () => {
                     </div>
                 </div>
             </div>
+            {hasMore && (
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={() =>
+                            setPage((prev) => prev + 1)
+                        }
+                        className="
+        px-6 py-3
+        rounded-xl
+        bg-brand-primary
+        text-white
+        hover:opacity-90
+      "
+                    >
+                        Load More
+                    </button>
+                </div>
+            )}
 
             <Footer />
         </div>

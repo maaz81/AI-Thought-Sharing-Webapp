@@ -3,6 +3,8 @@ const User = require('../../models/user/User');
 const PostDetails = require('../../models/user/PostDetails')
 const { generateAutoTags } = require("../../utils/autoTagService");
 const { sendSuccess, sendError, sendPaginated } = require("../../utils/apiResponse");
+const path = require("path");
+const fs = require("fs");
 
 /**
  * Get all public posts with pagination
@@ -284,5 +286,128 @@ const searchBar = async (req, res) => {
   }
 };
 
-module.exports = { getPosts, getSpecificPost, createPosts, searchBar };
+
+const getHomeFeed = async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+
+    const mongoLimit = 10;
+    const jsonLimit = 10;
+
+    const mongoSkip = (page - 1) * mongoLimit;
+    const jsonSkip = (page - 1) * jsonLimit;
+
+    /*
+     * Mongo Posts
+     */
+    const mongoPosts = await PostDetails.find({
+      visibility: "public",
+    })
+      .populate({
+        path: "postid",
+        select: "_id title content tags",
+      })
+      .sort({ createdAt: -1 })
+      .skip(mongoSkip)
+      .limit(mongoLimit)
+      .lean();
+
+    const formattedMongoPosts = mongoPosts
+      .filter(p => p.postid)
+      .map((p) => ({
+        source: "user",
+        _id: p.postid._id,
+        title: p.postid.title,
+        content: p.postid.content,
+        tags: p.postid.tags || [],
+        likes: p.like || 0,
+        dislikes: p.dislike || 0,
+        createdAt: p.createdAt
+      }));
+
+    /*
+     * JSON Posts
+     */
+    const dirPath = path.join(
+      __dirname,
+      "../../setpostjson"
+    );
+
+    let allJsonPosts = [];
+
+    const files = fs.readdirSync(dirPath);
+
+    files.forEach((file) => {
+      if (path.extname(file) === ".json") {
+        const filePath = path.join(dirPath, file);
+
+        const data = fs.readFileSync(
+          filePath,
+          "utf8"
+        );
+
+        const parsed = JSON.parse(data);
+
+        allJsonPosts.push(...parsed);
+      }
+    });
+
+    const paginatedJsonPosts = allJsonPosts
+      .slice(jsonSkip, jsonSkip + jsonLimit)
+      .map((post) => ({
+        source: "system",
+        ...post,
+      }));
+
+    /*
+     * Merge Feed
+     */
+
+    const feed = [];
+
+    const maxLength = Math.max(
+      formattedMongoPosts.length,
+      paginatedJsonPosts.length
+    );
+
+    for (let i = 0; i < maxLength; i++) {
+      if (formattedMongoPosts[i]) {
+        feed.push(formattedMongoPosts[i]);
+      }
+
+      if (paginatedJsonPosts[i]) {
+        feed.push(paginatedJsonPosts[i]);
+      }
+    }
+
+    const mongoCount =
+      await PostDetails.countDocuments({
+        visibility: "public",
+      });
+
+    const totalPages = Math.max(
+      Math.ceil(mongoCount / mongoLimit),
+      Math.ceil(allJsonPosts.length / jsonLimit)
+    );
+
+    return res.status(200).json({
+      success: true,
+      page,
+      totalPages,
+      hasNextPage: page < totalPages,
+      count: feed.length,
+      data: feed,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load feed",
+    });
+  }
+};
+
+
+module.exports = { getPosts, getSpecificPost, createPosts, searchBar, getHomeFeed };
 

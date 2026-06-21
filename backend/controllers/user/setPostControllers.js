@@ -2,30 +2,50 @@ const fs = require('fs');
 const path = require('path');
 
 const getAllPosts = (req, res) => {
-  const dirPath = path.join(__dirname, '../../setpostjson');
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
-  fs.readdir(dirPath, (err, files) => {
-    if (err) {
-      return res.status(500).json({ error: 'Unable to read directory' });
-    }
+    const dirPath = path.join(__dirname, "../../setpostjson");
 
-    const allPosts = [];
+    const files = fs.readdirSync(dirPath);
+
+    let allPosts = [];
 
     files.forEach((file) => {
-      if (path.extname(file) === '.json') {
+      if (path.extname(file) === ".json") {
         const filePath = path.join(dirPath, file);
-        try {
-          const data = fs.readFileSync(filePath, 'utf8');
-          const parsedData = JSON.parse(data);
-          allPosts.push(...parsedData); // Flatten all arrays
-        } catch (parseErr) {
-          console.error(`Error parsing ${file}:`, parseErr.message);
-        }
+
+        const data = fs.readFileSync(filePath, "utf8");
+
+        allPosts.push(...JSON.parse(data));
       }
     });
 
-    res.json(allPosts);
-  });
+    const totalItems = allPosts.length;
+
+    const paginatedPosts = allPosts.slice(
+      (page - 1) * limit,
+      page * limit
+    );
+
+    return res.json({
+      success: true,
+      data: paginatedPosts,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalItems / limit),
+        totalItems,
+        hasNextPage:
+          page < Math.ceil(totalItems / limit),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 const getSpecificPost = (req, res) => {
