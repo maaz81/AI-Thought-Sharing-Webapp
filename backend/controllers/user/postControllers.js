@@ -2,6 +2,16 @@ const Post = require('../../models/user/Post');
 const User = require('../../models/user/User');
 const PostDetails = require('../../models/user/PostDetails')
 const SystemPostReaction = require("../../models/user/SystemPostReaction");
+const UserFeed = require(
+  "../../models/user/UserFeed"
+);
+
+const {
+  calculateFeedScore,
+  calculateFollowBonus,
+} = require(
+  "../../services/feedRankingService"
+);
 const { generateAutoTags } = require("../../utils/autoTagService");
 const { sendSuccess, sendError, sendPaginated } = require("../../utils/apiResponse");
 const path = require("path");
@@ -298,15 +308,20 @@ const getHomeFeed = async (req, res) => {
     const mongoSkip = (page - 1) * mongoLimit;
     const jsonSkip = (page - 1) * jsonLimit;
 
-    /*
-     * Mongo Posts
-     */
+    const userFeed = await UserFeed.findOne({
+      userId: req.userId,
+    });
+
+    /* =========================
+       USER POSTS
+    ========================== */
+
     const mongoPosts = await PostDetails.find({
       visibility: "public",
     })
       .populate({
         path: "postid",
-        select: "_id title content tags",
+        select: "_id title content tags userid",
       })
       .sort({ createdAt: -1 })
       .skip(mongoSkip)
@@ -314,21 +329,40 @@ const getHomeFeed = async (req, res) => {
       .lean();
 
     const formattedMongoPosts = mongoPosts
-      .filter(p => p.postid)
-      .map((p) => ({
-        source: "user",
-        _id: p.postid._id,
-        title: p.postid.title,
-        content: p.postid.content,
-        tags: p.postid.tags || [],
-        likes: p.like || 0,
-        dislikes: p.dislike || 0,
-        createdAt: p.createdAt
-      }));
+      .filter((p) => p.postid)
+      .map((p) => {
+        const post = {
+          source: "user",
+          _id: p.postid._id,
+          authorId: p.postid.userid,
+          title: p.postid.title,
+          content: p.postid.content,
+          tags: p.postid.tags || [],
+          likes: p.like || 0,
+          dislikes: p.dislike || 0,
+          createdAt: p.createdAt,
+        };
 
-    /*
-     * JSON Posts
-     */
+        const score =
+          calculateFeedScore({
+            post,
+            userFeed,
+          }) +
+          calculateFollowBonus(
+            post.authorId,
+            userFeed
+          );
+
+        return {
+          ...post,
+          score,
+        };
+      });
+
+    /* =========================
+       SYSTEM POSTS
+    ========================== */
+
     const dirPath = path.join(
       __dirname,
       "../../setpostjson"
@@ -340,20 +374,27 @@ const getHomeFeed = async (req, res) => {
 
     files.forEach((file) => {
       if (path.extname(file) === ".json") {
-        const filePath = path.join(dirPath, file);
+        const filePath = path.join(
+          dirPath,
+          file
+        );
 
         const data = fs.readFileSync(
           filePath,
           "utf8"
         );
 
-        const parsed = JSON.parse(data);
-
-        allJsonPosts.push(...parsed);
+        allJsonPosts.push(
+          ...JSON.parse(data)
+        );
       }
     });
 
-    const paginatedJsonPosts = allJsonPosts.slice(jsonSkip, jsonSkip + jsonLimit);
+    const paginatedJsonPosts =
+      allJsonPosts.slice(
+        jsonSkip,
+        jsonSkip + jsonLimit
+      );
 
     const reactions =
       await SystemPostReaction.find({
@@ -371,38 +412,49 @@ const getHomeFeed = async (req, res) => {
     });
 
     const systemPosts =
-      paginatedJsonPosts.map((post) => ({
-        ...post,
+      paginatedJsonPosts.map((post) => {
+        const likes =
+          reactionMap[post._id]?.like || 0;
 
-        source: "system",
+        const dislikes =
+          reactionMap[post._id]?.dislike || 0;
 
-        likes:
-          reactionMap[post._id]?.like || 0,
+        const systemPost = {
+          source: "system",
+          ...post,
+          likes,
+          dislikes,
+        };
 
-        dislikes:
-          reactionMap[post._id]?.dislike || 0,
-      }));
+        const score =
+          calculateFeedScore({
+            post: systemPost,
+            userFeed,
+            source: "system",
+          });
 
-    /*
-     * Merge Feed
-     */
+        return {
+          ...systemPost,
+          score,
+        };
+      });
 
-    const feed = [];
+    /* =========================
+       MERGE + SORT
+    ========================== */
 
-    const maxLength = Math.max(
-      formattedMongoPosts.length,
-      systemPosts.length
+    const feed = [
+      ...formattedMongoPosts,
+      ...systemPosts,
+    ];
+
+    feed.sort(
+      (a, b) => b.score - a.score
     );
 
-    for (let i = 0; i < maxLength; i++) {
-      if (formattedMongoPosts[i]) {
-        feed.push(formattedMongoPosts[i]);
-      }
-
-      if (systemPosts[i]) {
-        feed.push(systemPosts[i]);
-      }
-    }
+    /* =========================
+       PAGINATION INFO
+    ========================== */
 
     const mongoCount =
       await PostDetails.countDocuments({
@@ -411,19 +463,25 @@ const getHomeFeed = async (req, res) => {
 
     const totalPages = Math.max(
       Math.ceil(mongoCount / mongoLimit),
-      Math.ceil(allJsonPosts.length / jsonLimit)
+      Math.ceil(
+        allJsonPosts.length / jsonLimit
+      )
     );
 
     return res.status(200).json({
       success: true,
       page,
       totalPages,
-      hasNextPage: page < totalPages,
+      hasNextPage:
+        page < totalPages,
       count: feed.length,
       data: feed,
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Feed Error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
