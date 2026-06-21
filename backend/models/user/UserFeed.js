@@ -37,17 +37,33 @@ const userFeedSchema = new mongoose.Schema({
      CONTENT SIGNALS
   ========================== */
 
-  likedPosts: [{
-    postId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
+  likedPosts: [
+    {
+      postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+        default: null,
+      },
+
+      systemPostId: {
+        type: String,
+        default: null,
+      },
+
+      source: {
+        type: String,
+        enum: ["user", "system"],
+        required: true,
+      },
+
+      likedAt: {
+        type: Date,
+        default: Date.now,
+      },
+
+      tags: [String],
     },
-    likedAt: {
-      type: Date,
-      default: Date.now,
-    },
-    tags: [String], // snapshot for fast interest calc
-  }],
+  ],
 
   savedPosts: [{
     type: mongoose.Schema.Types.ObjectId,

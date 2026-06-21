@@ -2,6 +2,22 @@ const SystemPostReaction = require(
     "../../models/user/SystemPostReaction"
 );
 
+const UserFeed = require(
+    "../../models/user/UserFeed"
+);
+
+const {
+    updateUserInterests,
+} = require(
+    "../../services/interestService"
+);
+
+const {
+    getSystemPostById,
+} = require(
+    "../../utils/systemPostHelper"
+);
+
 const toggleSystemReaction = async (
     req,
     res
@@ -56,20 +72,69 @@ const toggleSystemReaction = async (
         let userReaction = null;
 
         if (reaction === "like") {
-            if (hasLiked) {
-                postReaction.likedBy.pull(
-                    userId
-                );
-            } else {
-                postReaction.likedBy.addToSet(
-                    userId
-                );
 
-                postReaction.dislikedBy.pull(
-                    userId
-                );
+            if (hasLiked) {
+
+                // unlike
+                postReaction.likedBy.pull(userId);
+
+            } else {
+
+                // like
+                postReaction.likedBy.addToSet(userId);
+
+                // remove dislike if exists
+                postReaction.dislikedBy.pull(userId);
 
                 userReaction = "like";
+
+                /*
+                 * PHASE 2
+                 * Update UserFeed + Interests
+                 */
+
+                const systemPost =
+                    getSystemPostById(systemPostId);
+
+                if (systemPost) {
+
+                    let userFeed =
+                        await UserFeed.findOne({
+                            userId,
+                        });
+
+                    if (!userFeed) {
+                        userFeed =
+                            await UserFeed.create({
+                                userId,
+                            });
+                    }
+
+                    const alreadyExists =
+                        userFeed.likedPosts.some(
+                            (p) =>
+                                p.systemPostId ===
+                                systemPostId
+                        );
+
+                    if (!alreadyExists) {
+
+                        userFeed.likedPosts.push({
+                            systemPostId,
+                            source: "system",
+                            tags:
+                                systemPost.tags || [],
+                        });
+
+                        await userFeed.save();
+                    }
+
+                    await updateUserInterests(
+                        userId,
+                        systemPost.tags || [],
+                        "like"
+                    );
+                }
             }
         }
 
