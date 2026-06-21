@@ -1,6 +1,7 @@
 const Post = require('../../models/user/Post');
 const User = require('../../models/user/User');
 const PostDetails = require('../../models/user/PostDetails')
+const SystemPostReaction = require("../../models/user/SystemPostReaction");
 const { generateAutoTags } = require("../../utils/autoTagService");
 const { sendSuccess, sendError, sendPaginated } = require("../../utils/apiResponse");
 const path = require("path");
@@ -352,11 +353,34 @@ const getHomeFeed = async (req, res) => {
       }
     });
 
-    const paginatedJsonPosts = allJsonPosts
-      .slice(jsonSkip, jsonSkip + jsonLimit)
-      .map((post) => ({
-        source: "system",
+    const paginatedJsonPosts = allJsonPosts.slice(jsonSkip, jsonSkip + jsonLimit);
+
+    const reactions =
+      await SystemPostReaction.find({
+        systemPostId: {
+          $in: paginatedJsonPosts.map(
+            (p) => p._id
+          ),
+        },
+      });
+
+    const reactionMap = {};
+
+    reactions.forEach((r) => {
+      reactionMap[r.systemPostId] = r;
+    });
+
+    const systemPosts =
+      paginatedJsonPosts.map((post) => ({
         ...post,
+
+        source: "system",
+
+        likes:
+          reactionMap[post._id]?.like || 0,
+
+        dislikes:
+          reactionMap[post._id]?.dislike || 0,
       }));
 
     /*
@@ -367,7 +391,7 @@ const getHomeFeed = async (req, res) => {
 
     const maxLength = Math.max(
       formattedMongoPosts.length,
-      paginatedJsonPosts.length
+      systemPosts.length
     );
 
     for (let i = 0; i < maxLength; i++) {
@@ -375,8 +399,8 @@ const getHomeFeed = async (req, res) => {
         feed.push(formattedMongoPosts[i]);
       }
 
-      if (paginatedJsonPosts[i]) {
-        feed.push(paginatedJsonPosts[i]);
+      if (systemPosts[i]) {
+        feed.push(systemPosts[i]);
       }
     }
 

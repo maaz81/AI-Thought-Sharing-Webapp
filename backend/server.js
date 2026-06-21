@@ -20,6 +20,7 @@ const path = require('path');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const dns = require('dns');
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
+const systemReactionRoutes = require('./routes/user/systemReactionRoutes');
 
 dns.setServers(["1.1.1.1", "0.0.0.0"])
 
@@ -70,7 +71,7 @@ app.use('/api/ai', aiRoutes)
 app.use('/api/update/profile', userDetailsRoutes)
 app.use('/api/setpost', setPostRoutes);
 app.use('/api/followers', followerRoutes);
-
+app.use("/api/system/reaction", systemReactionRoutes);
 
 // Admin Routes
 app.use('/api/admin', adminAuthRoutes);

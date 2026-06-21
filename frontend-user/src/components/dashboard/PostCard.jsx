@@ -102,14 +102,24 @@ const PostCard = () => {
                     const postsWithReactions = await Promise.all(
                         enhancedPosts.map(async (post) => {
                             try {
-                                const reactionId = post.postId || post._id;
-                                const { data } = await api.get(`/profile/like/${reactionId}`);
-                                return {
-                                    ...post,
-                                    likes: data.like ?? post.likes,
-                                    dislikes: data.dislike ?? post.dislikes,
-                                    userReaction: data.userReaction ?? null,
-                                };
+                                if (post.source === "system") {
+                                    const { data } = await api.get(`/api/system/reaction/system-like/${post._id}`);
+                                    return {
+                                        ...post,
+                                        likes: data.like ?? post.likes,
+                                        dislikes: data.dislike ?? post.dislikes,
+                                        userReaction: data.userReaction ?? null,
+                                    };
+                                } else {
+                                    const reactionId = post.postId || post._id;
+                                    const { data } = await api.get(`/profile/like/${reactionId}`);
+                                    return {
+                                        ...post,
+                                        likes: data.like ?? post.likes,
+                                        dislikes: data.dislike ?? post.dislikes,
+                                        userReaction: data.userReaction ?? null,
+                                    };
+                                }
                             } catch {
                                 return post;
                             }
@@ -198,10 +208,22 @@ const PostCard = () => {
 
     const handleReaction = async (postId, reactionId, reactionType) => {
         try {
-            const { data } = await api.post(
-                `/profile/like/${reactionId}`,
-                { reaction: reactionType }
-            );
+            const targetPost = posts.find(p => p._id === postId);
+            let data;
+            
+            if (targetPost?.source === "system") {
+                const response = await api.post(
+                    `/api/system/reaction/system-like/${postId}`,
+                    { reaction: reactionType }
+                );
+                data = response.data;
+            } else {
+                const response = await api.post(
+                    `/profile/like/${reactionId}`,
+                    { reaction: reactionType }
+                );
+                data = response.data;
+            }
 
             setPosts(prevPosts =>
                 prevPosts.map(post =>
