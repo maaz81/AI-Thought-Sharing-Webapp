@@ -13,9 +13,44 @@ const {
   "../../services/feedRankingService"
 );
 const { generateAutoTags } = require("../../utils/autoTagService");
+const { updateUserInterests } = require("../../services/interestService");
 const { sendSuccess, sendError, sendPaginated } = require("../../utils/apiResponse");
 const path = require("path");
 const fs = require("fs");
+
+/* ================================================================
+   JSON SYSTEM POSTS — Module-level in-memory cache
+   Avoids synchronous disk reads (readdirSync / readFileSync) on
+   every single feed request. Cache auto-refreshes every 5 minutes.
+================================================================ */
+let _jsonPostsCache = null;
+let _jsonPostsCacheTime = 0;
+const JSON_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+const getSystemPosts = () => {
+  const now = Date.now();
+  if (_jsonPostsCache && now - _jsonPostsCacheTime < JSON_CACHE_TTL_MS) {
+    return _jsonPostsCache;
+  }
+  const dirPath = path.join(__dirname, "../../setpostjson");
+  const posts = [];
+  fs.readdirSync(dirPath).forEach((file) => {
+    if (path.extname(file) === ".json") {
+      const filePosts = JSON.parse(fs.readFileSync(path.join(dirPath, file), "utf8"));
+      // Normalize tags to lowercase for consistency with user posts
+      filePosts.forEach(p => {
+        if (Array.isArray(p.tags)) {
+          p.tags = p.tags.map(t => typeof t === "string" ? t.trim().toLowerCase() : t).filter(Boolean);
+        }
+      });
+      posts.push(...filePosts);
+    }
+  });
+  _jsonPostsCache = posts;
+  _jsonPostsCacheTime = now;
+  console.log(`[SystemPosts] Cache refreshed — ${posts.length} posts loaded`);
+  return posts;
+};
 
 /**
  * Get all public posts with pagination
@@ -204,6 +239,16 @@ const createPosts = async (req, res) => {
       });
     }
 
+    /*
+     * Problem #3 Fix — Learn from post creation.
+     * When a user writes about a topic, that's a strong signal of interest.
+     * Fire-and-forget (non-blocking) so the response is not delayed.
+     */
+    updateUserInterests(req.userId, finalTags, "post")
+      .catch((err) =>
+        console.error("[InterestService] Post-creation update failed:", err.message)
+      );
+
     return sendSuccess(res, 201, { post, postDetails }, 'Post created successfully');
 
   } catch (err) {
@@ -302,30 +347,40 @@ const getHomeFeed = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
 
-    const mongoLimit = 10;
-    const jsonLimit = 10;
+    /*
+     * Problem #1 Fix — Score ALL candidates before paginating.
+     *
+     * OLD (broken) flow:
+     *   Grab newest 10 Mongo posts + first 10 JSON posts
+     *   → score those 20 → sort → return
+     *
+     *   Problem: a highly-relevant post at JSON position #200 was
+     *   never scored. Every user saw almost the same feed.
+     *
+     * NEW flow:
+     *   Grab up to MONGO_CANDIDATE_LIMIT user posts + ALL system posts
+     *   → score every candidate → sort globally → slice the page
+     *
+     *   Now a user with Exams=70 will see the matching Exams post on
+     *   page 1 regardless of where it sits in the raw data.
+     */
+    const PAGE_SIZE = 20;
+    const MONGO_CANDIDATE_LIMIT = 200; // enough candidates for good ranking
 
-    const mongoSkip = (page - 1) * mongoLimit;
-    const jsonSkip = (page - 1) * jsonLimit;
-
-    const userFeed = await UserFeed.findOne({
-      userId: req.userId,
-    });
+    // Load the requesting user's interest profile
+    const userFeed = await UserFeed.findOne({ userId: req.userId });
 
     /* =========================
-       USER POSTS
+       USER POSTS — large candidate pool
     ========================== */
 
-    const mongoPosts = await PostDetails.find({
-      visibility: "public",
-    })
+    const mongoPosts = await PostDetails.find({ visibility: "public" })
       .populate({
         path: "postid",
         select: "_id title content tags userid",
       })
       .sort({ createdAt: -1 })
-      .skip(mongoSkip)
-      .limit(mongoLimit)
+      .limit(MONGO_CANDIDATE_LIMIT) // pull enough to rank meaningfully
       .lean();
 
     const formattedMongoPosts = mongoPosts
@@ -344,145 +399,73 @@ const getHomeFeed = async (req, res) => {
         };
 
         const score =
-          calculateFeedScore({
-            post,
-            userFeed,
-          }) +
-          calculateFollowBonus(
-            post.authorId,
-            userFeed
-          );
+          calculateFeedScore({ post, userFeed }) +
+          calculateFollowBonus(post.authorId, userFeed);
 
-        return {
-          ...post,
-          score,
-        };
+        return { ...post, score };
       });
 
     /* =========================
-       SYSTEM POSTS
+       SYSTEM POSTS — load ALL, score ALL
+       (uses module-level cache — no disk read per request)
     ========================== */
 
-    const dirPath = path.join(
-      __dirname,
-      "../../setpostjson"
-    );
+    const allJsonPosts = getSystemPosts();
 
-    let allJsonPosts = [];
-
-    const files = fs.readdirSync(dirPath);
-
-    files.forEach((file) => {
-      if (path.extname(file) === ".json") {
-        const filePath = path.join(
-          dirPath,
-          file
-        );
-
-        const data = fs.readFileSync(
-          filePath,
-          "utf8"
-        );
-
-        allJsonPosts.push(
-          ...JSON.parse(data)
-        );
-      }
+    // Single DB round-trip to get reactions for all system posts
+    const reactions = await SystemPostReaction.find({
+      systemPostId: { $in: allJsonPosts.map((p) => p._id) },
     });
 
-    const paginatedJsonPosts =
-      allJsonPosts.slice(
-        jsonSkip,
-        jsonSkip + jsonLimit
-      );
-
-    const reactions =
-      await SystemPostReaction.find({
-        systemPostId: {
-          $in: paginatedJsonPosts.map(
-            (p) => p._id
-          ),
-        },
-      });
-
     const reactionMap = {};
-
     reactions.forEach((r) => {
       reactionMap[r.systemPostId] = r;
     });
 
-    const systemPosts =
-      paginatedJsonPosts.map((post) => {
-        const likes =
-          reactionMap[post._id]?.like || 0;
+    const systemPosts = allJsonPosts.map((post) => {
+      const likes = reactionMap[post._id]?.like || 0;
+      const dislikes = reactionMap[post._id]?.dislike || 0;
 
-        const dislikes =
-          reactionMap[post._id]?.dislike || 0;
+      const systemPost = { source: "system", ...post, likes, dislikes };
 
-        const systemPost = {
-          source: "system",
-          ...post,
-          likes,
-          dislikes,
-        };
-
-        const score =
-          calculateFeedScore({
-            post: systemPost,
-            userFeed,
-            source: "system",
-          });
-
-        return {
-          ...systemPost,
-          score,
-        };
+      const score = calculateFeedScore({
+        post: systemPost,
+        userFeed,
+        source: "system",
       });
 
-    /* =========================
-       MERGE + SORT
-    ========================== */
-
-    const feed = [
-      ...formattedMongoPosts,
-      ...systemPosts,
-    ];
-
-    feed.sort(
-      (a, b) => b.score - a.score
-    );
+      return { ...systemPost, score };
+    });
 
     /* =========================
-       PAGINATION INFO
+       MERGE + RANK ALL CANDIDATES
+       Sort happens AFTER scoring every candidate, not before.
     ========================== */
 
-    const mongoCount =
-      await PostDetails.countDocuments({
-        visibility: "public",
-      });
+    const allCandidates = [...formattedMongoPosts, ...systemPosts];
+    allCandidates.sort((a, b) => b.score - a.score);
 
-    const totalPages = Math.max(
-      Math.ceil(mongoCount / mongoLimit),
-      Math.ceil(
-        allJsonPosts.length / jsonLimit
-      )
-    );
+    /* =========================
+       PAGINATE AFTER RANKING
+    ========================== */
+
+    const totalItems = allCandidates.length;
+    const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const feed = allCandidates.slice(start, end);
 
     return res.status(200).json({
       success: true,
       page,
       totalPages,
-      hasNextPage:
-        page < totalPages,
+      hasNextPage: page < totalPages,
       count: feed.length,
       data: feed,
     });
-  } catch (error) {
-    console.error(
-      "Feed Error:",
-      error
-    );
 
+  } catch (error) {
+    console.error("Feed Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to load feed",

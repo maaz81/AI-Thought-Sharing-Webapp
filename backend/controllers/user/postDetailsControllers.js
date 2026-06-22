@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const PostDetails = require('../../models/user/PostDetails');
 const Post = require('../../models/user/Post');
+const UserFeed = require('../../models/user/UserFeed');
+const { updateUserInterests } = require('../../services/interestService');
 
 const postLikeDetails = async (req, res) => {
     try {
@@ -47,6 +49,54 @@ const postLikeDetails = async (req, res) => {
                 postDetails.likedBy.addToSet(userId);
                 postDetails.dislikedBy.pull(userId);
                 userReaction = "like";
+
+                /*
+                 * Problem #3 Fix — Learn from user post likes.
+                 * Previously interests were only updated for system post likes.
+                 * Now all likes — user posts AND system posts — teach the engine.
+                 *
+                 * setImmediate: runs after the current I/O cycle completes,
+                 * so this never delays the HTTP response.
+                 */
+                setImmediate(async () => {
+                    try {
+                        const likedPost = await Post
+                            .findById(postId)
+                            .select('tags')
+                            .lean();
+
+                        if (likedPost?.tags?.length) {
+                            await updateUserInterests(userId, likedPost.tags, 'like');
+                        }
+
+                        // Record in UserFeed.likedPosts (previously only done for system posts)
+                        await UserFeed.findOneAndUpdate(
+                            { userId },
+                            { $setOnInsert: { userId } },
+                            { upsert: true, new: false }
+                        );
+                        await UserFeed.updateOne(
+                            {
+                                userId,
+                                'likedPosts.postId': {
+                                    $ne: new mongoose.Types.ObjectId(postId)
+                                }
+                            },
+                            {
+                                $push: {
+                                    likedPosts: {
+                                        postId: new mongoose.Types.ObjectId(postId),
+                                        source: 'user',
+                                        tags: likedPost?.tags || [],
+                                        likedAt: new Date(),
+                                    }
+                                }
+                            }
+                        );
+                    } catch (err) {
+                        console.error('[InterestService] User post like update failed:', err.message);
+                    }
+                });
             }
         }
 

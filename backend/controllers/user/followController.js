@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("../../models/user/User");
-const UserFeed = require("../../models/user/UserFeed")
+const UserFeed = require("../../models/user/UserFeed");
+const Post = require("../../models/user/Post");
+const { updateUserInterests } = require("../../services/interestService");
 
 /* =====================================================
    FOLLOW USER
@@ -54,6 +56,39 @@ exports.followUser = async (req, res) => {
         { $addToSet: { followers: followerId } }
       ),
     ]);
+
+    /*
+     * Problem #3 Fix — Learn from follows.
+     * Following someone is one of the strongest intent signals.
+     * We fetch their 10 most recent posts and extract tags to
+     * bootstrap the follower's interest profile for that creator's topics.
+     *
+     * Fire-and-forget so the follow response is instant.
+     */
+    setImmediate(async () => {
+      try {
+        const recentPosts = await Post
+          .find({ userid: followingId })
+          .select('tags')
+          .sort({ createdAt: -1 })
+          .limit(10)
+          .lean();
+
+        // Collect all unique tags from the followed user's posts
+        const tags = [
+          ...new Set(recentPosts.flatMap((p) => p.tags || []))
+        ];
+
+        if (tags.length) {
+          await updateUserInterests(followerId, tags, 'follow');
+          console.log(
+            `[InterestService] Follow signal: ${tags.length} tags from @${followingId} → user ${followerId}`
+          );
+        }
+      } catch (err) {
+        console.error('[InterestService] Follow interest update failed:', err.message);
+      }
+    });
 
     return res.status(200).json({
       message: "User followed successfully",

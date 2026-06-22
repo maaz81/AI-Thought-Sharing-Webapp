@@ -45,17 +45,16 @@ const toggleSystemReaction = async (
             });
         }
 
-        let postReaction =
-            await SystemPostReaction.findOne({
-                systemPostId,
-            });
+        // Upsert to guarantee document exists without duplicate key race conditions
+        let postReaction = await SystemPostReaction.findOneAndUpdate(
+            { systemPostId },
+            { $setOnInsert: { systemPostId } },
+            { upsert: true, new: true }
+        );
 
-        if (!postReaction) {
-            postReaction =
-                await SystemPostReaction.create({
-                    systemPostId,
-                });
-        }
+        // Ensure arrays are initialized if Mongoose omitted defaults on upsert
+        if (!postReaction.likedBy) postReaction.likedBy = [];
+        if (!postReaction.dislikedBy) postReaction.dislikedBy = [];
 
         const hasLiked =
             postReaction.likedBy.some(
@@ -98,36 +97,28 @@ const toggleSystemReaction = async (
 
                 if (systemPost) {
 
-                    let userFeed =
-                        await UserFeed.findOne({
+                    // Upsert UserFeed safely
+                    await UserFeed.findOneAndUpdate(
+                        { userId },
+                        { $setOnInsert: { userId } },
+                        { upsert: true, new: false }
+                    );
+
+                    await UserFeed.updateOne(
+                        { 
                             userId,
-                        });
-
-                    if (!userFeed) {
-                        userFeed =
-                            await UserFeed.create({
-                                userId,
-                            });
-                    }
-
-                    const alreadyExists =
-                        userFeed.likedPosts.some(
-                            (p) =>
-                                p.systemPostId ===
-                                systemPostId
-                        );
-
-                    if (!alreadyExists) {
-
-                        userFeed.likedPosts.push({
-                            systemPostId,
-                            source: "system",
-                            tags:
-                                systemPost.tags || [],
-                        });
-
-                        await userFeed.save();
-                    }
+                            'likedPosts.systemPostId': { $ne: systemPostId }
+                        },
+                        {
+                            $push: {
+                                likedPosts: {
+                                    systemPostId,
+                                    source: "system",
+                                    tags: systemPost.tags || [],
+                                }
+                            }
+                        }
+                    );
 
                     await updateUserInterests(
                         userId,
@@ -208,7 +199,7 @@ const getSystemReaction = async (
         let userReaction = null;
 
         if (
-            reaction.likedBy.some(
+            reaction.likedBy && reaction.likedBy.some(
                 (id) =>
                     id.toString() === userId
             )
@@ -217,7 +208,7 @@ const getSystemReaction = async (
         }
 
         if (
-            reaction.dislikedBy.some(
+            reaction.dislikedBy && reaction.dislikedBy.some(
                 (id) =>
                     id.toString() === userId
             )
