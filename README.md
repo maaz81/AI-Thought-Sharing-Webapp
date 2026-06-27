@@ -345,9 +345,19 @@ sequenceDiagram
 
 *Below are placeholders representation of the user dashboard interface layout.*
 
-| Dashboard Layout (Notion-Inspired) | AI Suggestion Sidebar Modal |
-| :---: | :---: |
-| ![Dashboard Mockup](https://raw.githubusercontent.com/placehold-it/private-assets/main/dashboard_mockup.png) <br> *Linear layout with sidebar nav, central feeds, and right-hand activity widgets.* | ![AI Editor suggestions](https://raw.githubusercontent.com/placehold-it/private-assets/main/ai_sidebar_mockup.png) <br> *Focus-mode drafting editor alongside LLM tone reviews and suggestions.* |
+## 📸 Application Screenshots
+
+| Homepage | Search Results |
+|----------|----------------|
+| ![Homepage](Screenshots/Homepage.png) | ![Search Results](Screenshots/HomePage1.png) |
+
+| Profile Page | Edit Profile |
+|--------------|--------------|
+| ![Profile Page](Screenshots/ProfilePage1.png) | ![Edit Profile](Screenshots/ProfileEdit.png) |
+
+| Create Post | |
+|------------|--|
+| ![Create Post](Screenshots/CreatePost.png) | |
 
 ---
 
@@ -438,8 +448,9 @@ This project is licensed under the **ISC License** - see the [backend/package.js
 ---
 
 ## ✍️ Author
-Designed and developed by a forward-thinking engineer passionate about building intelligent MERN architectures and real-time social applications. 
 
-- **GitHub**: [github.com/your-username](https://github.com/)
-- **LinkedIn**: [linkedin.com/in/your-username](https://linkedin.com/)
-- **Website**: [your-portfolio.com](https://your-portfolio.com/)
+Designed and developed by Maaz Ahmad Khan, a Full Stack Developer focused on building scalable web applications, AI-powered products, and real-time user experiences.
+
+- **GitHub**: [maaz81](https://github.com/maaz81)
+- **LinkedIn**: [Maaz Ahmad Khan](https://www.linkedin.com/in/maazak90/)
+- **Portfolio**: [Maaz's Portfolio](https://maaz-portfolio-xi.vercel.app/)
