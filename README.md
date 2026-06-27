@@ -1,6 +1,6 @@
-# 🧠 InsightShare - AI-Powered Collaborative Thought-Sharing Ecosystem
+# 🚀 Thoughtly - AI-Powered Social Content Platform
 
-An intelligent, real-time thought-sharing platform built with the MERN stack that empowers users to write, refine, and catalog their ideas in collaboration with advanced AI. InsightShare features a personalized recommendations engine, real-time feed synchronization via WebSockets, and secure authentication models.
+Thoughtly is an AI-powered social content platform built with the MERN stack that enables users to create, refine, and share ideas with AI assistance. The platform combines intelligent content recommendations, real-time interactions, and personalized feeds to enhance knowledge sharing.
 
 This workspace covers both the **Node.js/Express Backend API** and the **Vite-based React Frontend Web App**.
 
@@ -8,6 +8,17 @@ This workspace covers both the **Node.js/Express Backend API** and the **Vite-ba
 
 ## 📖 Short Description
 InsightShare is a modern social knowledge network designed to bridge the gap between creative writing and artificial intelligence. By integrating atomic interest tracking, real-time feed ranking, and AI co-authoring assistance, the platform enables creators to share ideas while consuming highly personalized content tailored directly to their reading behavior.
+
+## 💡 Why I Built This
+
+Thoughtly was built to combine social content sharing with AI-assisted writing. Users can create posts, receive AI-powered writing suggestions, discover personalized content through an interest-based recommendation engine, and interact in real time using WebSockets.
+
+
+## 🌐 Live Demo
+
+🚀 **Frontend:** https://thoughtly.vercel.app/
+
+⚙️ **Backend API:** https://ai-thought-sharing-webapp-backend.onrender.com
 
 ---
 
@@ -19,6 +30,17 @@ InsightShare is a modern social knowledge network designed to bridge the gap bet
 - **⚡ Real-Time WebSocket Feeds**: Integrates Socket.IO to broadcast newly created content and synchronize reaction updates instantly across connected clients.
 - **🔐 Secure Dual-Auth Channels**: Supports traditional credential sign-up protected by bcrypt hashing and express-rate-limit brute force mitigation, alongside a seamless Google OAuth2 integration.
 - **💼 Rich Professional Profiles**: Comprehensive metadata structures mapping basic info, professional accomplishments, key skill lists, and active social media channels.
+
+---
+
+## ⭐ Project Highlights
+
+- Built a full-stack MERN application with secure JWT and Google OAuth authentication.
+- Integrated AI-powered content generation, rewriting, and automatic tag recommendations.
+- Implemented real-time feed updates using Socket.IO.
+- Designed a personalized recommendation engine based on user interests and engagement signals.
+- Added role-based access control (RBAC), rate limiting, and input validation.
+- Deployed production-ready applications on Vercel and Render.
 
 ---
 
@@ -75,7 +97,7 @@ graph TD
 ```
 
 ---
-
+<!-- 
 ## 📂 Folder Structure
 
 ```
@@ -121,7 +143,7 @@ AI-Thought-Sharing webapp/
 │   └── tsconfig.json              # TypeScript compilation setup
 ```
 
----
+--- -->
 
 ## ⚙️ Installation Guide
 
@@ -133,8 +155,8 @@ AI-Thought-Sharing webapp/
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/your-username/AI-Thought-Sharing.git
-cd AI-Thought-Sharing
+git clone https://github.com/maaz81/AI-Thought-Sharing-Webapp.git
+cd AI-Thought-Sharing-Webapp
 ```
 
 ### Step 2: Configure the Backend
@@ -218,28 +240,17 @@ npm run preview
 
 ## 🔌 API Documentation
 
-### 🔒 Authentication Endpoints
+### Main APIs
 - `POST /api/auth/register` - Registers a new user. Initializes a default profile layout.
 - `POST /api/auth/login` - Authenticates user credentials. Issues JWT inside an HTTP-only cookie.
 - `POST /api/auth/google-login` - Authenticates Google OAuth accounts. Handles automatic registration for first-time logins.
 - `POST /api/auth/logout` - Clears client session cookie token.
-
-### 📝 Post & Feed Endpoints
-- `GET /api/post` - Public paginated feed endpoint. Returns general published posts.
-- `POST /api/post/create` - Protected route to post thoughts. Triggers the AI Auto-Tagging service and learns user interest categories.
-- `GET /api/post/:postId` - Fetches specific post details.
 - `GET /api/feed` - Evaluates current user interactions and interest vectors to supply a custom, ranked personalization feed.
-- `GET /api/search` - Searches for posts and users using optimized partial query matching.
 
-### 🤖 Artificial Intelligence Endpoints
-- `POST /api/ai/suggest` - Brainstorms titles, improved descriptions, and related tags based on drafts.
-- `POST /api/ai/chat` - Initiates interactive brainstorming with the chat co-pilot assistant.
-- `POST /api/ai/review` - Processes writing drafts to fix structures, suggest vocabulary adjustments, and propose improvements.
+### API Explorer
 
-### 👥 Follow & Interaction Endpoints
-- `POST /api/followers/:followingId/toggle` - Toggles follow relationships. Dynamically adapts interest updates.
-- `POST /api/system/reaction/toggle/:systemPostId` - Likes or dislikes predefined system posts. Synchronizes reactions to User Feed parameters.
-
+📄 Swagger UI:
+https://ai-thought-sharing-webapp-backend.onrender.com/api-docs
 ---
 
 ## 📊 Database Schema Overview
@@ -341,11 +352,7 @@ sequenceDiagram
 
 ---
 
-## 🖼️ Screenshots
-
-*Below are placeholders representation of the user dashboard interface layout.*
-
-## 📸 Application Screenshots
+## �️ Screenshots
 
 | Homepage | Search Results |
 |----------|----------------|
@@ -403,6 +410,19 @@ flowchart TD
 
 ---
 
+## ☁️ Deployment Architecture
+
+| Layer | Service |
+|---------|---------|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | MongoDB Atlas |
+| AI Provider | OpenRouter |
+| Authentication | JWT + Google OAuth |
+| Real-Time Communication | Socket.IO |
+
+---
+
 ## 🚀 Deployment
 
 ### Backend Deployment (e.g., Render, Heroku)
@@ -443,7 +463,18 @@ Contributions are welcome! Please follow these steps to contribute:
 ---
 
 ## 📄 License
-This project is licensed under the **ISC License** - see the [backend/package.json](file:///e:/Important%20Projects/AI-Thought-Sharing%20webapp/backend/package.json#L12) file for details.
+
+## 📄 License & Copyright
+
+© 2025 Maaz Ahmad Khan. All Rights Reserved.
+
+This project, including its source code, architecture, designs, documentation, screenshots, and associated assets, is the intellectual property of Maaz Ahmad Khan.
+
+This repository is provided for portfolio, demonstration, and evaluation purposes only. No part of this project may be copied, modified, distributed, sublicensed, sold, or used in commercial or production environments without prior written permission from the author.
+
+Unauthorized use, reproduction, or redistribution of this project or its components is strictly prohibited.
+
+The live deployment of this application is maintained by the author and is intended solely for demonstration purposes.
 
 ---
 
@@ -454,3 +485,9 @@ Designed and developed by Maaz Ahmad Khan, a Full Stack Developer focused on bui
 - **GitHub**: [maaz81](https://github.com/maaz81)
 - **LinkedIn**: [Maaz Ahmad Khan](https://www.linkedin.com/in/maazak90/)
 - **Portfolio**: [Maaz's Portfolio](https://maaz-portfolio-xi.vercel.app/)
+
+
+![React](https://img.shields.io/badge/React-19-blue)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
+![License](https://img.shields.io/badge/License-ISC-yellow)
