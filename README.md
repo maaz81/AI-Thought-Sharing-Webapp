@@ -1,13 +1,13 @@
-# 🧠 CogniShare - AI-Powered Collaborative Thought-Sharing Ecosystem
+# 🧠 InsightShare - AI-Powered Collaborative Thought-Sharing Ecosystem
 
-An intelligent, real-time thought-sharing platform built with the MERN stack that empowers users to write, refine, and catalog their ideas in collaboration with advanced AI. CogniShare features a personalized recommendations engine, real-time feed synchronization via WebSockets, and secure authentication models.
+An intelligent, real-time thought-sharing platform built with the MERN stack that empowers users to write, refine, and catalog their ideas in collaboration with advanced AI. InsightShare features a personalized recommendations engine, real-time feed synchronization via WebSockets, and secure authentication models.
 
 This workspace covers both the **Node.js/Express Backend API** and the **Vite-based React Frontend Web App**.
 
 ---
 
 ## 📖 Short Description
-CogniShare is a modern social knowledge network designed to bridge the gap between creative writing and artificial intelligence. By integrating atomic interest tracking, real-time feed ranking, and AI co-authoring assistance, the platform enables creators to share ideas while consuming highly personalized content tailored directly to their reading behavior.
+InsightShare is a modern social knowledge network designed to bridge the gap between creative writing and artificial intelligence. By integrating atomic interest tracking, real-time feed ranking, and AI co-authoring assistance, the platform enables creators to share ideas while consuming highly personalized content tailored directly to their reading behavior.
 
 ---
 
