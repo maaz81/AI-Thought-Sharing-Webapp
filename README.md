@@ -349,15 +349,15 @@ sequenceDiagram
 
 | Homepage | Search Results |
 |----------|----------------|
-| ![Homepage](Screenshots/Homepage.png) | ![Search Results](Screenshots/HomePage1.png) |
+| ![Homepage](Screenshots/HomePage.PNG) | ![Search Results](Screenshots/HomePage1.PNG) |
 
 | Profile Page | Edit Profile |
 |--------------|--------------|
-| ![Profile Page](Screenshots/ProfilePage1.png) | ![Edit Profile](Screenshots/ProfileEdit.png) |
+| ![Profile Page](Screenshots/ProfilePage1.PNG) | ![Edit Profile](Screenshots/ProfileEdit.PNG) |
 
 | Create Post | |
 |------------|--|
-| ![Create Post](Screenshots/CreatePost.png) | |
+| ![Create Post](Screenshots/CreatePost.PNG) | |
 
 ---
 
