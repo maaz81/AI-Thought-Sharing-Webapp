@@ -1,99 +1,34 @@
-const express = require('express');
-const app = express();
 const http = require('http');
 const socketIo = require('socket.io');
-const helmet = require('helmet');
+const dns = require('dns');
+
+const app = require('./app');
+
 const envSecret = require('./config/env');
 const connectDB = require('./config/db');
-const userRoutes = require('./routes/user/userRoutes');
-const postRoutes = require('./routes/user/postRoutes');
-const profileRoutes = require('./routes/user/profileRoutes');
-const postDetailsRoutes = require('./routes/user/postDetailsRoutes');
-const updatePostRoutes = require('./routes/user/updatePostRoutes');
-const aiRoutes = require('./routes/user/aiRoutes');
-const cookieParser = require('cookie-parser');
-const cors = require("cors");
-const userDetailsRoutes = require('./routes/user/userDetailsRoutes');
-const setPostRoutes = require('./routes/user/setPostRoutes');
-const followerRoutes = require('./routes/user/followRoutes');
-const path = require('path');
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
-const dns = require('dns');
-const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
-const systemReactionRoutes = require('./routes/user/systemReactionRoutes');
 
-dns.setServers(["1.1.1.1", "0.0.0.0"])
+dns.setServers(["1.1.1.1", "0.0.0.0"]);
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:5175',
-  process.env.CLIENT_URL, // Add production URL from env
-  process.env.FRONTEND_URL // Alternative naming
-].filter(Boolean); // Remove undefined values
-
-// Security middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow images/uploads to be accessed
-}));
-
-app.use(express.json({ limit: '10mb' }));
-app.use(cookieParser());
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked by CORS:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-// Connect to MongoDB
 connectDB();
 
-// Routes
-app.use('/api/auth', userRoutes);
-app.use('/api', postRoutes);
-app.use('/api/update', updatePostRoutes);
-app.use('/profile', profileRoutes);
-app.use('/profile', postDetailsRoutes);
-app.use('/api/ai', aiRoutes)
-app.use('/api/update/profile', userDetailsRoutes)
-app.use('/api/setpost', setPostRoutes);
-app.use('/api/followers', followerRoutes);
-app.use("/api/system/reaction", systemReactionRoutes);
-
-// Admin Routes
-app.use('/api/admin', adminAuthRoutes);
-
-
-// Create HTTP server for Socket.IO
 const server = http.createServer(app);
 
-// Setup Socket.IO
 const io = socketIo(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: [
+      process.env.CLIENT_URL,
+      process.env.FRONTEND_URL,
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175'
+    ].filter(Boolean),
     methods: ['GET', 'POST'],
     credentials: true
   }
 });
 
-
-// Make io globally available (for controllers to use)
 app.set('io', io);
 
-// Socket.io connection listener
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
@@ -102,17 +37,6 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});
-
-// Handle 404 - Route not found (must be after all routes)
-app.use(notFoundHandler);
-
-// Global error handler (must be last middleware)
-app.use(errorHandler);
-
-// Start server
 server.listen(envSecret.PORT, () => {
   console.log(`Server running on port ${envSecret.PORT}`);
 });
