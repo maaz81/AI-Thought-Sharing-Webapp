@@ -16,7 +16,8 @@ const followerRoutes = require('./routes/user/followRoutes');
 const adminAuthRoutes = require('./routes/admin/adminAuthRoute');
 const systemReactionRoutes = require('./routes/user/systemReactionRoutes');
 
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const errorHandler = require('./middleware/error.middleware');
+const notFoundHandler = require('./middleware/notFound.middleware');
 
 const app = express();
 

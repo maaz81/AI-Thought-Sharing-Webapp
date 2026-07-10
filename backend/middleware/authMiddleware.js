@@ -1,24 +1,44 @@
 const jwt = require('jsonwebtoken');
+const util = require('util');
+
+const verifyToken = util.promisify(jwt.verify);
+
+const AppError = require('../utils/AppError');
+const catchAsync = require('../utils/catchAsync');
+
 const envSecret = require('../config/env');
 
-const protectRoutes = (req, res, next) => {
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+const protectRoutes = catchAsync(
+    async (req, res, next) => {
+        let token;
 
-    if (!token) {
-        return res.status(401).json({ success: false, message: "Unauthorized - No token provided" });
-    }
-
-    try {
-        const decoded = jwt.verify(token, envSecret.JWT_SECRET);
-        req.userId = decoded.id;
-        next();
-
-    } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ success: false, message: 'Token expired' });
+        if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith('Bearer')
+        ) {
+            token = req.headers.authorization.split(' ')[1];
         }
-        return res.status(401).json({ success: false, message: 'Invalid token' });
+
+        if (!token && req.cookies?.token) {
+            token = req.cookies.token;
+        }
+
+        if (!token) {
+            throw new AppError(
+                'Unauthorized. Please login.',
+                401
+            );
+        }
+
+        const decoded = await verifyToken(
+            token,
+            envSecret.JWT_SECRET
+        );
+
+        req.userId = decoded.id;
+
+        next();
     }
-}
+);
 
 module.exports = protectRoutes;
