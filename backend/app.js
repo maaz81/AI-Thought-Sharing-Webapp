@@ -18,6 +18,8 @@ const systemReactionRoutes = require('./routes/user/systemReactionRoutes');
 
 const errorHandler = require('./middleware/error.middleware');
 const notFoundHandler = require('./middleware/notFound.middleware');
+const requestLogger =
+    require('./middleware/requestLogger');
 
 const app = express();
 
@@ -37,6 +39,7 @@ app.use(
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.use(
     cors({

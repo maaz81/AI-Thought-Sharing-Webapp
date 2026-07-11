@@ -1,4 +1,5 @@
 const AppError = require('../utils/AppError');
+const logger = require('../config/logger');
 
 const handleJWTError = () =>
     new AppError('Invalid authentication token', 401);
@@ -47,7 +48,15 @@ const sendErrorProd = (err, res) => {
         });
     }
 
-    console.error('ERROR 💥', err);
+    logger.error({
+        type: 'APPLICATION_ERROR',
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.ip
+    });
 
     return res.status(500).json({
         success: false,

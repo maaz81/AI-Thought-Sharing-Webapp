@@ -1,6 +1,7 @@
 const http = require('http');
 const socketIo = require('socket.io');
 const dns = require('dns');
+const logger = require('./config/logger');
 
 const app = require('./app');
 
@@ -10,6 +11,34 @@ const connectDB = require('./config/db');
 dns.setServers(["1.1.1.1", "0.0.0.0"]);
 
 connectDB();
+
+process.on(
+  'uncaughtException',
+  (err) => {
+    logger.error({
+      type: 'UNCAUGHT_EXCEPTION',
+      message: err.message,
+      stack: err.stack
+    });
+
+    process.exit(1);
+  }
+);
+
+process.on(
+  'unhandledRejection',
+  (err) => {
+    logger.error({
+      type: 'UNHANDLED_REJECTION',
+      message: err.message,
+      stack: err.stack
+    });
+
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+);
 
 const server = http.createServer(app);
 
@@ -30,13 +59,24 @@ const io = socketIo(server, {
 app.set('io', io);
 
 io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
+  logger.info({
+    type: 'SOCKET',
+    event: 'connect',
+    socketId: socket.id
+  });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+    logger.info({
+      type: 'SOCKET',
+      event: 'disconnect',
+      socketId: socket.id
+    });
   });
 });
 
 server.listen(envSecret.PORT, () => {
-  console.log(`Server running on port ${envSecret.PORT}`);
+  logger.info({
+    type: 'SERVER',
+    message: `Server running on port ${envSecret.PORT}`
+  });
 });
