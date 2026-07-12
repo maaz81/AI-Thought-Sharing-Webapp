@@ -1,0 +1,976 @@
+================================================================================
+  THOUGHTLY — PRODUCTION-GRADE UPGRADE PLAN
+  AI-First Creator Platform: Twitter + Notion AI + Grammarly + LinkedIn
+  Author: Senior Full-Stack + UI/UX Engineering Review
+  Date: July 2026
+================================================================================
+
+CURRENT STATE ASSESSMENT
+─────────────────────────
+Rating Before:
+  UI/UX:               7/10
+  Frontend:            7.5/10
+  Backend Arch:        6/10
+  Product Thinking:    8/10
+  Portfolio Strength:  7.5/10
+
+Target After:
+  All dimensions:      8.5-9/10
+  Recruiter Impression: "Real startup product, not a college project"
+
+Critical Bugs Found in Audit:
+  1. N+1 API Problem: Feed loads 20 posts then fires 20 separate reaction calls
+     (Feed.jsx lines 99-124). Must be fixed at backend level.
+  2. Brand Identity Mismatch: URL=thoughtly, title=InsightShare, footer=PostShare
+  3. AI is invisible: No user on homepage knows AI exists
+  4. Feed.jsx is a 561-line monolith
+  5. Search is a basic button — no debounce, no history, no live suggestions
+  6. No Trending Topics, No Who-To-Follow, No Discovery panel
+  7. Invalid Date bug in feed timestamps
+  8. Content has no max-length validation (DoS risk)
+  9. Post model missing author info in feed response (no username/avatar)
+  10. No AI score visible on posts
+
+
+================================================================================
+  PHASE 1: CRITICAL BUG FIXES (Do This First — Highest ROI)
+================================================================================
+
+STEP 1.1 — Fix N+1 Reaction Problem (Backend)
+File: backend/controllers/user/postControllers.js → getHomeFeed()
+
+PROBLEM:
+  Frontend currently does:
+    GET /api/feed → 20 posts
+    GET /api/system/reaction/system-like/ID1  (for every post)
+    GET /api/system/reaction/system-like/ID2  (for every post)
+    ... (N more requests)
+
+FIX — Embed reactions directly in the feed response:
+  - For user posts: PostDetails already has like/dislike counts
+    → Add likedBy check for req.userId → include userReaction in response
+  - For system posts: Already queries SystemPostReaction in bulk (reactionMap)
+    → Add userId check in map to include userReaction per post
+  - Return final feed with { likes, dislikes, userReaction } per post
+
+Code logic in getHomeFeed:
+  const userId = req.userId; // may be undefined for guests
+
+  // For user posts — userReaction check:
+  userReaction: userId
+    ? (p.likedBy?.some(id => id.toString() === userId) ? 'like'
+      : p.dislikedBy?.some(id => id.toString() === userId) ? 'dislike'
+      : null)
+    : null,
+
+  // For system posts — extend reactionMap lookup:
+  userReaction: userId
+    ? (reactionMap[post._id]?.likedBy?.some(id => id.toString() === userId)
+      ? 'like'
+      : reactionMap[post._id]?.dislikedBy?.some(id => id.toString() === userId)
+      ? 'dislike' : null)
+    : null,
+
+  Result: 1 feed request instead of 1 + N requests. ~95% performance win.
+
+NOTE: PostDetails query needs to also select likedBy/dislikedBy arrays.
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.2 — Fix Author Info Missing in Feed (Backend)
+File: backend/controllers/user/postControllers.js → getHomeFeed()
+
+PROBLEM:
+  Feed returns posts without author name/username/avatar.
+  Frontend cannot show "Posted by @ahmed" without this.
+
+FIX — Populate author in getHomeFeed:
+  path: 'postid',
+  populate: {
+    path: 'userid',
+    select: 'name username',
+    populate: { path: 'userDetails', select: 'basic_info.photo' }
+  }
+
+  Add to formatted output:
+    authorName: p.postid.userid?.name || 'Anonymous',
+    authorUsername: p.postid.userid?.username || 'unknown',
+    authorAvatar: p.postid.userid?.userDetails?.basic_info?.photo || null,
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.3 — Fix Content Max Length DoS Vulnerability (Backend)
+File: backend/validators/ (post validators)
+
+FIX:
+  .isLength({ min: 10, max: 5000 })
+  .withMessage('Content must be 10-5000 characters')
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.4 — Fix Brand Identity (Global)
+Files to update:
+  frontend-user/index.html → <title>Thoughtly — AI Creator Platform</title>
+  frontend-user/src/components/HeaderFooter/ → update logo/brand refs
+  frontend-user/public/ → update favicon, og:title, og:description
+  All hardcoded "InsightShare" / "PostShare" text → "Thoughtly"
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.5 — Fix Invalid Date Bug (Frontend)
+File: Feed.jsx and any date rendering component
+
+FIX — Create safe date formatter:
+  // src/utils/formatDate.js
+  export const formatDate = (dateStr) => {
+    if (!dateStr) return 'Unknown date';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'Unknown date';
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  };
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.6 — Add Trending Topics Endpoint (Backend)
+NEW ENDPOINT: GET /api/trending
+
+Logic:
+  const getTrendingTopics = async (req, res) => {
+    // In-memory cache (15 minutes TTL — same pattern as JSON posts cache)
+    if (_trendingCache && Date.now() - _trendingCacheTime < 15 * 60 * 1000) {
+      return res.json({ success: true, data: _trendingCache });
+    }
+    const trending = await Post.aggregate([
+      { $unwind: '$tags' },
+      { $group: { _id: '$tags', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      { $project: { tag: '$_id', count: 1, _id: 0 } }
+    ]);
+    _trendingCache = trending;
+    _trendingCacheTime = Date.now();
+    return res.json({ success: true, data: trending });
+  };
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.7 — Add Who-To-Follow Endpoint (Backend)
+NEW ENDPOINT: GET /api/followers/suggestions
+
+Logic:
+  const getSuggestedUsers = async (req, res) => {
+    const currentUserId = req.userId;
+    let query = {};
+    if (currentUserId) {
+      const userFeed = await UserFeed.findOne({ userId: currentUserId });
+      const following = userFeed?.following || [];
+      query = { _id: { $nin: [...following, currentUserId] } };
+    }
+    const users = await User.find(query)
+      .select('name username')
+      .populate({ path: 'userDetails', select: 'basic_info.photo' })
+      .limit(5)
+      .lean();
+    return res.json({ success: true, data: users });
+  };
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 1.8 — Add AI Viral Score Endpoint (Backend)
+NEW ENDPOINT: POST /api/ai/score
+
+This is the MOST IMPORTANT new AI feature for portfolio differentiation.
+
+Prompt sent to OpenRouter:
+  You are an expert content strategist for a social platform.
+  Analyze this post and return ONLY valid JSON:
+
+  Title: "${title}"
+  Content: "${content}"
+  Tags: ${JSON.stringify(tags)}
+
+  {
+    "viralScore": 85,
+    "readability": 90,
+    "engagementPrediction": 78,
+    "hookStrength": "Strong",
+    "checks": [
+      { "label": "Strong Hook", "passed": true },
+      { "label": "Good Readability", "passed": true },
+      { "label": "Has CTA", "passed": false },
+      { "label": "Optimal Length", "passed": true },
+      { "label": "Trending Tags", "passed": false }
+    ],
+    "topSuggestion": "Add a clear call-to-action at the end"
+  }
+
+
+================================================================================
+  PHASE 2: FRONTEND ARCHITECTURE REFACTOR
+================================================================================
+
+STEP 2.1 — New Folder Structure
+Current problem: Feed.jsx is 561 lines. Single monolith handles state,
+UI rendering, animations, sockets, reactions — all in one file.
+
+Target folder structure:
+  frontend-user/src/
+  ├── components/
+  │   ├── layout/
+  │   │   ├── AppShell.jsx        (3-column layout wrapper)
+  │   │   ├── Sidebar.jsx         (Left navigation)
+  │   │   ├── RightPanel.jsx      (Trending + Who to Follow)
+  │   │   └── MobileNav.jsx       (Bottom nav for mobile)
+  │   │
+  │   ├── feed/
+  │   │   ├── Feed.jsx            (Orchestrator only — fetch + state)
+  │   │   ├── FeedCard.jsx        (Single post card UI)
+  │   │   ├── FeedSkeleton.jsx    (Loading placeholder)
+  │   │   └── ReactionButton.jsx  (Like/Dislike button)
+  │   │
+  │   ├── search/
+  │   │   ├── SearchInput.jsx     (Debounced input with icon)
+  │   │   ├── SearchDropdown.jsx  (Live suggestions dropdown)
+  │   │   └── SearchResults.jsx   (Full search results page)
+  │   │
+  │   ├── ai/
+  │   │   ├── AIScore.jsx         (Score badge on post card)
+  │   │   └── AIInsights.jsx      (Expanded AI insights panel)
+  │   │
+  │   ├── discovery/
+  │   │   ├── TrendingTopics.jsx  (Trending tags list)
+  │   │   └── WhoToFollow.jsx     (Suggested users)
+  │   │
+  │   └── shared/
+  │       ├── Avatar.jsx          (Avatar with initials fallback)
+  │       └── ConfirmModal.jsx    (Reusable delete confirmation)
+  │
+  ├── hooks/
+  │   ├── useFeed.js              (Feed fetch + pagination logic)
+  │   ├── useSearch.js            (Debounced search logic)
+  │   ├── useInfiniteScroll.js    (Intersection Observer scroll)
+  │   └── useReactions.js         (Optimistic reaction updates)
+  │
+  ├── services/
+  │   ├── feedService.js          (Feed API calls)
+  │   ├── searchService.js        (Search API calls)
+  │   └── reactionService.js      (Reaction API calls)
+  │
+  └── utils/
+      ├── formatDate.js           (Safe date formatting + timeAgo)
+      ├── formatNumber.js         (1200 → "1.2K")
+      └── cn.js                   (className utility)
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.2 — AppShell Layout (3-Column Twitter/X Style)
+File: src/components/layout/AppShell.jsx
+
+Layout:
+  Desktop:  [Sidebar 280px] | [Feed max-w-600px] | [RightPanel 320px]
+  Tablet:   [Feed] | [RightPanel]  (sidebar collapses to icon-only)
+  Mobile:   [Feed only] + [MobileNav bottom bar]
+
+const AppShell = ({ children }) => (
+  <div className="min-h-screen bg-brand-bg dark:bg-brandDark-bg">
+    <div className="max-w-[1280px] mx-auto flex">
+      <Sidebar />
+      <main className="flex-1 min-h-screen border-x border-brand-border
+                       dark:border-brandDark-border max-w-[600px]">
+        {children}
+      </main>
+      <RightPanel className="hidden lg:block w-[320px]" />
+    </div>
+    <MobileNav className="lg:hidden" />
+  </div>
+);
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.3 — Sidebar Component (Production Grade)
+File: src/components/layout/Sidebar.jsx
+
+Requirements:
+  - Fixed left sidebar, sticky on scroll
+  - Thoughtly logo at top
+  - Navigation links with active state via useLocation()
+  - User profile mini-card at bottom
+  - "Create Post" prominent CTA button (full width, gradient)
+  - Collapsible on medium screens (icon-only mode)
+  - All icons from lucide-react
+
+Navigation Items:
+  { icon: Home,     label: 'Home',         path: '/' }
+  { icon: Search,   label: 'Explore',      path: '/explore' }
+  { icon: Sparkles, label: 'AI Studio',    path: '/ai-studio' }
+  { icon: Bookmark, label: 'Bookmarks',    path: '/bookmarks' }
+  { icon: Bell,     label: 'Notifications',path: '/notifications' }
+  { icon: User,     label: 'Profile',      path: '/profile' }
+
+Bottom Section:
+  - Avatar with initials fallback
+  - Name + @username (collapsed mode: hidden)
+  - Settings gear → dropdown with Logout inside
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.4 — RightPanel (Discovery Panel)
+File: src/components/layout/RightPanel.jsx
+
+Sections (top to bottom):
+  1. Search input (sticky)
+  2. TrendingTopics component
+  3. WhoToFollow component
+  4. Popular Tags chips
+
+TrendingTopics.jsx:
+  - Calls GET /api/trending on mount
+  - Shows ranked: #1 #ai (1.2K posts), #2 #startup (890 posts)
+  - Each tag → navigate to /explore?tag=ai
+  - Skeleton loading state
+
+WhoToFollow.jsx:
+  - Calls GET /api/followers/suggestions
+  - User card: Avatar | Name @username | Follow button
+  - Follow button is stateful (Follow / Following toggle)
+  - Max 5 users shown
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.5 — FeedCard Component (Twitter/X Quality)
+File: src/components/feed/FeedCard.jsx
+
+What FeedCard renders:
+  [Avatar] Name @username · 2h ago       [kebab menu]
+
+  Post Title (bold, large)
+
+  Content preview (line-clamp-3)
+
+  #tag1  #tag2  #tag3
+
+  [AI 89] heart 120  speech 34  share 11  bookmark
+
+Key design decisions:
+  - Avatar: no photo → show initials in colored circle
+  - Timestamp: relative format ("2h ago", "3d ago")
+  - Content: line-clamp-3 in feed (no wall of text)
+  - Tags: max 3 shown, rest "+N more"
+  - AI Score badge: small gradient pill "AI 89"
+  - Kebab menu (3 dots): author only → Edit / Delete
+  - Hover: subtle background lift + border color change
+  - Card click → navigate to /post/:postId
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.6 — FeedSkeleton Component
+File: src/components/feed/FeedSkeleton.jsx
+
+Twitter-style skeleton pulse loading:
+  const FeedSkeleton = () => (
+    <div className="animate-pulse space-y-4 p-4">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex gap-3 p-4 border-b border-brand-border">
+          <div className="w-10 h-10 rounded-full bg-brand-border" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-brand-border rounded w-1/3" />
+            <div className="h-4 bg-brand-border rounded w-full" />
+            <div className="h-4 bg-brand-border rounded w-4/5" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.7 — useFeed Hook (Infinite Scroll via Intersection Observer)
+File: src/hooks/useFeed.js
+
+Replace "Load More" button with automatic scroll detection.
+
+const useFeed = () => {
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const loaderRef = useRef(null);
+
+  const fetchFeed = useCallback(async (pageNum) => {
+    setLoading(true);
+    const res = await feedService.getFeed(pageNum);
+    // reactions now embedded in feed — no N+1 requests needed
+    if (pageNum === 1) setPosts(res.data);
+    else setPosts(prev => [...prev, ...res.data]);
+    setHasMore(res.hasNextPage);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, loading]);
+
+  useEffect(() => { fetchFeed(page); }, [page]);
+
+  return { posts, loading, hasMore, loaderRef, setPosts };
+};
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.8 — useSearch Hook (Debounced Live Search)
+File: src/hooks/useSearch.js
+
+const useSearch = () => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [history, setHistory] = useState(
+    () => JSON.parse(localStorage.getItem('searchHistory') || '[]')
+  );
+
+  useEffect(() => {
+    if (!query.trim()) { setResults(null); return; }
+    const timer = setTimeout(async () => {
+      const res = await searchService.getSuggestions(query);
+      setResults(res);
+      setIsOpen(true);
+    }, 350); // 350ms debounce
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const addToHistory = (term) => {
+    const updated = [term, ...history.filter(h => h !== term)].slice(0, 5);
+    setHistory(updated);
+    localStorage.setItem('searchHistory', JSON.stringify(updated));
+  };
+
+  return { query, setQuery, results, isOpen, setIsOpen, history, addToHistory };
+};
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.9 — Search Components
+SearchInput.jsx features:
+  - Search icon (left side)
+  - Clear "x" button (right, appears when text present)
+  - onFocus → show dropdown (shows history if query empty)
+  - ESC key → clear and close dropdown
+  - Arrow keys → keyboard navigation through dropdown items
+  - Enter → navigate to /explore?q=query
+
+SearchDropdown.jsx shows:
+  Empty state: Recent Searches (clock icon + x to remove each)
+  Typed state: live results grouped by Users and Posts
+  User result: Avatar | Name @username
+  Post result: Title preview + first tag
+  Footer: "See all results for 'query'" link
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.10 — AIScore Component (Make AI VISIBLE on Every Post)
+File: src/components/ai/AIScore.jsx
+
+Default state on feed card: small gradient badge "✨ AI 89/100"
+
+Hover/click → expanded tooltip:
+  AI Content Score: 89/100
+  ✓ Strong Hook
+  ✓ Good Readability
+  ⚠ Add CTA
+  Tip: Add a clear call-to-action at the end
+
+Score color coding:
+  >= 80: green gradient
+  60-79: amber gradient
+  <  60: rose gradient
+
+Implementation note:
+  - Score is PRE-COMPUTED at post creation time (fire-and-forget)
+  - Feed response includes aiScore field
+  - FeedCard shows AIScore badge only if post.aiScore exists
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.11 — MobileNav (Bottom Navigation)
+File: src/components/layout/MobileNav.jsx
+
+Fixed bottom bar for mobile (hidden on lg+ breakpoint):
+  Home | Search | Create | Alerts | Profile
+
+  - Active tab: icon fills with color + indicator dot
+  - Create button: slightly larger, gradient background
+  - Min 44px touch targets (iOS/Android accessibility guideline)
+  - Blur backdrop background
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 2.12 — ReactionButton Component (with Optimistic Updates)
+File: src/components/feed/ReactionButton.jsx
+
+Extract from Feed.jsx + add optimistic updates:
+  const handleClick = async () => {
+    // 1. Immediately update UI (optimistic)
+    setOptimisticReaction(prev => prev === type ? null : type);
+    // 2. API call in background
+    try {
+      await reactionService.react(postId, reactionId, type, source);
+    } catch {
+      // 3. Rollback on failure
+      setOptimisticReaction(prevReaction);
+    }
+  };
+
+
+================================================================================
+  PHASE 3: AUTH & PROFILE UX IMPROVEMENTS
+================================================================================
+
+STEP 3.1 — Login Page UX Fixes
+File: src/components/auth/LoginForm.jsx
+
+Add:
+  [x] "Forgot Password?" link below password field
+  [x] Password show/hide eye icon toggle
+  [x] Left side panel for desktop: "The AI-Powered Creator Platform"
+      with 3 feature bullets and gradient background
+  [x] Thoughtly logo on the login card
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 3.2 — Profile Page UX Fixes
+File: src/components/profile/ProfilePage.jsx
+
+Fix list:
+  [x] Broken avatar → initials fallback with unique color
+  [x] Logout → move to Settings (gear) dropdown
+  [x] Post actions (Edit/Delete) → kebab menu (3 dots)
+  [x] Delete post → confirmation modal before action
+  [x] Stats (Followers/Following) → inline bold text, not big cards
+  [x] Remove "Online" badge (irrelevant, adds DB socket pressure)
+  [x] Add "Share Profile" copy-link button
+  [x] Tab "Contributions" → rename to "Highlights"
+  [x] Tab "Comments" + "Replies" → merge into "Replies"
+  [x] Feed posts → line-clamp-4 with "Show more" link
+  [x] Feed posts → show heart count and comment count with icons
+  [x] AI-reviewed posts → show "✨ AI Enhanced" badge
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 3.3 — Post Creation UX Fixes
+File: src/components/dashboard/CreatePost.jsx
+
+Fix list:
+  [x] Disable ALL buttons during AI generation (not just the AI button)
+  [x] AI suggestions → tab UI (Titles | Drafts | Tags) not vertical stack
+  [x] "Use This" → show Undo toast + Copy icon
+  [x] Tag chips → clickable toggle (outline → solid on select) + "Select All"
+  [x] "Regenerate" button at bottom of suggestions
+  [x] Auto-save draft to localStorage on content change
+  [x] "Save as Draft" button
+  [x] AI chat → right side drawer instead of center modal
+  [x] AI chat: greeting + quick prompt chips on empty state
+  [x] AI chat: "Insert at Cursor" + "Copy" on every AI response
+  [x] AI chat input → auto-expand textarea
+  [x] AI chat header → "Reading your current draft..." badge
+
+
+================================================================================
+  PHASE 4: BACKEND NEW FEATURES
+================================================================================
+
+STEP 4.1 — Add AI Score to Post Model
+File: backend/models/user/Post.js
+
+Add to aiMeta field:
+  aiMeta: {
+    autoTagged: Boolean,
+    autoTagsUsed: [String],
+    score: {
+      value: Number,
+      readability: Number,
+      engagementPrediction: Number,
+      hookStrength: String,
+      checks: [{ label: String, passed: Boolean }],
+      topSuggestion: String,
+      computedAt: Date
+    }
+  }
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 4.2 — Compute AI Score on Post Creation (Fire-and-Forget)
+File: backend/controllers/user/postControllers.js → createPosts()
+
+After sendSuccess(201):
+  computeAndSaveAIScore(post._id, { title, content: content.trim(), tags: finalTags })
+    .catch(err => console.error('[AIScore] Failed:', err.message));
+
+  async function computeAndSaveAIScore(postId, postData) {
+    const score = await computeAIScore(postData);
+    await Post.findByIdAndUpdate(postId, { 'aiMeta.score': score });
+  }
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 4.3 — Feed Endpoint Returns Author + AI Score
+File: backend/controllers/user/postControllers.js → getHomeFeed()
+
+Final formatted post shape from feed API:
+  {
+    _id, title, content, tags,
+    source: 'user' | 'system',
+    likes, dislikes, userReaction,          (N+1 fix)
+    authorName, authorUsername, authorAvatar, (author fix)
+    aiScore: post.aiMeta?.score || null,    (AI visibility)
+    createdAt, updatedAt,
+    score                                   (internal ranking score)
+  }
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 4.4 — Forgot Password Flow (Backend)
+Files:
+  backend/routes/user/userRoutes.js
+  backend/controllers/user/userControllers.js
+  backend/models/user/User.js
+
+ENDPOINTS:
+  POST /api/auth/forgot-password
+    - Accept { email }
+    - Generate crypto random token, store hashed with 1-hour expiry
+    - Send email via Nodemailer with reset link
+    - Always return same message (prevents email enumeration attack)
+
+  POST /api/auth/reset-password
+    - Accept { token, newPassword }
+    - Find user by hashed token + check expiry
+    - Hash new password, clear token fields, save
+
+User model additions:
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 4.5 — Search Improvements (Backend)
+  1. Add text index:
+     db.posts.createIndex({ title: 'text', content: 'text', tags: 'text' })
+
+  2. New suggestions endpoint: GET /api/search/suggestions?q=react
+     Returns top 5 tags + top 3 users (powers live dropdown)
+
+  3. Full search: GET /api/search?query=react (unchanged)
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 4.6 — Duplicate Tags Prevention
+File: backend/controllers/user/postControllers.js → createPosts()
+
+  finalTags = [...new Set(finalTags)].slice(0, 15);
+
+
+================================================================================
+  PHASE 5: ROUTING REFACTOR
+================================================================================
+
+STEP 5.1 — Updated Routes in App.jsx
+  /                   → Home feed (AppShell wrapping Feed)
+  /explore            → Explore/Search page
+  /explore?q=X        → Search results for query X
+  /explore?tag=X      → Posts filtered by tag X
+  /ai-studio          → AI Writing Studio page (new page)
+  /notifications      → Notifications page
+  /bookmarks          → Saved posts
+  /post/:postId       → Post detail page
+  /profile            → Own profile (auth required)
+  /profile/:username  → Public profile
+  /profile/post       → Create post (auth required)
+  /login              → Login
+  /signup             → Signup
+  /pricing            → Pricing
+
+
+================================================================================
+  PHASE 6: DESIGN SYSTEM POLISH
+================================================================================
+
+STEP 6.1 — Typography Upgrade
+File: frontend-user/index.html → <head>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  Set base font: font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 6.2 — Relative Time Utility
+File: src/utils/formatDate.js
+
+  export const timeAgo = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date)) return '';
+    const diff = Date.now() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 6.3 — Avatar Initials Fallback Component
+File: src/components/shared/Avatar.jsx
+
+  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b'];
+
+  const Avatar = ({ src, name, size = 40 }) => {
+    const [imgError, setImgError] = useState(false);
+    const initials = name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?';
+    const color = COLORS[(name?.charCodeAt(0) || 0) % COLORS.length];
+
+    if (!src || imgError) {
+      return (
+        <div style={{ width: size, height: size, backgroundColor: color }}
+             className="rounded-full flex items-center justify-center text-white font-semibold text-sm">
+          {initials}
+        </div>
+      );
+    }
+    return <img src={src} alt={name} width={size} height={size}
+                className="rounded-full object-cover"
+                onError={() => setImgError(true)} />;
+  };
+
+─────────────────────────────────────────────────────────────────────────────
+
+STEP 6.4 — Number Formatting Utility
+File: src/utils/formatNumber.js
+
+  export const formatCount = (n) => {
+    if (!n) return '0';
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+    return String(n);
+  };
+
+
+================================================================================
+  PHASE 7: EMPTY STATES & ERROR STATES
+================================================================================
+
+STEP 7.1 — Better Empty States
+
+Feed empty state:
+  🌱
+  "Nothing here yet"
+  "Be the first to post something amazing"
+  [Create Post] button
+
+Search empty state:
+  🔍
+  No results for "react"
+  Try: #javascript  #frontend  #webdev
+
+Error state:
+  ⚠
+  "Something went wrong"
+  "We couldn't load the feed. Please try again."
+  [Retry] button
+
+
+================================================================================
+  WEEK-BY-WEEK EXECUTION ORDER
+================================================================================
+
+WEEK 1 — Critical Bug Fixes + Backend
+  Day 1: Fix N+1 (Step 1.1) + Fix author info in feed (Step 1.2)
+  Day 2: Fix brand identity (Step 1.4) + Fix Invalid Date (Step 1.5)
+  Day 3: Add /api/trending endpoint (Step 1.6)
+  Day 4: Add /api/followers/suggestions endpoint (Step 1.7)
+  Day 5: Add /api/ai/score endpoint (Step 1.8) + AI score in Post model (Step 4.1)
+  Day 6: Content max-length validation (Step 1.3) + Duplicate tags fix (Step 4.6)
+  Day 7: Test all new endpoints with Postman/Thunder Client
+
+WEEK 2 — Layout + Core Component Split
+  Day 1: Create AppShell.jsx + Sidebar.jsx (Steps 2.2, 2.3)
+  Day 2: Create RightPanel.jsx + TrendingTopics.jsx + WhoToFollow.jsx (Step 2.4)
+  Day 3: Create MobileNav.jsx (Step 2.11)
+  Day 4: Split Feed.jsx into Feed + FeedCard + FeedSkeleton (Steps 2.5, 2.6)
+  Day 5: Extract ReactionButton.jsx (Step 2.12) + create Avatar.jsx (Step 6.3)
+  Day 6: Create useFeed.js hook with infinite scroll (Step 2.7)
+  Day 7: Update App.jsx routing (Step 5.1) + test layout on all breakpoints
+
+WEEK 3 — Search + AI Visibility
+  Day 1: Create useSearch.js hook (Step 2.8)
+  Day 2: Build SearchInput.jsx + SearchDropdown.jsx (Step 2.9)
+  Day 3: Build AIScore.jsx component (Step 2.10)
+  Day 4: Wire AI score to post creation — background computation (Step 4.2)
+  Day 5: Verify AI score shown in FeedCard for newly created posts
+  Day 6: Add search suggestions backend endpoint (Step 4.5)
+  Day 7: Full search flow end-to-end test
+
+WEEK 4 — Auth + Profile + Create Post UX
+  Day 1: Fix Login page (Forgot Password + password toggle) (Step 3.1)
+  Day 2: Forgot password backend endpoints (Step 4.4)
+  Day 3: Profile UX fixes — avatar, kebab menu, stats layout (Step 3.2)
+  Day 4: Profile UX fixes — tabs merge, line-clamp, share button (Step 3.2)
+  Day 5: Create Post UX fixes — AI tabs, button states, draft auto-save (Step 3.3)
+  Day 6: AI chat → right side drawer refactor (Step 3.3)
+  Day 7: QA across all pages + mobile testing
+
+WEEK 5 — Polish + Performance + Deploy
+  Day 1: Inter font, global typography cleanup (Step 6.1)
+  Day 2: Relative timestamps (Step 6.2) + formatCount utility (Step 6.4)
+  Day 3: All empty states and error states (Phase 7)
+  Day 4: Services layer (feedService, searchService, reactionService)
+  Day 5: MongoDB indexes (Step 4.5)
+  Day 6: End-to-end testing + bug fixes
+  Day 7: Deploy and verify production
+
+
+================================================================================
+  ARCHITECTURE DECISIONS — WHY EACH CHOICE WAS MADE
+================================================================================
+
+1. WHY split Feed.jsx into 5 files?
+   → Single Responsibility Principle. 561 lines = untestable, unscalable.
+   → FeedCard can be reused in Profile, Explore, Search results.
+   → Recruiter reviewing code sees modular thinking.
+
+2. WHY fix N+1 at backend vs frontend?
+   → Frontend cannot batch reaction fetches efficiently.
+   → Backend does single MongoDB $in query for all postIds at once.
+   → Result: 20 HTTP requests → 1. ~95% reduction.
+
+3. WHY Intersection Observer for infinite scroll?
+   → Twitter, Instagram, LinkedIn all use this pattern.
+   → Users scroll naturally — no extra click required.
+   → useInfiniteScroll.js hook is reusable across multiple pages.
+
+4. WHY pre-compute AI score on creation vs on feed load?
+   → Computing AI score on every feed load = expensive API calls
+     (N posts × 3-8 second AI latency = unusable feed).
+   → Pre-compute once on creation, store result → feed always fast.
+   → Fire-and-forget: post creation response is NOT delayed.
+
+5. WHY in-memory cache for trending (not Redis)?
+   → Redis adds ops complexity and cost for a portfolio project.
+   → In-memory 15-minute cache matches existing JSON posts cache.
+   → Consistent, easy to upgrade to Redis later.
+
+6. WHY localStorage for search history?
+   → No backend needed — instant read, zero API cost.
+   → Works even when logged out.
+   → Same approach as Twitter/X search history.
+
+7. WHY move Logout to Settings dropdown?
+   → Destructive actions should not be prominently placed (UX principle).
+   → Users stop accidentally logging out.
+   → Twitter, LinkedIn, GitHub all follow this exact pattern.
+
+8. WHY Avatar initials fallback?
+   → Broken image icons destroy platform trust immediately.
+   → Color derived from name = each user has unique consistent color.
+   → Same pattern: Google, Notion, Linear, Vercel.
+
+9. WHY deduplicate tags?
+   → Live production bug found: #india #india #india on a post.
+   → Set() dedup is O(n), trivially prevents DB clutter.
+   → Cap at 15 tags to prevent spam.
+
+10. WHY line-clamp-3 on feed cards?
+    → Users scan feeds — wall of text = scroll fatigue = churn.
+    → Twitter, Medium, LinkedIn all truncate feed previews.
+    → Full content accessible on post detail page.
+
+
+================================================================================
+  DATABASE INDEXES TO ADD
+================================================================================
+
+Run once in MongoDB shell or in a migration script:
+
+  // Full-text search on posts
+  db.posts.createIndex({ title: 'text', content: 'text', tags: 'text' })
+
+  // Feed query performance (most common query pattern)
+  db.postdetails.createIndex({ visibility: 1, createdAt: -1 })
+
+  // Trending topics aggregation
+  db.posts.createIndex({ tags: 1 })
+
+  // User search
+  db.users.createIndex({ username: 1 })
+  db.users.createIndex({ name: 1 })
+
+  // System post reactions bulk lookup
+  db.systempostreactions.createIndex({ systemPostId: 1 })
+
+
+================================================================================
+  ENVIRONMENT VARIABLES NEEDED
+================================================================================
+
+Backend (.env):
+  OPENROUTER_API_KEY=your_key_here
+  EMAIL_HOST=smtp.gmail.com
+  EMAIL_PORT=587
+  EMAIL_USER=your_email@gmail.com
+  EMAIL_PASS=your_app_password_here
+  CLIENT_URL=http://localhost:5173
+  FRONTEND_URL=https://thoughtly.vercel.app
+
+Frontend (.env):
+  VITE_API_URL=http://localhost:5000
+
+
+================================================================================
+  FINAL TARGET STATE
+================================================================================
+
+After all 5 weeks of implementation:
+
+  UI/UX:              9/10   (3-column layout, no broken states, premium feel)
+  Frontend:           9/10   (modular, hooks-based, infinite scroll, skeletons)
+  Backend Arch:       8.5/10 (N+1 fixed, indexes, caching, auth complete)
+  Product Thinking:   9/10   (AI visible everywhere, discovery, trending)
+  Portfolio Strength: 9/10   (Looks like a funded startup)
+
+What a recruiter/interviewer will see:
+  ✅ Modern 3-column layout (Twitter/X quality UX)
+  ✅ AI score on every post (unique differentiation from every Twitter clone)
+  ✅ Infinite scroll + skeletons (production engineering pattern)
+  ✅ Debounced search with live dropdown (senior UX thinking)
+  ✅ N+1 problem solved at the correct layer (backend architecture thinking)
+  ✅ Modular component architecture (scalability thinking)
+  ✅ Responsive mobile + desktop design (product polish)
+  ✅ Real-time updates via Socket.io (full-stack depth)
+
+Final vision:
+  Twitter/X + Notion AI + Grammarly + LinkedIn = AI Personal Branding Platform
+
+  User writes → AI scores it → AI improves it → User publishes →
+  Platform shows viral score → User grows audience → Platform earns trust.
+
+  "Inn sab ka khulasa yeh hai: Thoughtly sirf Twitter clone nahi rehna chahiye.
+   Yeh AI-Powered Creator Platform banana hai. Aur is plan ke baad,
+   aisa hi lagega."
+
+================================================================================
+  END OF PLAN — THOUGHTLY PRODUCTION UPGRADE
+================================================================================
