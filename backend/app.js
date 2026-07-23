@@ -3,6 +3,8 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./docs/swagger");
 
 const userRoutes = require('./routes/user/userRoutes');
 const postRoutes = require('./routes/user/postRoutes');
@@ -24,6 +26,7 @@ const requestLogger =
 const app = express();
 
 const allowedOrigins = [
+    "http://localhost:5000",
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:5175',
@@ -44,19 +47,29 @@ app.use(requestLogger);
 app.use(
     cors({
         origin: function (origin, callback) {
+
+            console.log("Origin:", origin);
+
             if (!origin) return callback(null, true);
 
             if (allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
-                callback(new Error('Not allowed by CORS'));
+                callback(new Error("Not allowed by CORS"));
             }
-        },
-        credentials: true
+        }
     })
 );
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+        explorer: true,
+    })
+);
 
 // Routes
 app.use('/api/auth', userRoutes);

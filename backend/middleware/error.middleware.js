@@ -40,7 +40,7 @@ const sendErrorDev = (err, res) => {
     });
 };
 
-const sendErrorProd = (err, res) => {
+const sendErrorProd = (req, err, res) => {
     if (err.isOperational) {
         return res.status(err.statusCode).json({
             success: false,
