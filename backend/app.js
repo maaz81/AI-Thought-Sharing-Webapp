@@ -46,18 +46,25 @@ app.use(requestLogger);
 
 app.use(
     cors({
-        origin: function (origin, callback) {
+        origin(origin, callback) {
 
-            console.log("Origin:", origin);
+            console.log("Incoming Origin:", origin);
+            console.log("Allowed Origins:", allowedOrigins);
 
-            if (!origin) return callback(null, true);
+            if (!origin) {
+                console.log("✅ No origin (Postman/server request)");
+                return callback(null, true);
+            }
 
             if (allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
+                console.log("✅ Origin allowed");
+                return callback(null, true);
             }
-        }
+
+            console.log("❌ Origin blocked");
+            return callback(new Error(`Origin '${origin}' not allowed`));
+        },
+        credentials: true
     })
 );
 
